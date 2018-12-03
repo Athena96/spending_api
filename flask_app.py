@@ -42,15 +42,24 @@ def get_all_purchases(month, year, category):
         cursor.execute("SELECT * FROM spending where spending.date >= '{0}' and spending.date <= '{1}'".format(begin_date, end_date))
     else:
         cursor.execute("SELECT * FROM spending where spending.date >= '{0}' and spending.date <= '{1}' and spending.category = '{2}'".format(begin_date, end_date, category))
-    rows = cursor.fetchall()
+    #rows = cursor.fetchall()
+    data = []
 
-    # rows = spending_db.get_purchases()
+    for purchase_id, item, price, category, date, note in cursor:
+        contents = {}
+        contents["purchase_id"] = purchase_id
+        contents["item"] = item
+        contents["price"] = price
+        contents["category"] = category
+        contents["date"] = date
+        contents["note"] = note
+        data.append(contents)
 
     # close
     db_conn.close()
 
     # send data
-    return jsonify(rows)
+    return jsonify(data)
 
 # Update - PUT
 # @app.route('/<string:oldTicker>/<string:oldDate>/<string:ticker>/<string:openPrice>/<string:closePrice>/<string:highPrice>/<string:lowPrice>/<string:volume>/<string:date>', methods=['PUT'])
