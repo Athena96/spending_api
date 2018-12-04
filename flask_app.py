@@ -42,9 +42,8 @@ def get_all_purchases(month, year, category):
         cursor.execute("SELECT * FROM spending where spending.date >= '{0}' and spending.date <= '{1}'".format(begin_date, end_date))
     else:
         cursor.execute("SELECT * FROM spending where spending.date >= '{0}' and spending.date <= '{1}' and spending.category = '{2}'".format(begin_date, end_date, category))
-    #rows = cursor.fetchall()
-    data = []
 
+    data = []
     for purchase_id, item, price, category, date, note in cursor:
         contents = {}
         contents["purchase_id"] = purchase_id
@@ -60,6 +59,30 @@ def get_all_purchases(month, year, category):
 
     # send data
     return jsonify(data)
+
+@app.route('/<string:item>/<string:price>/<string:category>/<string:date>/<string:note>', methods=['POST'])
+def add_purchase(item, price, category, date, note):
+    print("add_purchase()")
+    print((item, price, category, date, note))
+
+    # open
+    db_conn = sqlite3.connect(DATABASE)
+    cursor = db_conn.cursor()
+
+    # add purchase
+    # TODO check if it exists?
+    # TODO check values are valid
+    cursor.execute(
+    """INSERT INTO spending (item, price, category, date, note)
+    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}')""".format(item,
+    price, category, date, note))
+    db_conn.commit()
+
+    # close
+    db_conn.close()
+
+    return jsonify({'result': 'successfuly added purchase!'})
+
 
 # Update - PUT
 # @app.route('/<string:oldTicker>/<string:oldDate>/<string:ticker>/<string:openPrice>/<string:closePrice>/<string:highPrice>/<string:lowPrice>/<string:volume>/<string:date>', methods=['PUT'])
@@ -129,4 +152,3 @@ def get_all_purchases(month, year, category):
 #     # mariadb_connection.commit()
 #
 #     return jsonify({'result': 'deleted'})
-
