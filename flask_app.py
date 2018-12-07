@@ -72,10 +72,17 @@ def add_purchase(item, price, category, date, note):
     # add purchase
     # TODO check if it exists?
     # TODO check values are valid
-    cursor.execute(
-    """INSERT INTO spending (item, price, category, date, note)
-    VALUES ('{0}', '{1}', '{2}', '{3}', '{4}')""".format(item,
-    price, category, date, note))
+    if note == "--":
+        cursor.execute(
+        """INSERT INTO spending (item, price, category, date, note)
+        VALUES ('{0}', '{1}', '{2}', '{3}', NULL)""".format(item,
+        price, category, date, note))
+    else:
+        cursor.execute(
+        """INSERT INTO spending (item, price, category, date, note)
+        VALUES ('{0}', '{1}', '{2}', '{3}', '{4}')""".format(item,
+        price, category, date, note))
+
     db_conn.commit()
 
     # close
@@ -83,6 +90,38 @@ def add_purchase(item, price, category, date, note):
 
     return jsonify({'result': 'successfuly added purchase!'})
 
+@app.route('/<string:purchase_id>', methods=['DELETE'])
+def delete_purchase(purchase_id):
+    print("delete_purchase(): ", purchase_id)
+    # open
+    db_conn = sqlite3.connect(DATABASE)
+    cursor = db_conn.cursor()
+
+    cursor.execute("DELETE FROM spending WHERE spending.purchase_id = {0};".format(int(purchase_id)))
+    db_conn.commit()
+
+    # close
+    db_conn.close()
+    return jsonify({'result': 'successfuly deleted purchase!'})
+
+
+    #     '''
+#     A function that handles our DELETE API Endpoint.
+#     More specificaly, the function is used to delete a tuple in our database.
+#
+#     - Parameters:
+#     - cid: the cid for the tuple to be deleted
+#
+#     return: status msg
+#     '''
+#     print("deleteRecord()")
+#
+#     # query the DB
+#     cursor.execute("DELETE FROM StockData WHERE ticker = '{0}' AND date = DATE '{1}';".format(ticker, date))
+#
+#     # mariadb_connection.commit()
+#
+#     return jsonify({'result': 'deleted'})
 
 # Update - PUT
 # @app.route('/<string:oldTicker>/<string:oldDate>/<string:ticker>/<string:openPrice>/<string:closePrice>/<string:highPrice>/<string:lowPrice>/<string:volume>/<string:date>', methods=['PUT'])
