@@ -12,20 +12,45 @@ class Purchase:
         self.note = note
 
 
-    # def add_purchase(self, purchase):
-    #     self.cursor.execute(
-    #         """INSERT INTO spending (item, price, category, date, note)
-    #         VALUES ('{0}', '{1}', '{2}', '{3}', '{4}')""".format(purchase.item,
-    #         purchase.price, purchase.category, purchase.date, purchase.note))
-    #     self.connection.commit()
-
 # declare our Flask app
 app = Flask(__name__)
 
 # setup DB
 DATABASE = '/home/inherentVice/spending_log.db'
 
-@app.route('/<string:month>/<string:year>/<string:category>')
+@app.route('/<string:year>', methods=['GET'])
+def get_all_purchases_for_year(year):
+    print("get_all_purchases()")
+    print(year)
+
+    # open
+    db_conn = sqlite3.connect(DATABASE)
+    cursor = db_conn.cursor()
+
+    # query
+    begin_date = "{0}-01-01 00:00:00".format(year)
+    end_date = "{0}-12-31 00:00:00".format(year)
+
+    cursor.execute("SELECT * FROM spending where spending.date >= '{0}' and spending.date <= '{1}'".format(begin_date, end_date))
+
+    data = []
+    for purchase_id, item, price, category, date, note in cursor:
+        contents = {}
+        contents["purchase_id"] = purchase_id
+        contents["item"] = item
+        contents["price"] = price
+        contents["category"] = category
+        contents["date"] = date
+        contents["note"] = note
+        data.append(contents)
+
+    # close
+    db_conn.close()
+
+    # send data
+    return jsonify(data)
+
+@app.route('/<string:month>/<string:year>/<string:category>', methods=['GET'])
 def get_all_purchases(month, year, category):
     print("get_all_purchases()")
     print((month, year, category))
@@ -160,11 +185,9 @@ def get_spending_report(month, year):
     # send data
     return jsonify(categories)
 
-@app.route('/<string:budget>', methods=['GET'])
-def get_budget(budget):
+@app.route('/budget', methods=['GET'])
+def get_budget():
     print("get_budget()")
-    if budget != "budget":
-        return jsonify({'result': 'bad budget request'})
 
     # open
     db_conn = sqlite3.connect(DATABASE)
