@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 import sqlite3
-
+from db_comms import DBCommms
 
 class Purchase:
 
@@ -17,6 +17,7 @@ app = Flask(__name__)
 
 # setup DB
 DATABASE = '/home/inherentVice/spending_log.db'
+#db_comm = DBCommms(DATABASE)
 
 @app.route('/<string:year>', methods=['GET'])
 def get_all_purchases_for_year(year):
@@ -46,6 +47,9 @@ def get_all_purchases_for_year(year):
 
     # close
     db_conn.close()
+
+    # FUTURE
+    #result = db_comm.get_purchases(year=2018)
 
     # send data
     return jsonify(data)
