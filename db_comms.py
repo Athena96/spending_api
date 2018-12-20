@@ -18,8 +18,8 @@ class DBCommms:
         self.cursor = self.db_conn.cursor()
 
     def update_purchase(self, purchase_id, item, price, category, date, note):
-        print("update_purchase()")
-        print((purchase_id, item, price, category, date, note))
+        print(self.__class__.__name__)
+        print("update_purchase({}, {}, {}, {}, {}, {})", purchase_id, item, price, category, date, note)
 
         self.cursor.execute(
         """UPDATE spending SET item = '{0}', price = {1}, category = '{2}', date = '{3}', note = '{4}'
@@ -31,8 +31,8 @@ class DBCommms:
         return jsonify({'result': 'successfuly updated purchase!'})
 
     def delete_purchase(self, purchase_id):
-        print("delete_purchase(): ")
-        print(purchase_id)
+        print(self.__class__.__name__)
+        print("delete_purchase({})", purchase_id)
 
         self.cursor.execute("DELETE FROM spending WHERE spending.purchase_id = {0};".format(int(purchase_id)))
         self.db_conn.commit()
@@ -41,19 +41,14 @@ class DBCommms:
 
 
     def add_purchase(self, item, price, category, date, note):
-        print("add_purchase()")
-        print((item, price, category, date, note))
+        print(self.__class__.__name__)
+        print("add_purchase({}, {}, {}, {}, {})", item, price, category, date, note)
 
         # add purchase
-        if note == "--":
-            self.cursor.execute(
+        note = "NULL" if note == "--" else "'{0}'".format(note)
+        self.cursor.execute(
             """INSERT INTO spending (item, price, category, date, note)
-            VALUES ('{0}', '{1}', '{2}', '{3}', NULL)""".format(item,
-            price, category, date, note))
-        else:
-            self.cursor.execute(
-            """INSERT INTO spending (item, price, category, date, note)
-            VALUES ('{0}', '{1}', '{2}', '{3}', '{4}')""".format(item,
+            VALUES ('{0}', '{1}', '{2}', '{3}', {4})""".format(item,
             price, category, date, note))
 
         self.db_conn.commit()
@@ -61,7 +56,8 @@ class DBCommms:
         return jsonify({'result': 'successfuly added purchase!'})
 
     def get_purchases(self, month=None,year=None,category="ALL"):
-        print("DBCommms : get_purchases({},{},{})".format(month, year, category))
+        print(self.__class__.__name__)
+        print("get_purchases({},{},{})".format(month, year, category))
 
         if month is None:
             begin_date = "{0}-01-01 00:00:00".format(year)
@@ -89,9 +85,9 @@ class DBCommms:
         # send data
         return jsonify(data)
 
-    def get_spending_report(self,month, year):
-        print("get_spending_report()")
-        print((month, year))
+    def get_spending_report(self, month, year):
+        print(self.__class__.__name__)
+        print("get_spending_report({}, {})".format(month, year))
 
         # query
         begin_date = "{0}-{1}-01 00:00:00".format(year, month)
@@ -101,7 +97,6 @@ class DBCommms:
         categories = {}
         self.cursor.execute("SELECT distinct(spending.category) from spending")
         for category in self.cursor:
-            print("->: ", category[0])
             categories[category[0]] = 0.0
 
         # get month and year purchase data
@@ -115,6 +110,7 @@ class DBCommms:
         return jsonify(categories)
 
     def get_budget(self):
+        print(self.__class__.__name__)
         print("get_budget()")
 
         # query

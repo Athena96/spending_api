@@ -42,7 +42,7 @@ def update_purchase(purchase_id, item, price, category, date, note):
 @app.route('/<string:purchase_id>', methods=['DELETE'])
 def delete_purchase(purchase_id):
     print("delete_purchase()")
-    print((purchase_id))
+    print(purchase_id)
     result = db_comm.delete_purchase(purchase_id)
     return result
 
@@ -50,7 +50,7 @@ def delete_purchase(purchase_id):
 @app.route('/<string:month>/<string:year>', methods=['GET'])
 def get_spending_report(month, year):
     print("get_spending_report")
-    print(get_spending_report)
+    print((month, year))
     result = db_comm.get_spending_report(month, year)
     return result
 
