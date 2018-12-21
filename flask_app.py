@@ -9,12 +9,14 @@ app = Flask(__name__)
 DATABASE = '/home/inherentVice/spending_log.db'
 db_comm = DBCommms(DATABASE)
 
+
+# Purchases Table Endpoints
+
 @app.route('/<string:year>', methods=['GET'])
 def get_all_purchases_for_year(year):
     print("get_all_purchases_for_year()")
     result = db_comm.get_purchases(year=year)
     return result
-
 
 @app.route('/<string:month>/<string:year>/<string:category>', methods=['GET'])
 def get_all_purchases(month, year, category):
@@ -55,9 +57,34 @@ def get_spending_report(month, year):
     return result
 
 
+# Budget Table Endpoints
+
 @app.route('/budget', methods=['GET'])
 def get_budget():
     print("get_budget()")
     result = db_comm.get_budget()
+    return result
+
+@app.route('/budget/<string:category>/<string:amount>/<string:amount_frequency>', methods=['POST'])
+def add_budget_category(category, amount, amount_frequency):
+    print("add_budget_category()")
+    print((category, amount, amount_frequency))
+    result = db_comm.add_budget_category(category, amount, amount_frequency)
+    return result
+
+
+@app.route('/budget/<string:category_id>/<string:category>/<string:amount>/<string:amount_frequency>', methods=['PUT'])
+def update_budget_category(category_id, category, amount, amount_frequency):
+    print("update_budget_category()")
+    print((category_id, category, amount, amount_frequency))
+    result = db_comm.update_budget_category(category_id, category, amount, amount_frequency)
+    return result
+
+
+@app.route('/budget/<string:category_id>', methods=['DELETE'])
+def delete_budget_category(category_id):
+    print("delete_budget_category()")
+    print(category_id)
+    result = db_comm.delete_budget_category(category_id)
     return result
 

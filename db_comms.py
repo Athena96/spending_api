@@ -48,7 +48,7 @@ class DBCommms:
         note = "NULL" if note == "--" else "'{0}'".format(note)
         self.cursor.execute(
             """INSERT INTO spending (item, price, category, date, note)
-            VALUES ('{0}', '{1}', '{2}', '{3}', {4})""".format(item,
+            VALUES ('{0}', {1}, '{2}', '{3}', {4})""".format(item,
             price, category, date, note))
 
         self.db_conn.commit()
@@ -129,6 +129,41 @@ class DBCommms:
         # send data
         return jsonify(data)
 
+    def add_budget_category(self, category, amount, amount_frequency):
+        print(self.__class__.__name__)
+        print("add_budget_category({}, {}, {}, )", category, amount, amount_frequency)
+
+        # add budget category
+        self.cursor.execute(
+            """INSERT INTO budget (category, amount, amount_frequency)
+            VALUES ('{0}', {1}, '{2}')""".format(category, amount, amount_frequency))
+
+        self.db_conn.commit()
+
+        return jsonify({'result': 'successfuly added budget category!'})
+
+    def update_budget_category(self, category_id, category, amount, amount_frequency):
+        print(self.__class__.__name__)
+        print("update_budget_category({}, {}, {}, {})", category_id, category, amount, amount_frequency)
+
+        self.cursor.execute(
+        """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}'
+        WHERE budget.category_id = {3}""".format(category,
+        amount, amount_frequency, category_id))
+
+        self.db_conn.commit()
+
+        return jsonify({'result': 'successfuly updated budget category!'})
+
+    def delete_budget_category(self, category_id):
+        print(self.__class__.__name__)
+        print("delete_budget_category({})", category_id)
+
+        # TODO is int() necessary?
+        self.cursor.execute("DELETE FROM budget WHERE budget.category_id = {0};".format(int(category_id)))
+        self.db_conn.commit()
+
+        return jsonify({'result': 'successfuly deleted budget category!'})
 
     def __exit__(self):
         print("in __exit__")
