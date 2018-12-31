@@ -56,7 +56,6 @@ def get_spending_report(month, year):
     result = db_comm.get_spending_report(month, year)
     return result
 
-
 # Budget Table Endpoints
 
 @app.route('/budget', methods=['GET'])
