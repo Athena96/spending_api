@@ -55,16 +55,45 @@ class DBCommms:
 
         return jsonify({'result': 'successfuly added purchase!'})
 
+    def get_list_purchases(self, month=None, year=None, category="ALL"):
+        print(self.__class__.__name__)
+        print("get_list_purchases({},{},{})".format(month, year, category))
+
+        if month is None:
+            begin_date = "{0}-01-01 00:00:00".format(year)
+            end_date = "{0}-12-31 23:59:59".format(year)
+        else:
+            begin_date = "{0}-{1}-01 00:00:00".format(year, month)
+            end_date = "{0}-{1}-31 23:59:59".format(year, month)
+
+        if category == "ALL":
+            print("IN ALL")
+            self.cursor.execute("SELECT * FROM spending where spending.date >= '{0}' and spending.date <= '{1}'".format(begin_date, end_date))
+        else:
+            self.cursor.execute("SELECT * FROM spending where spending.date >= '{0}' and spending.date <= '{1}' and spending.category = '{2}'".format(begin_date, end_date, category))
+
+        data = []
+        for purchase_id, item, price, category, date, note in self.cursor:
+            st = '<li> <b>{}</b> -- <b>${}</b> -- <u>{}</u> -- {} -- <i>{}</i> </li>'.format(item, price, category, date, note)
+            data.append(st)
+
+        print(len(data))
+        print("\n".join(data))
+
+
+        # send data
+        return data
+
     def get_purchases(self, month=None,year=None,category="ALL"):
         print(self.__class__.__name__)
         print("get_purchases({},{},{})".format(month, year, category))
 
         if month is None:
             begin_date = "{0}-01-01 00:00:00".format(year)
-            end_date = "{0}-12-31 00:00:00".format(year)
+            end_date = "{0}-12-31 23:59:59".format(year)
         else:
             begin_date = "{0}-{1}-01 00:00:00".format(year, month)
-            end_date = "{0}-{1}-31 00:00:00".format(year, month)
+            end_date = "{0}-{1}-31 23:59:59".format(year, month)
 
         if category == "ALL":
             self.cursor.execute("SELECT * FROM spending where spending.date >= '{0}' and spending.date <= '{1}'".format(begin_date, end_date))
@@ -91,7 +120,7 @@ class DBCommms:
 
         # query
         begin_date = "{0}-{1}-01 00:00:00".format(year, month)
-        end_date = "{0}-{1}-31 00:00:00".format(year, month)
+        end_date = "{0}-{1}-31 23:59:59".format(year, month)
 
         # get list of categories
         categories = {}

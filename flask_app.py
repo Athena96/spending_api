@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import sqlite3
 from db_comms import DBCommms
 
@@ -9,6 +9,25 @@ app = Flask(__name__)
 DATABASE = '/home/inherentVice/spending_log.db'
 db_comm = DBCommms(DATABASE)
 
+@app.route("/site/<string:month>/<string:year>/<string:category>", methods=["GET"])
+def adder_page(month, year, category):
+
+    result = db_comm.get_list_purchases(month,year, category)
+
+    out = "\n".join(result)
+
+    rev_val = '''
+        <html>
+            <body>
+                <h2>My Purchases for {0}/{1} in category: {2}</h2>
+                <ul>
+                    {3}
+                </ul>
+            </body>
+        </html>
+    '''.format(month, year, category, out)
+
+    return rev_val
 
 # Purchases Table Endpoints
 
