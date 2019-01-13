@@ -1,6 +1,7 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 import sqlite3
 from db_comms import DBCommms
+
 
 # declare our Flask app
 app = Flask(__name__)
@@ -9,25 +10,48 @@ app = Flask(__name__)
 DATABASE = '/home/inherentVice/spending_log.db'
 db_comm = DBCommms(DATABASE)
 
-@app.route("/site/<string:month>/<string:year>/<string:category>", methods=["GET"])
-def adder_page(month, year, category):
+@app.route("/site/add_purchase", methods=["GET"])
+def add_purchase_page():
+    return render_template('add_purchase.html')
 
-    result = db_comm.get_list_purchases(month,year, category)
+@app.route("/site/purchases/<string:month>/<string:year>/<string:category>", methods=["GET"])
+def purchases_page(month, year, category):
+    month_purchase_tuples = db_comm.get_list_purchases(month, year, category)
 
-    out = "\n".join(result)
+    # total monthly spending
+    spent_in_month = 0.0
+    for p in month_purchase_tuples:
+        spent_in_month += p[2]
 
-    rev_val = '''
-        <html>
-            <body>
-                <h2>My Purchases for {0}/{1} in category: {2}</h2>
-                <ul>
-                    {3}
-                </ul>
-            </body>
-        </html>
-    '''.format(month, year, category, out)
+    # total yearly spending
+    spent_in_year = 0.0
+    year_purchase_tuples = db_comm.get_list_purchases(year=year)
+    for p in year_purchase_tuples:
+        spent_in_year += p[2]
 
-    return rev_val
+    # total monthly limit
+    month_limit = 0.0
+    budget_tuples = db_comm.get_list_budgets()
+    for b in budget_tuples:
+        if b[2] == "month":
+            month_limit += b[1]
+        elif b[2] == "year":
+            month_limit += (b[1] / 12.0)
+        else:
+            month_limit += (b[1] / (4.0 * 12.0))
+
+    month_limit_str = str(round(month_limit, 2))
+
+    # total yearly limit
+    year_limit = month_limit * 12.0
+
+    return render_template('purchases.html', month=month, year=year, category=category,purchases=month_purchase_tuples,spent_in_month=spent_in_month,spent_in_year=spent_in_year,
+        month_limit=month_limit_str,year_limit=year_limit)
+
+@app.route("/site/budgets", methods=["GET"])
+def budgets_page():
+    budget_tuples = db_comm.get_list_budgets()
+    return render_template('budgets.html', budgets=budget_tuples)
 
 # Purchases Table Endpoints
 

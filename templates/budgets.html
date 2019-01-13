@@ -1,0 +1,68 @@
+
+
+
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<head>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+.btn {
+  border: none;
+  background-color: inherit;
+  padding: 14px 28px;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.btn:hover {background: #eee;}
+
+.purchases {color: green;}
+.budgets {color: dodgerblue;}
+.add_purchase {color: purple;}
+
+
+</style>
+</head>
+
+<body>
+    <button class="btn purchases" onclick="location.href='http://inherentvice.pythonanywhere.com/site/purchases/01/2019/ALL'">Purchases</button>
+    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets'">Budgets</button>
+    <button class="btn add_purchase" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_purchase'">Add Purchase</button>
+
+<h2>Budget</h2>
+<table>
+  <tr>
+    <th>Category</th>
+    <th>Amount</th>
+    <th>Amount Frequency</th>
+  </tr>
+  {% for budget in budgets %}
+    <tr>
+        <td>{{ budget[0] }}</td>
+        <td>${{ budget[1] }}</td>
+        <td>{{ budget[2] }}</td>
+    </tr>
+  {% endfor %}
+
+</table>
+
+</body>
+
+

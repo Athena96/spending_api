@@ -21,8 +21,9 @@ class DBCommms:
         print(self.__class__.__name__)
         print("update_purchase({}, {}, {}, {}, {}, {})", purchase_id, item, price, category, date, note)
 
+        note = "NULL" if (note == "--" or note == "NULL" or note == None) else "'{0}'".format(note)
         self.cursor.execute(
-        """UPDATE spending SET item = '{0}', price = {1}, category = '{2}', date = '{3}', note = '{4}'
+        """UPDATE spending SET item = '{0}', price = {1}, category = '{2}', date = '{3}', note = {4}
         WHERE spending.purchase_id = {5}""".format(item,
         price, category, date, note, purchase_id))
 
@@ -45,7 +46,7 @@ class DBCommms:
         print("add_purchase({}, {}, {}, {}, {})", item, price, category, date, note)
 
         # add purchase
-        note = "NULL" if note == "--" else "'{0}'".format(note)
+        note = "NULL" if (note == "--" or note == "NULL" or note == None) else "'{0}'".format(note)
         self.cursor.execute(
             """INSERT INTO spending (item, price, category, date, note)
             VALUES ('{0}', {1}, '{2}', '{3}', {4})""".format(item,
@@ -56,30 +57,43 @@ class DBCommms:
         return jsonify({'result': 'successfuly added purchase!'})
 
     def get_list_purchases(self, month=None, year=None, category="ALL"):
-        print(self.__class__.__name__)
-        print("get_list_purchases({},{},{})".format(month, year, category))
+        base_query = "select * from spending"
 
+        date_query = ""
         if month is None:
-            begin_date = "{0}-01-01 00:00:00".format(year)
-            end_date = "{0}-12-31 23:59:59".format(year)
+            date_query = "spending.date like('{}%')".format(year)
         else:
-            begin_date = "{0}-{1}-01 00:00:00".format(year, month)
-            end_date = "{0}-{1}-31 23:59:59".format(year, month)
+            date_query = "spending.date like('{}-{}-%')".format(year, month)
 
-        if category == "ALL":
-            print("IN ALL")
-            self.cursor.execute("SELECT * FROM spending where spending.date >= '{0}' and spending.date <= '{1}'".format(begin_date, end_date))
-        else:
-            self.cursor.execute("SELECT * FROM spending where spending.date >= '{0}' and spending.date <= '{1}' and spending.category = '{2}'".format(begin_date, end_date, category))
+        category_query = ""
+        if category != "ALL":
+            category_query = "spending.category = '{}'".format(category)
+
+        q = base_query + " where " + date_query + (" and " if category != "ALL" else "") + category_query
+        print(q)
+
+        self.cursor.execute(q)
 
         data = []
         for purchase_id, item, price, category, date, note in self.cursor:
-            st = '<li> <b>{}</b> -- <b>${}</b> -- <u>{}</u> -- {} -- <i>{}</i> </li>'.format(item, price, category, date, note)
-            data.append(st)
+            p = (purchase_id, item, price, category, date, note)
+            data.append(p)
 
-        print(len(data))
-        print("\n".join(data))
+        # send data
+        return data
 
+    def get_list_budgets(self):
+        print(self.__class__.__name__)
+        print("get_list_budgets()")
+
+        # query
+        self.cursor.execute("SELECT * FROM budget")
+
+        # get list of categories
+        data = []
+        for category, amount, amount_frequency, category_id in self.cursor:
+            b = (category, amount, amount_frequency, category_id)
+            data.append(b)
 
         # send data
         return data
@@ -88,20 +102,10 @@ class DBCommms:
         print(self.__class__.__name__)
         print("get_purchases({},{},{})".format(month, year, category))
 
-        if month is None:
-            begin_date = "{0}-01-01 00:00:00".format(year)
-            end_date = "{0}-12-31 23:59:59".format(year)
-        else:
-            begin_date = "{0}-{1}-01 00:00:00".format(year, month)
-            end_date = "{0}-{1}-31 23:59:59".format(year, month)
-
-        if category == "ALL":
-            self.cursor.execute("SELECT * FROM spending where spending.date >= '{0}' and spending.date <= '{1}'".format(begin_date, end_date))
-        else:
-            self.cursor.execute("SELECT * FROM spending where spending.date >= '{0}' and spending.date <= '{1}' and spending.category = '{2}'".format(begin_date, end_date, category))
+        result = self.get_list_purchases(month, year, category)
 
         data = []
-        for purchase_id, item, price, category, date, note in self.cursor:
+        for purchase_id, item, price, category, date, note in result:
             contents = {}
             contents["purchase_id"] = purchase_id
             contents["item"] = item
