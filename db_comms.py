@@ -1,14 +1,8 @@
 from flask import jsonify
 import sqlite3
 
-class Purchase:
-
-    def __init__(self, item, price, category, date, note=None):
-        self.item = item
-        self.price = price
-        self.category = category
-        self.date = date
-        self.note = note
+from models import Purchase
+from models import Budget
 
 class DBCommms:
 
@@ -47,6 +41,7 @@ class DBCommms:
 
         # add purchase
         note = "NULL" if (note == "--" or note == "NULL" or note == None) else "'{0}'".format(note)
+
         self.cursor.execute(
             """INSERT INTO spending (item, price, category, date, note)
             VALUES ('{0}', {1}, '{2}', '{3}', {4})""".format(item,
@@ -76,8 +71,8 @@ class DBCommms:
 
         data = []
         for purchase_id, item, price, category, date, note in self.cursor:
-            p = (purchase_id, item, price, category, date, note)
-            data.append(p)
+            purchase = Purchase(item, price, category, date, note, purchase_id)
+            data.append(purchase)
 
         # send data
         return data
@@ -92,27 +87,42 @@ class DBCommms:
         # get list of categories
         data = []
         for category, amount, amount_frequency, category_id in self.cursor:
-            b = (category, amount, amount_frequency, category_id)
-            data.append(b)
+            budget = Budget(category, amount, amount_frequency, category_id)
+            data.append(budget)
 
         # send data
         return data
 
-    def get_purchases(self, month=None,year=None,category="ALL"):
+    def get_purchase(self, purchase_id):
+        print(self.__class__.__name__)
+        print("get_purchase({})".format(purchase_id))
+        if purchase_id is None:
+            return None
+
+        self.cursor.execute("SELECT * FROM spending where spending.purchase_id = {}".format(purchase_id))
+
+        res = None
+        for purchase_id, item, price, category, date, note in  self.cursor:
+            res = (purchase_id, item, price, category, date, note)
+
+        # send data
+        return res
+
+    def get_purchases(self, month=None, year=None, category="ALL"):
         print(self.__class__.__name__)
         print("get_purchases({},{},{})".format(month, year, category))
 
-        result = self.get_list_purchases(month, year, category)
+        purchases = self.get_list_purchases(month, year, category)
 
         data = []
-        for purchase_id, item, price, category, date, note in result:
+        for purchase in purchases:
             contents = {}
-            contents["purchase_id"] = purchase_id
-            contents["item"] = item
-            contents["price"] = price
-            contents["category"] = category
-            contents["date"] = date
-            contents["note"] = note
+            contents["purchase_id"] = purchase.purchase_id
+            contents["item"] = purchase.item
+            contents["price"] = purchase.price
+            contents["category"] = purchase.category
+            contents["date"] = purchase.date
+            contents["note"] = purchase.note
             data.append(contents)
 
         # send data
@@ -146,21 +156,35 @@ class DBCommms:
         print(self.__class__.__name__)
         print("get_budget()")
 
-        # query
-        self.cursor.execute("SELECT * FROM budget")
+        budgets = self.get_list_budgets()
 
         # get list of categories
         data = []
-        for category, amount, amount_frequency, category_id in self.cursor:
+        for budget in budgets:
             contents = {}
-            contents["category"] = category
-            contents["amount"] = amount
-            contents["amount_frequency"] = amount_frequency
-            contents["category_id"] = category_id
+            contents["category"] = budget.category
+            contents["amount"] = budget.amount
+            contents["amount_frequency"] = budget.amount_frequency
+            contents["category_id"] = budget.budget_id
             data.append(contents)
 
         # send data
         return jsonify(data)
+
+    def get_a_budget(self, budget_id):
+        print(self.__class__.__name__)
+        print("get_a_budget({})".format(budget_id))
+        if budget_id is None:
+            return None
+
+        self.cursor.execute("SELECT * FROM budget where budget.category_id = {}".format(budget_id))
+
+        res = None
+        for category, amount, amount_frequency, category_id in self.cursor:
+            res = (category, amount, amount_frequency, category_id)
+
+        # send data
+        return res
 
     def add_budget_category(self, category, amount, amount_frequency):
         print(self.__class__.__name__)

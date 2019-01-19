@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<head>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+.btn {
+  border: none;
+  background-color: inherit;
+  padding: 14px 28px;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.btnSmall {
+  border: none;
+  background-color: inherit;
+  padding: 9px 28px;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.btn:hover {background: #eee;}
+
+.purchases {color: green;}
+.budgets {color: dodgerblue;}
+.chart {color: gold;}
+
+.add_purchase {color: purple;}
+.add_budget {color: orange;}
+.delete {color: red;}
+
+</style>
+</head>
+
+<body>
+    <button class="btn purchases" onclick="location.href='http://inherentvice.pythonanywhere.com/site/purchases/01/2019/ALL'">Purchases</button>
+    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets/01/2019'">Budgets</button>
+    <button class="btn chart" onclick="location.href='http://inherentvice.pythonanywhere.com/site/chart'">Chart</button>
+    <button class="btn add_purchase" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_purchase'">Add Purchase</button>
+    <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
+
+<h2>Chart for 01/2019 </h2>
+    <img src="chart_test.jpg" />
+
+</body>
+
+
+
+
+

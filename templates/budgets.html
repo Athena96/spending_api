@@ -9,17 +9,22 @@
 table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
-  width: 100%;
 }
 
 td, th {
   border: 1px solid #dddddd;
   text-align: left;
-  padding: 8px;
+
 }
+
 
 tr:nth-child(even) {
   background-color: #dddddd;
+}
+
+table.a {
+  table-layout: auto;
+  width: 600px;
 }
 
 .btn {
@@ -31,37 +36,109 @@ tr:nth-child(even) {
   display: inline-block;
 }
 
+.btnSmall {
+  border: none;
+  background-color: inherit;
+  padding: 9px 28px;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-block;
+}
+
 .btn:hover {background: #eee;}
 
 .purchases {color: green;}
 .budgets {color: dodgerblue;}
 .add_purchase {color: purple;}
-
+.add_budget {color: orange;}
+.chart {color: gold;}
+.delete {color: red;}
 
 </style>
 </head>
 
 <body>
     <button class="btn purchases" onclick="location.href='http://inherentvice.pythonanywhere.com/site/purchases/01/2019/ALL'">Purchases</button>
-    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets'">Budgets</button>
+    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets/01/2019'">Budgets</button>
+    <button class="btn chart" onclick="location.href='http://inherentvice.pythonanywhere.com/site/chart'">Chart</button>
+
     <button class="btn add_purchase" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_purchase'">Add Purchase</button>
+    <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
 
 <h2>Budget</h2>
-<table>
+<h3>Total Spent for {{month}}/{{year}}: ${{spent_in_month}}</h3>
+<h3>Monthly Budget: ${{month_limit}}</h3>
+<h3>Total Spent for 2019: ${{spent_in_year}}</h3>
+<h3>Yearly Budget: ${{year_limit}}</h3>
+<p>
+</p>
+
+<h2>Month Budget Categories</h2>
+<table class="a">
   <tr>
     <th>Category</th>
     <th>Amount</th>
     <th>Amount Frequency</th>
+    <th>Delete?</th>
   </tr>
-  {% for budget in budgets %}
+  {% for budget in month_budgets %}
     <tr>
-        <td>{{ budget[0] }}</td>
-        <td>${{ budget[1] }}</td>
-        <td>{{ budget[2] }}</td>
+        <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p><p>  {{ budget[2] }} -- {{budget[3]}}</p></td>
+        <td>${{ budget[4] }}</td>
+        <td>{{ budget[5] }}</td>
+        <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)">{{ budget[0] }}</button></td>
+
     </tr>
   {% endfor %}
-
 </table>
+<p>
+
+</p>
+<h2>Year Budget Categories</h2>
+<table class="a">
+  <tr>
+    <th>Category</th>
+    <th>Amount</th>
+    <th>Amount Frequency</th>
+    <th>Delete?</th>
+  </tr>
+  {% for budget in year_budgets %}
+    <tr>
+        <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p><p>{{ budget[2] }} -- {{budget[3]}}</p></td>
+        <td>${{ budget[4] }}</td>
+        <td>{{ budget[5] }}</td>
+        <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)">{{ budget[0] }}</button></td>
+
+    </tr>
+  {% endfor %}
+</table>
+
+<script>
+
+function openUpdatePage(budget_id) {
+    var xhr = new XMLHttpRequest();
+    var url = "http://inherentvice.pythonanywhere.com/site/add_budget/" + budget_id;
+    window.open(url);
+}
+
+function deleteBudget(budget_id) {
+
+    var xhr = new XMLHttpRequest();
+    var url = "http://inherentvice.pythonanywhere.com/budget/" + budget_id;
+    xhr.open("DELETE", url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.send(JSON.stringify({
+}));
+xhr.onload = function() {
+  console.log("Deleted Budget Category")
+  console.log(this.responseText);
+  location.reload();
+  alert(this.responseText);
+}
+}
+
+</script>
+
 
 </body>
 

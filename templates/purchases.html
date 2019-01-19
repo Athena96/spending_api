@@ -41,23 +41,37 @@ tr:nth-child(even) {
 
 .purchases {color: green;}
 .budgets {color: dodgerblue;}
+.chart {color: gold;}
+
 .add_purchase {color: purple;}
+.add_budget {color: orange;}
 .delete {color: red;}
+.select {color: black;}
+
 
 </style>
 </head>
 
 <body>
     <button class="btn purchases" onclick="location.href='http://inherentvice.pythonanywhere.com/site/purchases/{{ month }}/{{ year }}/{{ category }}'">Purchases</button>
-    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets'">Budgets</button>
+    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets/01/2019'">Budgets</button>
+    <button class="btn chart" onclick="location.href='http://inherentvice.pythonanywhere.com/site/chart'">Chart</button>
     <button class="btn add_purchase" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_purchase'">Add Purchase</button>
+    <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
 
 <h2>Purchases for {{month}}/{{year}} and category = {{category}}</h2>
 <h3>Total Spent for {{month}}/{{year}}: ${{spent_in_month}}</h3>
 <h3>Monthly Budget: ${{month_limit}}</h3>
 <h3>Total Spent for 2019: ${{spent_in_year}}</h3>
 <h3>Yearly Budget: ${{year_limit}}</h3>
-<table>
+<table >
+    <col width="10">
+    <col width="10">
+    <col width="10">
+    <col width="10">
+    <col width="10">
+    <col width="10">
+
   <tr>
     <th>Item</th>
     <th>Price</th>
@@ -68,39 +82,40 @@ tr:nth-child(even) {
   </tr>
   {% for purchase in purchases %}
     <tr>
-        <td>{{ purchase[1] }}</td>
-        <td>${{ purchase[2] }}</td>
-        <td>{{ purchase[3] }}</td>
-        <td>{{ purchase[4] }}</td>
-        <td>{{ purchase[5] }}</td>
-        <td><button class="btnSmall delete" id="{{purchase[0]}}" onclick="deletePurchase(this.id)">{{ purchase[0] }}</button></td>
+        <td><button class="btnSmall select" id="{{purchase.purchase_id}}" onclick="openUpdatePage(this.id)"><u>{{ purchase.item }}</u></button></td>
+        <td>${{ purchase.price }}</td>
+        <td>{{ purchase.category }}</td>
+        <td>{{ purchase.date }}</td>
+        <td>{{ purchase.note }}</td>
+        <td><button class="btnSmall delete" id="{{purchase.purchase_id}}" onclick="deletePurchase(this.id)">{{ purchase.purchase_id }}</button></td>
     </tr>
   {% endfor %}
 
 </table>
 
 <script>
-function deletePurchase(purchase_id) {
 
+function deletePurchase(purchase_id) {
     var xhr = new XMLHttpRequest();
     var url = "http://inherentvice.pythonanywhere.com/" + purchase_id;
     xhr.open("DELETE", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
-xhr.send(JSON.stringify({
-}));
-xhr.onload = function() {
-  console.log("Deleted")
-  console.log(this.responseText);
-  location.reload();
-  alert(this.responseText);
+    xhr.send(JSON.stringify({
+
+    }));
+    xhr.onload = function() {
+        console.log("Deleted")
+        console.log(this.responseText);
+        location.reload();
+        alert(this.responseText);
+    }
 }
 
-
-
-
+function openUpdatePage(purchase_id) {
+    var xhr = new XMLHttpRequest();
+    var url = "http://inherentvice.pythonanywhere.com/site/add_purchase/" + purchase_id;
+    window.open(url);
 }
-
-
 
 </script>
 

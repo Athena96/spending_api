@@ -32,48 +32,91 @@ tr:nth-child(even) {
 .purchases {color: green;}
 .budgets {color: dodgerblue;}
 .add_purchase {color: purple;}
+.add_budget {color: orange;}
+.chart {color: gold;}
 
 </style>
 </head>
 
 <body>
     <button class="btn purchases" onclick="location.href='http://inherentvice.pythonanywhere.com/site/purchases/01/2019/ALL'">Purchases</button>
-    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets'">Budgets</button>
+    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets/01/2019'">Budgets</button>
+    <button class="btn chart" onclick="location.href='http://inherentvice.pythonanywhere.com/site/chart'">Chart</button>
+
     <button class="btn add_purchase" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_purchase'">Add Purchase</button>
+    <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
 
 <form>
+    {% if purchase != None %}
+item: <input type="text" id="itemTextBoxU" name="item" value="{{purchase[1]}}"><br>
+price: <input type="text" id="priceTextBoxU" name="price" value="{{purchase[2]}}"><br>
+category: <input type="text" id="categoryTextBoxU" name="category" value="{{purchase[3]}}"><br>
+date: <input type="text" id="dateTextBoxU" name="date" value="{{purchase[4]}}"><br>
+note: <input type="text" id="noteTextBoxU" name="note" value="{{purchase[5]}}"><br>
+<button id="{{purchase[0]}}" onclick="updatePurchase(this.id)">Update</button>
+
+{% else %}
 item: <input type="text" id="itemTextBox" name="item" value=""><br>
 price: <input type="text" id="priceTextBox" name="price" value=""><br>
 category: <input type="text" id="categoryTextBox" name="category" value=""><br>
 date: <input type="text" id="dateTextBox" name="date" value="2019-01-11 00:00:00"><br>
 note: <input type="text" id="noteTextBox" name="note" value="--"><br>
-<button onclick="addPurchase()">Try it</button>
+<button onclick="addPurchase()">Insert</button>
+
+{% endif %}
 </form>
 
 <p>Click the "Submit" button to save the purchase.</p>
 
 <script>
 function addPurchase() {
-  var item = document.getElementById("itemTextBox").value;
-  var price = document.getElementById("priceTextBox").value;
-  var category = document.getElementById("categoryTextBox").value;
-  var date = document.getElementById("dateTextBox").value;
-  var note = document.getElementById("noteTextBox").value;
+    var item = document.getElementById("itemTextBox").value;
+    var price = document.getElementById("priceTextBox").value;
+    var category = document.getElementById("categoryTextBox").value;
+    var date = document.getElementById("dateTextBox").value;
+    var note = document.getElementById("noteTextBox").value;
 
-  var xhr = new XMLHttpRequest();
-  var url = "http://inherentvice.pythonanywhere.com/" + item + "/" + price + "/" + category + "/" + date + "/" + note;
-  alert(url);
+    var xhr = new XMLHttpRequest();
+    var url_tmp = "http://inherentvice.pythonanywhere.com/" + item + "/" + price + "/" + category + "/" + date + "/" + note;
+    var url = url_tmp.replace(" ", "%20");
+
+    alert("Inserted: " + url);
     xhr.open("POST", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
-xhr.send(JSON.stringify({
-}));
-xhr.onload = function() {
-  console.log("Added Purchase")
-  console.log(this.responseText);
-  location.reload();
-  alert(this.responseText);
+    xhr.send(JSON.stringify({
+    }));
+    xhr.onload = function() {
+        console.log("Added Purchase")
+        console.log(this.responseText);
+        location.reload();
+        alert(this.responseText);
+    }
 }
 
+function updatePurchase(purchase_id) {
+    var item = document.getElementById("itemTextBoxU").value;
+    var price = document.getElementById("priceTextBoxU").value;
+    var category = document.getElementById("categoryTextBoxU").value;
+    var date = document.getElementById("dateTextBoxU").value;
+    var note = document.getElementById("noteTextBoxU").value;
+
+    var xhr = new XMLHttpRequest();
+    var url_tmp = "http://inherentvice.pythonanywhere.com/" + purchase_id + "/" + item + "/"  + price+ "/" + category + "/" + date + "/" + note;
+    var url = url_tmp.replace(" ", "%20");
+
+    alert("Updated: " + url);
+    xhr.open("PUT", url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify({
+
+    }));
+
+    xhr.onload = function() {
+        console.log("Updated Purchase")
+        console.log(this.responseText);
+        location.reload();
+        alert(this.responseText);
+    }
 }
 </script>
 
