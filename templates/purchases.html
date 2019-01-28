@@ -6,7 +6,6 @@
 table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
-  width: 100%;
 }
 
 td, th {
@@ -17,6 +16,11 @@ td, th {
 
 tr:nth-child(even) {
   background-color: #dddddd;
+}
+
+table.a {
+  table-layout: auto;
+  width: 800px;
 }
 
 .btn {
@@ -53,8 +57,8 @@ tr:nth-child(even) {
 </head>
 
 <body>
-    <button class="btn purchases" onclick="location.href='http://inherentvice.pythonanywhere.com/site/purchases/{{ month }}/{{ year }}/{{ category }}'">Purchases</button>
-    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets/01/2019'">Budgets</button>
+    <button class="btn purchases" onclick="location.href='http://inherentvice.pythonanywhere.com/site/purchases'">Purchases</button>
+    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets'">Budgets</button>
     <button class="btn chart" onclick="location.href='http://inherentvice.pythonanywhere.com/site/chart'">Chart</button>
     <button class="btn add_purchase" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_purchase'">Add Purchase</button>
     <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
@@ -64,13 +68,7 @@ tr:nth-child(even) {
 <h3>Monthly Budget: ${{month_limit}}</h3>
 <h3>Total Spent for 2019: ${{spent_in_year}}</h3>
 <h3>Yearly Budget: ${{year_limit}}</h3>
-<table >
-    <col width="10">
-    <col width="10">
-    <col width="10">
-    <col width="10">
-    <col width="10">
-    <col width="10">
+<table class="a">
 
   <tr>
     <th>Item</th>

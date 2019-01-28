@@ -24,7 +24,7 @@ tr:nth-child(even) {
 
 table.a {
   table-layout: auto;
-  width: 600px;
+  width: 800px;
 }
 
 .btn {
@@ -58,10 +58,9 @@ table.a {
 </head>
 
 <body>
-    <button class="btn purchases" onclick="location.href='http://inherentvice.pythonanywhere.com/site/purchases/01/2019/ALL'">Purchases</button>
-    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets/01/2019'">Budgets</button>
+    <button class="btn purchases" onclick="location.href='http://inherentvice.pythonanywhere.com/site/purchases'">Purchases</button>
+    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets'">Budgets</button>
     <button class="btn chart" onclick="location.href='http://inherentvice.pythonanywhere.com/site/chart'">Chart</button>
-
     <button class="btn add_purchase" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_purchase'">Add Purchase</button>
     <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
 
@@ -83,7 +82,7 @@ table.a {
   </tr>
   {% for budget in month_budgets %}
     <tr>
-        <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p><p>  {{ budget[2] }} -- {{budget[3]}}</p></td>
+        <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p><p>  {{ budget[2] }} -- {{budget[3]}} -- ${{ budget[6]}}</p></td>
         <td>${{ budget[4] }}</td>
         <td>{{ budget[5] }}</td>
         <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)">{{ budget[0] }}</button></td>
@@ -104,7 +103,7 @@ table.a {
   </tr>
   {% for budget in year_budgets %}
     <tr>
-        <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p><p>{{ budget[2] }} -- {{budget[3]}}</p></td>
+        <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p><p>{{ budget[2] }} -- {{budget[3]}} -- ${{ budget[6]}}</p></td>
         <td>${{ budget[4] }}</td>
         <td>{{ budget[5] }}</td>
         <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)">{{ budget[0] }}</button></td>

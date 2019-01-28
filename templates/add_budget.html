@@ -39,10 +39,9 @@ tr:nth-child(even) {
 </head>
 
 <body>
-    <button class="btn purchases" onclick="location.href='http://inherentvice.pythonanywhere.com/site/purchases/01/2019/ALL'">Purchases</button>
-    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets/01/2019'">Budgets</button>
+    <button class="btn purchases" onclick="location.href='http://inherentvice.pythonanywhere.com/site/purchases'">Purchases</button>
+    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets'">Budgets</button>
     <button class="btn chart" onclick="location.href='http://inherentvice.pythonanywhere.com/site/chart'">Chart</button>
-
     <button class="btn add_purchase" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_purchase'">Add Purchase</button>
     <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
 
@@ -71,10 +70,22 @@ function addBudget() {
   var amountFrequency = document.getElementById("amountFrequencyTextBox").value;
 
   var xhr = new XMLHttpRequest();
-  var url = "http://inherentvice.pythonanywhere.com/budget/" + category + "/" + amount + "/" + amountFrequency;
-    alert(url);
+  var url_tmp = "http://inherentvice.pythonanywhere.com/budget/" + category + "/" + amount + "/" + amountFrequency;
+   var url = url_tmp.replace(" ", "%20");
+
+   var usrNmPwd;
+    var entry = prompt("Please enter the password:", "here");
+
+    if (entry == null || entry == "") {
+        usrNmPwd = "User cancelled the prompt.";
+    } else {
+        usrNmPwd = entry;
+    }
+    xhr.withCredentials = true;
     xhr.open("POST", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader("Authorization", "Basic " + btoa(usrNmPwd));
+
 xhr.send(JSON.stringify({
 }));
 xhr.onload = function() {
@@ -92,13 +103,22 @@ function updateBudget(budget_id) {
   var amountFrequency = document.getElementById("amountFrequencyTextBoxU").value;
 
     var xhr = new XMLHttpRequest();
-
     var url_w_spc = "http://inherentvice.pythonanywhere.com/budget/" + budget_id + "/" + category + "/"  + amount+ "/" + amountFrequency;
     var url = url_w_spc.replace(" ", "%20");
 
-    alert("Updated: " + url);
+    var usrNmPwd;
+    var entry = prompt("Please enter the password:", "here");
+
+    if (entry == null || entry == "") {
+        usrNmPwd = "User cancelled the prompt.";
+    } else {
+        usrNmPwd = entry;
+    }
+    xhr.withCredentials = true;
     xhr.open("PUT", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader("Authorization", "Basic " + btoa(usrNmPwd));
+
     xhr.send(JSON.stringify({
 
     }));
@@ -110,6 +130,8 @@ function updateBudget(budget_id) {
         alert(this.responseText);
     }
 }
+
+
 </script>
 
 </body>

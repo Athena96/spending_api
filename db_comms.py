@@ -1,8 +1,8 @@
 from flask import jsonify
-import sqlite3
-
 from models import Purchase
 from models import Budget
+
+import sqlite3
 
 class DBCommms:
 
@@ -12,8 +12,8 @@ class DBCommms:
         self.cursor = self.db_conn.cursor()
 
     def update_purchase(self, purchase_id, item, price, category, date, note):
-        print(self.__class__.__name__)
-        print("update_purchase({}, {}, {}, {}, {}, {})", purchase_id, item, price, category, date, note)
+        print("     " + self.__class__.__name__)
+        print("     " + "update_purchase({}, {}, {}, {}, {}, {})", purchase_id, item, price, category, date, note)
 
         note = "NULL" if (note == "--" or note == "NULL" or note == None) else "'{0}'".format(note)
         self.cursor.execute(
@@ -26,8 +26,8 @@ class DBCommms:
         return jsonify({'result': 'successfuly updated purchase!'})
 
     def delete_purchase(self, purchase_id):
-        print(self.__class__.__name__)
-        print("delete_purchase({})", purchase_id)
+        print("     " + self.__class__.__name__)
+        print("     " + "delete_purchase({})", purchase_id)
 
         self.cursor.execute("DELETE FROM spending WHERE spending.purchase_id = {0};".format(int(purchase_id)))
         self.db_conn.commit()
@@ -36,8 +36,8 @@ class DBCommms:
 
 
     def add_purchase(self, item, price, category, date, note):
-        print(self.__class__.__name__)
-        print("add_purchase({}, {}, {}, {}, {})", item, price, category, date, note)
+        print("     " + self.__class__.__name__)
+        print("     " + "add_purchase({}, {}, {}, {}, {})", item, price, category, date, note)
 
         # add purchase
         note = "NULL" if (note == "--" or note == "NULL" or note == None) else "'{0}'".format(note)
@@ -52,6 +52,8 @@ class DBCommms:
         return jsonify({'result': 'successfuly added purchase!'})
 
     def get_list_purchases(self, month=None, year=None, category="ALL"):
+        print("     " + self.__class__.__name__)
+        print("     " + "get_list_purchases({},{},{})".format(month, year, category))
         base_query = "select * from spending"
 
         date_query = ""
@@ -65,7 +67,7 @@ class DBCommms:
             category_query = "spending.category = '{}'".format(category)
 
         q = base_query + " where " + date_query + (" and " if category != "ALL" else "") + category_query
-        print(q)
+        print("     " + q)
 
         self.cursor.execute(q)
 
@@ -78,8 +80,8 @@ class DBCommms:
         return data
 
     def get_list_budgets(self):
-        print(self.__class__.__name__)
-        print("get_list_budgets()")
+        print("     " + self.__class__.__name__)
+        print("     " + "get_list_budgets()")
 
         # query
         self.cursor.execute("SELECT * FROM budget")
@@ -94,8 +96,8 @@ class DBCommms:
         return data
 
     def get_purchase(self, purchase_id):
-        print(self.__class__.__name__)
-        print("get_purchase({})".format(purchase_id))
+        print("     " + self.__class__.__name__)
+        print("     " + "get_purchase({})".format(purchase_id))
         if purchase_id is None:
             return None
 
@@ -109,8 +111,8 @@ class DBCommms:
         return res
 
     def get_purchases(self, month=None, year=None, category="ALL"):
-        print(self.__class__.__name__)
-        print("get_purchases({},{},{})".format(month, year, category))
+        print("     " + self.__class__.__name__)
+        print("     " + "get_purchases({},{},{})".format(month, year, category))
 
         purchases = self.get_list_purchases(month, year, category)
 
@@ -128,33 +130,9 @@ class DBCommms:
         # send data
         return jsonify(data)
 
-    def get_spending_report(self, month, year):
-        print(self.__class__.__name__)
-        print("get_spending_report({}, {})".format(month, year))
-
-        # query
-        begin_date = "{0}-{1}-01 00:00:00".format(year, month)
-        end_date = "{0}-{1}-31 23:59:59".format(year, month)
-
-        # get list of categories
-        categories = {}
-        self.cursor.execute("SELECT distinct(spending.category) from spending")
-        for category in self.cursor:
-            categories[category[0]] = 0.0
-
-        # get month and year purchase data
-        self.cursor.execute("SELECT spending.price, spending.category FROM spending where spending.date >= '{0}' and spending.date <= '{1}'".format(begin_date, end_date))
-
-        # aggregate
-        for price, category in self.cursor:
-            categories[category] += float(price)
-
-        # send data
-        return jsonify(categories)
-
     def get_budget(self):
-        print(self.__class__.__name__)
-        print("get_budget()")
+        print("     " + self.__class__.__name__)
+        print("     " + "get_budget()")
 
         budgets = self.get_list_budgets()
 
@@ -172,8 +150,8 @@ class DBCommms:
         return jsonify(data)
 
     def get_a_budget(self, budget_id):
-        print(self.__class__.__name__)
-        print("get_a_budget({})".format(budget_id))
+        print("     " + self.__class__.__name__)
+        print("     " + "get_a_budget({})".format(budget_id))
         if budget_id is None:
             return None
 
@@ -187,8 +165,8 @@ class DBCommms:
         return res
 
     def add_budget_category(self, category, amount, amount_frequency):
-        print(self.__class__.__name__)
-        print("add_budget_category({}, {}, {}, )", category, amount, amount_frequency)
+        print("     " + self.__class__.__name__)
+        print("     " + "add_budget_category({}, {}, {}, )", category, amount, amount_frequency)
 
         # add budget category
         self.cursor.execute(
@@ -200,8 +178,8 @@ class DBCommms:
         return jsonify({'result': 'successfuly added budget category!'})
 
     def update_budget_category(self, category_id, category, amount, amount_frequency):
-        print(self.__class__.__name__)
-        print("update_budget_category({}, {}, {}, {})", category_id, category, amount, amount_frequency)
+        print("     " + self.__class__.__name__)
+        print("     " + "update_budget_category({}, {}, {}, {})", category_id, category, amount, amount_frequency)
 
         self.cursor.execute(
         """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}'
@@ -213,8 +191,8 @@ class DBCommms:
         return jsonify({'result': 'successfuly updated budget category!'})
 
     def delete_budget_category(self, category_id):
-        print(self.__class__.__name__)
-        print("delete_budget_category({})", category_id)
+        print("     " + self.__class__.__name__)
+        print("     " + "delete_budget_category({})", category_id)
 
         # TODO is int() necessary?
         self.cursor.execute("DELETE FROM budget WHERE budget.category_id = {0};".format(int(category_id)))
