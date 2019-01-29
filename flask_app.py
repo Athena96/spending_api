@@ -2,6 +2,11 @@ from flask import Flask, jsonify, request, render_template
 from db_comms import DBCommms
 from datetime import datetime
 import sqlite3
+import os
+
+import matplotlib.pyplot as plt; plt.rcdefaults()
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 # declare our Flask app
@@ -17,12 +22,14 @@ db_comm = DBCommms(DATABASE)
 @app.route("/site/add_purchase", methods=["GET"])
 @app.route("/site/add_purchase/<string:purchase_id>", methods=["GET"])
 def add_purchase_page(purchase_id=None):
+    print("add_purchase_page()")
     purchase = db_comm.get_purchase(purchase_id)
     return render_template('add_purchase.html', purchase=purchase)
 
 @app.route("/site/purchases", methods=["GET"])
 @app.route("/site/purchases/<string:month>/<string:year>/<string:category>", methods=["GET"])
 def purchases_page(month=None, year=None, category="ALL"):
+    print("purchases_page()")
     if month == None and year == None:
         (month,year) = get_current_date()
 
@@ -53,8 +60,115 @@ def purchases_page(month=None, year=None, category="ALL"):
 # website page controllers for charts
 
 @app.route("/site/chart", methods=["GET"])
-def chart_page():
-    return render_template('chart.html')
+@app.route("/site/chart/<string:month>/<string:year>", methods=["GET"])
+def chart_page(month=None, year=None):
+    print("chart_page()")
+    if month == None and year == None:
+        (m,y) = get_current_date()
+        month = m
+        year = y
+
+    # 1. delete everything in '/home/inherentVice/mysite/static/images/'
+    mydir = '/home/inherentVice/mysite/static/images/'
+    filelist = [ f for f in os.listdir(mydir) ]
+    for f in filelist:
+        os.remove(os.path.join(mydir, f))
+
+    # 2. generate new plot image
+
+    #   3.1 get all distinct categories
+    db_comm.cursor.execute(
+    '''
+    select distinct(budget.category)
+    from budget
+    ''')
+    categories = []
+    for c in db_comm.cursor.fetchall():
+        val = c[0].encode('ascii','ignore')
+        categories.append(val.decode('UTF-8'))
+
+    category_spending = {}
+    category_spending["entertainment"] = 140.00
+    category_spending["random"] = 45.00
+    category_spending["home_supplies"] = 6.83
+    category_spending["loans_student"] = 1471.0
+    category_spending["bill_electric"] = 32.00
+    category_spending["bill_internet"] = 50.00
+    category_spending["bill_icloud"] = 2.99
+    category_spending["bill_applemusic"] = 9.99
+    category_spending["bill_cellphone"] = 25.00
+    category_spending["bill_amazonprime"] = 9.29
+    category_spending["bill_gas"] = 32.00
+    category_spending["education"] = 24.00
+    category_spending["grocery"] = 174.00
+    category_spending["gift"] = (128.0/12.0)
+    category_spending["hygiene_supplies"] = 11.40
+    category_spending["rent"] = 604.95
+    category_spending["travel"] = (424.0/12.0)
+    category_spending["electronics_laptop"] = ((2572.33/4.0)/12.0)
+    category_spending["electronics_iphone"] = ((1071.18/4.0)/12.0)
+    category_spending["electronics_headphones"] = ((375.23/4.0)/12.0)
+    category_spending["running_shoes"] = (106.50/12.0)
+    category_spending["investments"] = 1850
+
+    #   3.2 get total spent per category
+    grouped = []
+
+    for category in categories:
+        query = "select sum(spending.price) from spending where spending.date >= '{0}-{1}-01 00:00:00' and spending.date <= '{0}-{1}-31 00:00:00' and spending.category = '{2}'".format(year, month, category)
+        db_comm.cursor.execute(query)
+        spent = db_comm.cursor.fetchone()[0]
+        if spent is None:
+            spent = 0.0
+        grouped.append( (spent,category_spending[category], category) )
+
+    grouped.sort(key=lambda tup: tup[0])
+    category_spending_planned = [g[1] for g in grouped]
+    category_spending_actual = [g[0] for g in grouped]
+    sorted_categories = [g[2] for g in grouped]
+
+    # data to plot
+    n_groups = len(categories)
+
+    # create plot
+    fig, ax = plt.subplots()
+    index = np.arange(n_groups)
+    bar_width = 0.35
+    opacity = 0.8
+
+
+    rects1 = plt.bar(index, category_spending_actual, bar_width, alpha=opacity, color='b', label='Actual')
+
+    rects2 = plt.bar(index + bar_width, category_spending_planned, bar_width,  alpha=opacity, color='g', label='Planned')
+
+    for rect in rects1 + rects2:
+        height = rect.get_height()
+        plt.text(rect.get_x() + rect.get_width()/2.0, height, '$%d ' % int(height), ha='center', va='bottom')
+
+    plt.xlabel('Categories')
+    plt.xticks(rotation=45)
+
+
+    plt.ylabel('Spending')
+    plt.title('Categorical Spending')
+    plt.xticks(index + bar_width, sorted_categories)
+    plt.legend()
+
+    plt.tight_layout()
+    # plt.show()
+
+    # 3. write to '/home/inherentVice/mysite/static/images/'
+    outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_plot.png'.format(year, month)
+    plt.savefig(outputFileName)
+
+    fileExists = False
+
+    while fileExists == False:
+        if os.path.isfile(outputFileName):
+            fileExists = True
+
+    # 4. pass date to html page
+    return render_template('chart.html', year=year, month=month)
 
 
 # website page controllers for budget
@@ -62,6 +176,7 @@ def chart_page():
 @app.route("/site/budgets", methods=["GET"])
 @app.route("/site/budgets/<string:month>/<string:year>", methods=["GET"])
 def budgets_page(month=None, year=None):
+    print("budgets_page()")
     if month == None and year == None:
         (month,year) = get_current_date()
 
@@ -112,6 +227,7 @@ def budgets_page(month=None, year=None):
 @app.route("/site/add_budget", methods=["GET"])
 @app.route("/site/add_budget/<string:budget_id>", methods=["GET"])
 def add_budget_page(budget_id=None):
+    print("add_budget_page()")
     budget = db_comm.get_a_budget(budget_id)
     return render_template('add_budget.html', budget=budget)
 
@@ -120,6 +236,7 @@ def add_budget_page(budget_id=None):
 
 @app.route("/year_income", methods=["GET"])
 def get_income():
+    print("get_income()")
     return jsonify(get_income_data())
 
 # purchase API endpoints
@@ -134,21 +251,18 @@ def get_all_purchases_for_year(month=None, year=None, category="ALL"):
 @app.route('/<string:item>/<string:price>/<string:category>/<string:date>/<string:note>', methods=['POST'])
 def add_purchase(item, price, category, date, note):
     print("add_purchase()")
-    print((item, price, category, date, note))
     result = db_comm.add_purchase(item, price, category, date, note)
     return result
 
 @app.route('/<string:purchase_id>/<string:item>/<string:price>/<string:category>/<string:date>/<string:note>', methods=['PUT'])
 def update_purchase(purchase_id, item, price, category, date, note):
     print("update_purchase()")
-    print((item, price, category, date, note))
     result = db_comm.update_purchase(purchase_id, item, price, category, date, note)
     return result
 
 @app.route('/<string:purchase_id>', methods=['DELETE'])
 def delete_purchase(purchase_id):
     print("delete_purchase()")
-    print(purchase_id)
     result = db_comm.delete_purchase(purchase_id)
     return result
 
@@ -163,7 +277,6 @@ def get_budget():
 @app.route('/budget/<string:category>/<string:amount>/<string:amount_frequency>', methods=['POST'])
 def add_budget_category(category, amount, amount_frequency):
     print("add_budget_category()")
-    print((category, amount, amount_frequency))
     result = db_comm.add_budget_category(category, amount, amount_frequency)
     return result
 
@@ -171,7 +284,6 @@ def add_budget_category(category, amount, amount_frequency):
 @app.route('/budget/<string:category_id>/<string:category>/<string:amount>/<string:amount_frequency>', methods=['PUT'])
 def update_budget_category(category_id, category, amount, amount_frequency):
     print("update_budget_category()")
-    print((category_id, category, amount, amount_frequency))
     result = db_comm.update_budget_category(category_id, category, amount, amount_frequency)
     return result
 
@@ -179,12 +291,12 @@ def update_budget_category(category_id, category, amount, amount_frequency):
 @app.route('/budget/<string:category_id>', methods=['DELETE'])
 def delete_budget_category(category_id):
     print("delete_budget_category()")
-    print(category_id)
     result = db_comm.delete_budget_category(category_id)
     return result
 
 # helpers
 def get_income_data():
+    print("Helper: get_income_data()")
     data = {}
     per_month_school = (280.0 + 211.0)
     total_per_year = (1930.00 * 26.0) + (per_month_school * 12.0)
@@ -193,6 +305,8 @@ def get_income_data():
     return data
 
 def get_current_date():
+    print("Helper: get_current_date()")
+
     year = "{}".format(datetime.now().year)
     curr_month = datetime.now().month
     month = ""

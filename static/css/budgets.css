@@ -1,0 +1,47 @@
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+
+}
+
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+table.a {
+  table-layout: auto;
+  width: 800px;
+}
+
+.btn {
+  border: none;
+  background-color: inherit;
+  padding: 14px 28px;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.btnSmall {
+  border: none;
+  background-color: inherit;
+  padding: 9px 28px;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.btn:hover {background: #eee;}
+
+.purchases {color: green;}
+.budgets {color: dodgerblue;}
+.add_purchase {color: purple;}
+.add_budget {color: orange;}
+.chart {color: gold;}
+.delete {color: red;}
