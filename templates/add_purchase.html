@@ -14,20 +14,26 @@
 
 <form>
     {% if purchase != None %}
-item: <input type="text" id="itemTextBoxU" name="item" value="{{purchase[1]}}"><br>
-price: <input type="text" id="priceTextBoxU" name="price" value="{{purchase[2]}}"><br>
-category: <input type="text" id="categoryTextBoxU" name="category" value="{{purchase[3]}}"><br>
-date: <input type="text" id="dateTextBoxU" name="date" value="{{purchase[4]}}"><br>
-note: <input type="text" id="noteTextBoxU" name="note" value="{{purchase[5]}}"><br>
-<button id="{{purchase[0]}}" onclick="updatePurchase(this.id)">Update</button>
+        item: <input type="text" id="itemTextBoxU" name="item" value="{{purchase.item}}"><br>
+        price: <input type="text" id="priceTextBoxU" name="price" value="{{purchase.price}}"><br>
+        category: <input type="text" id="categoryTextBoxU" name="category" value="{{purchase.category}}"><br>
+        date: <input type="text" id="dateTextBoxU" name="date" value="{{purchase.date}}"><br>
 
-{% else %}
-item: <input type="text" id="itemTextBox" name="item" value=""><br>
-price: <input type="text" id="priceTextBox" name="price" value=""><br>
-category: <input type="text" id="categoryTextBox" name="category" value=""><br>
-date: <input type="text" id="dateTextBox" name="date" value="2019-01-11 00:00:00"><br>
-note: <input type="text" id="noteTextBox" name="note" value="--"><br>
-<button onclick="addPurchase()">Insert</button>
+        {% if purchase.note != None %}
+            note: <input type="text" id="noteTextBoxU" name="note" value="{{purchase.note}}"><br>
+        {% else %}
+            note: <input type="text" id="noteTextBoxU" name="note" value="--"><br>
+        {% endif %}
+
+        <button id="{{purchase.purchase_id}}" onclick="updatePurchase(this.id)">Update</button>
+
+    {% else %}
+        item: <input type="text" id="itemTextBox" name="item" value=""><br>
+        price: <input type="text" id="priceTextBox" name="price" value=""><br>
+        category: <input type="text" id="categoryTextBox" name="category" value=""><br>
+        date: <input type="text" id="dateTextBox" name="date" value="2019-01-11 00:00:00"><br>
+        note: <input type="text" id="noteTextBox" name="note" value="--"><br>
+        <button onclick="addPurchase()">Insert</button>
 
 {% endif %}
 </form>

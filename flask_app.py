@@ -1,9 +1,9 @@
 from flask import Flask, jsonify, request, render_template
 from db_comms import DBCommms
 from datetime import datetime
-import sqlite3
 import os
 
+from matplotlib.pyplot import figure
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import numpy as np
 import matplotlib.pyplot as plt
@@ -79,48 +79,32 @@ def chart_page(month=None, year=None):
     #   3.1 get all distinct categories
     db_comm.cursor.execute(
     '''
-    select distinct(budget.category)
+    select distinct(budget.category), amount, amount_frequency
     from budget
     ''')
     categories = []
-    for c in db_comm.cursor.fetchall():
-        val = c[0].encode('ascii','ignore')
-        categories.append(val.decode('UTF-8'))
-
     category_spending = {}
-    category_spending["entertainment"] = 140.00
-    category_spending["random"] = 45.00
-    category_spending["home_supplies"] = 6.83
-    category_spending["loans_student"] = 1471.0
-    category_spending["bill_electric"] = 32.00
-    category_spending["bill_internet"] = 50.00
-    category_spending["bill_icloud"] = 2.99
-    category_spending["bill_applemusic"] = 9.99
-    category_spending["bill_cellphone"] = 25.00
-    category_spending["bill_amazonprime"] = 9.29
-    category_spending["bill_gas"] = 32.00
-    category_spending["education"] = 24.00
-    category_spending["grocery"] = 174.00
-    category_spending["gift"] = (128.0/12.0)
-    category_spending["hygiene_supplies"] = 11.40
-    category_spending["rent"] = 604.95
-    category_spending["travel"] = (424.0/12.0)
-    category_spending["electronics_laptop"] = ((2572.33/4.0)/12.0)
-    category_spending["electronics_iphone"] = ((1071.18/4.0)/12.0)
-    category_spending["electronics_headphones"] = ((375.23/4.0)/12.0)
-    category_spending["running_shoes"] = (106.50/12.0)
-    category_spending["investments"] = 1850
+    for c in db_comm.cursor.fetchall():
+        cat = c[0].encode('ascii','ignore')
+        if cat == 'investments':
+            continue
+
+        amount = c[1]
+        amount_frequency = c[2].encode('ascii','ignore')
+        categories.append(cat.decode('UTF-8'))
+
+        category_spending[cat.decode('UTF-8')] = (float(amount), amount_frequency.decode('UTF-8'))
 
     #   3.2 get total spent per category
     grouped = []
 
-    for category in categories:
+    for category in category_spending.keys():
         query = "select sum(spending.price) from spending where spending.date >= '{0}-{1}-01 00:00:00' and spending.date <= '{0}-{1}-31 00:00:00' and spending.category = '{2}'".format(year, month, category)
         db_comm.cursor.execute(query)
         spent = db_comm.cursor.fetchone()[0]
         if spent is None:
             spent = 0.0
-        grouped.append( (spent,category_spending[category], category) )
+        grouped.append( (spent,category_spending[category][0], category) )
 
     grouped.sort(key=lambda tup: tup[0])
     category_spending_planned = [g[1] for g in grouped]
@@ -128,12 +112,12 @@ def chart_page(month=None, year=None):
     sorted_categories = [g[2] for g in grouped]
 
     # data to plot
-    n_groups = len(categories)
+    n_groups = len(category_spending)
 
     # create plot
     fig, ax = plt.subplots()
     index = np.arange(n_groups)
-    bar_width = 0.35
+    bar_width = 0.50
     opacity = 0.8
 
 
@@ -146,7 +130,7 @@ def chart_page(month=None, year=None):
         plt.text(rect.get_x() + rect.get_width()/2.0, height, '$%d ' % int(height), ha='center', va='bottom')
 
     plt.xlabel('Categories')
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=90)
 
 
     plt.ylabel('Spending')
@@ -154,12 +138,13 @@ def chart_page(month=None, year=None):
     plt.xticks(index + bar_width, sorted_categories)
     plt.legend()
 
-    plt.tight_layout()
-    # plt.show()
 
     # 3. write to '/home/inherentVice/mysite/static/images/'
     outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_plot.png'.format(year, month)
-    plt.savefig(outputFileName)
+
+    DefaultSize = plt.gcf().get_size_inches()
+    plt.gcf().set_size_inches( (DefaultSize[0]*2.75, DefaultSize[1]*2.75) )
+    plt.savefig(outputFileName, dpi=300)
 
     fileExists = False
 
@@ -191,7 +176,7 @@ def budgets_page(month=None, year=None):
             purchases = filter(lambda purchase: (month ==  "{}{}".format(purchase.date[5], purchase.date[6])), purchases)
 
         spent_so_far = sum([purchase.price for purchase in purchases])
-        spent_so_far_str = "${}".format(round(spent_so_far, 2))
+        spent_so_far_str = "{}".format(round(spent_so_far, 2))
 
         percent = "{}%".format(round(((spent_so_far / budget.amount) * 100),2))
         remaining = round((budget.amount - spent_so_far),2)

@@ -27,17 +27,18 @@
 <table class="a">
   <tr>
     <th>Category</th>
-    <th>Amount</th>
-    <th>Amount Frequency</th>
+    <th>Spent</th>
+    <th>Budgeted</th>
+    <th>Remaining</th>
     <th>Delete?</th>
   </tr>
   {% for budget in month_budgets %}
     <tr>
-        <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p><p>  {{ budget[2] }} -- {{budget[3]}} -- ${{ budget[6]}}</p></td>
+        <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p></td>
+        <td>${{ budget[2] }}</td>
         <td>${{ budget[4] }}</td>
-        <td>{{ budget[5] }}</td>
+        <td>${{ budget[6] }}</td>
         <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)">{{ budget[0] }}</button></td>
-
     </tr>
   {% endfor %}
 </table>
@@ -48,21 +49,21 @@
 <table class="a">
   <tr>
     <th>Category</th>
-    <th>Amount</th>
-    <th>Amount Frequency</th>
+    <th>Spent</th>
+    <th>Budgeted</th>
+    <th>Remaining</th>
     <th>Delete?</th>
   </tr>
   {% for budget in year_budgets %}
     <tr>
-        <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p><p>{{ budget[2] }} -- {{budget[3]}} -- ${{ budget[6]}}</p></td>
+        <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p></td>
+        <td>${{ budget[2] }}</td>
         <td>${{ budget[4] }}</td>
-        <td>{{ budget[5] }}</td>
+        <td>${{ budget[6] }}</td>
         <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)">{{ budget[0] }}</button></td>
-
     </tr>
   {% endfor %}
 </table>
-
 
 <script src="/static/js/budgets.js"></script>
 

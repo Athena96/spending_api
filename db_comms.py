@@ -105,7 +105,7 @@ class DBCommms:
 
         res = None
         for purchase_id, item, price, category, date, note in  self.cursor:
-            res = (purchase_id, item, price, category, date, note)
+            res = Purchase(item, price, category, date, note, purchase_id)
 
         # send data
         return res
