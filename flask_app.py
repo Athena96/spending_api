@@ -82,24 +82,26 @@ def chart_page(month=None, year=None):
     select distinct(budget.category), amount, amount_frequency
     from budget
     ''')
-    categories = []
     category_spending = {}
     for c in db_comm.cursor.fetchall():
         cat = c[0].encode('ascii','ignore')
         if cat == 'investments':
             continue
-
         amount = c[1]
         amount_frequency = c[2].encode('ascii','ignore')
-        categories.append(cat.decode('UTF-8'))
-
         category_spending[cat.decode('UTF-8')] = (float(amount), amount_frequency.decode('UTF-8'))
 
     #   3.2 get total spent per category
     grouped = []
 
     for category in category_spending.keys():
-        query = "select sum(spending.price) from spending where spending.date >= '{0}-{1}-01 00:00:00' and spending.date <= '{0}-{1}-31 00:00:00' and spending.category = '{2}'".format(year, month, category)
+        query = """
+        select sum(spending.price)
+        from spending
+        where spending.date >= '{0}-{1}-01 00:00:00'
+            and spending.date <= '{0}-{1}-31 00:00:00'
+            and spending.category = '{2}'
+            """.format(year, month, category)
         db_comm.cursor.execute(query)
         spent = db_comm.cursor.fetchone()[0]
         if spent is None:
@@ -178,7 +180,16 @@ def budgets_page(month=None, year=None):
         spent_so_far = sum([purchase.price for purchase in purchases])
         spent_so_far_str = "{}".format(round(spent_so_far, 2))
 
-        percent = "{}%".format(round(((spent_so_far / budget.amount) * 100),2))
+        p = (spent_so_far / budget.amount)
+        percent = ""
+        if p >= 0.0 and p < 0.9:
+            percent = "green"
+        elif p >= 0.9 and p < 0.99:
+            percent = "orange"
+        elif p >= 0.99 and p <= 1.00:
+            percent = "red"
+        else:
+            percent = "violet"
         remaining = round((budget.amount - spent_so_far),2)
         entry = (budget.budget_id, budget.category, spent_so_far_str, percent, budget.amount, budget.amount_frequency, remaining)
         budget_data.append(entry)

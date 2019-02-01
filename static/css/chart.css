@@ -10,6 +10,13 @@ td, th {
   padding: 8px;
 }
 
+h2 {
+    font-family:helvetica;
+}
+h3 {
+    font-family:helvetica;
+}
+
 tr:nth-child(even) {
   background-color: #dddddd;
 }

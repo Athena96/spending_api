@@ -15,15 +15,14 @@
     <button class="btn add_purchase" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_purchase'">Add Purchase</button>
     <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
 
-<h2>Budget</h2>
-<h3>Total Spent for {{month}}/{{year}}: ${{spent_in_month}}</h3>
-<h3>Monthly Budget: ${{month_limit}}</h3>
-<h3>Total Spent for 2019: ${{spent_in_year}}</h3>
-<h3>Yearly Budget: ${{year_limit}}</h3>
+<h2>Budgets for {{month}}/{{year}}</h2>
+<h3>Total Spent for {{month}}/{{year}}: ${{spent_in_month}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Monthly Budget: ${{month_limit}}</h3>
+<h3>Total Spent for {{year}}: ${{spent_in_year}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Yearly Budget: ${{year_limit}}</h3>
 <p>
+    <br />
 </p>
 
-<h2>Month Budget Categories</h2>
+<h2>Month Budgets</h2>
 <table class="a">
   <tr>
     <th>Category</th>
@@ -37,15 +36,15 @@
         <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p></td>
         <td>${{ budget[2] }}</td>
         <td>${{ budget[4] }}</td>
-        <td>${{ budget[6] }}</td>
-        <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)">{{ budget[0] }}</button></td>
+        <td><font color="{{budget[3]}}">${{ budget[6] }}</font></td>
+        <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)"><u>{{ budget[0] }}</u></button></td>
     </tr>
   {% endfor %}
 </table>
 <p>
 
 </p>
-<h2>Year Budget Categories</h2>
+<h2>Year Budgets</h2>
 <table class="a">
   <tr>
     <th>Category</th>
@@ -59,8 +58,8 @@
         <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p></td>
         <td>${{ budget[2] }}</td>
         <td>${{ budget[4] }}</td>
-        <td>${{ budget[6] }}</td>
-        <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)">{{ budget[0] }}</button></td>
+        <td>  <font color="{{budget[3]}}">${{ budget[6] }}</font></td>
+        <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)"><u>{{ budget[0] }}</u></button></td>
     </tr>
   {% endfor %}
 </table>

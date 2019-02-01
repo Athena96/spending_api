@@ -1,7 +1,16 @@
 table {
-  font-family: arial, sans-serif;
+  font-family: helvetica;
   border-collapse: collapse;
 }
+
+h2 {
+    font-family:helvetica;
+}
+h3 {
+    font-family:helvetica;
+}
+
+
 
 td, th {
   border: 1px solid #dddddd;

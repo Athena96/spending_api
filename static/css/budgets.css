@@ -1,5 +1,5 @@
 table {
-  font-family: arial, sans-serif;
+  font-family: helvetica;
   border-collapse: collapse;
 }
 
@@ -9,6 +9,12 @@ td, th {
 
 }
 
+h2 {
+    font-family:helvetica;
+}
+h3 {
+    font-family:helvetica;
+}
 
 tr:nth-child(even) {
   background-color: #dddddd;

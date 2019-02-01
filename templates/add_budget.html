@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <head>
-<link rel="stylesheet" type="text/css" href="/static/css/purchases.css">
+<link rel="stylesheet" type="text/css" href="/static/css/add_budget.css">
 </head>
 
 <body>
@@ -14,17 +14,19 @@
 <form>
 
     {% if budget != None %}
-category: <input type="text" id="categoryTextBoxU" name="item" value="{{budget[0]}}"><br>
-amount: <input type="text" id="amountTextBoxU" name="price" value="{{budget[1]}}"><br>
-amount frequency: <input type="text" id="amountFrequencyTextBoxU" name="category" value="{{budget[2]}}"><br>
-<button id="{{budget[3]}}" onclick="updateBudget(this.id)">Update</button>
-{% else %}
-category: <input type="text" id="categoryTextBox" name="item" value=""><br>
-amount: <input type="text" id="amountTextBox" name="price" value=""><br>
-amount frequency: <input type="text" id="amountFrequencyTextBox" name="category" value=""><br>
+        Category: <input type="text" id="categoryTextBoxU" name="item" value="{{budget[0]}}"><br>
+        Amount: <input type="text" id="amountTextBoxU" name="price" value="{{budget[1]}}"><br>
+        Amount Frequency: <input type="text" id="amountFrequencyTextBoxU" name="category" value="{{budget[2]}}"><br>
+        Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
+        <button id="{{budget[3]}}" onclick="updateBudget(this.id)">Update</button>
+    {% else %}
+        Category: <input type="text" id="categoryTextBox" name="item" value=""><br>
+        Amount: <input type="text" id="amountTextBox" name="price" value=""><br>
+        Amount Frequency: <input type="text" id="amountFrequencyTextBox" name="category" value=""><br>
+        Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
+        <button onclick="addBudget()">Insert</button>
+    {% endif %}
 
-<button onclick="addBudget()">Insert</button>
-{% endif %}
 </form>
 
 <p>Click the "Submit" button to save the budget.</p>
