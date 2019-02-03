@@ -82,39 +82,65 @@ def chart_page(month=None, year=None):
     select distinct(budget.category), amount, amount_frequency
     from budget
     ''')
-    category_spending = {}
+
+    # month
+    month_category_spending = {}
+    year_category_spending = {}
     for c in db_comm.cursor.fetchall():
-        cat = c[0].encode('ascii','ignore')
-        if cat == 'investments':
-            continue
-        amount = c[1]
-        amount_frequency = c[2].encode('ascii','ignore')
-        category_spending[cat.decode('UTF-8')] = (float(amount), amount_frequency.decode('UTF-8'))
+        category = (c[0].encode('ascii','ignore')).decode('UTF-8')
+        amount = float(c[1])
+        amount_frequency = (c[2].encode('ascii','ignore')).decode('UTF-8')
 
+        if amount_frequency == "month":
+            month_category_spending[category] = (float(amount), amount_frequency)
+        elif amount_frequency == "year":
+            year_category_spending[category] = (float(amount), amount_frequency)
+
+    print(month_category_spending)
+    print(year_category_spending)
     #   3.2 get total spent per category
-    grouped = []
-
-    for category in category_spending.keys():
+    month_grouped = []
+    for month_category in month_category_spending.keys():
         query = """
         select sum(spending.price)
         from spending
-        where spending.date >= '{0}-{1}-01 00:00:00'
-            and spending.date <= '{0}-{1}-31 00:00:00'
+        where spending.date like('{0}-{1}-%')
             and spending.category = '{2}'
-            """.format(year, month, category)
+            """.format(year, month, month_category)
         db_comm.cursor.execute(query)
         spent = db_comm.cursor.fetchone()[0]
         if spent is None:
             spent = 0.0
-        grouped.append( (spent,category_spending[category][0], category) )
+        month_grouped.append( (spent,month_category_spending[month_category][0], month_category) )
 
-    grouped.sort(key=lambda tup: tup[0])
-    category_spending_planned = [g[1] for g in grouped]
-    category_spending_actual = [g[0] for g in grouped]
-    sorted_categories = [g[2] for g in grouped]
+    month_grouped.sort(key=lambda tup: tup[0])
+    month_category_spending_planned = [g[1] for g in month_grouped]
+    month_category_spending_actual = [g[0] for g in month_grouped]
+    sorted_month_categories = [g[2] for g in month_grouped]
+
+    year_grouped = []
+    for year_category in year_category_spending.keys():
+        query = """
+        select sum(spending.price)
+        from spending
+        where spending.date like('{0}-%')
+            and spending.category = '{1}'
+            """.format(year, year_category)
+        print(query)
+        db_comm.cursor.execute(query)
+        spent = db_comm.cursor.fetchone()[0]
+        if spent is None:
+            spent = 0.0
+        year_grouped.append( (spent,year_category_spending[year_category][0], year_category) )
+
+    year_grouped.sort(key=lambda tup: tup[0])
+    year_category_spending_planned = [g[1] for g in year_grouped]
+    year_category_spending_actual = [g[0] for g in year_grouped]
+    sorted_year_categories = [g[2] for g in year_grouped]
 
     # data to plot
-    n_groups = len(category_spending)
+    n_groups = len(month_category_spending)
+    n_groups_year = len(year_category_spending)
 
     # create plot
     fig, ax = plt.subplots()
@@ -122,10 +148,8 @@ def chart_page(month=None, year=None):
     bar_width = 0.50
     opacity = 0.8
 
-
-    rects1 = plt.bar(index, category_spending_actual, bar_width, alpha=opacity, color='b', label='Actual')
-
-    rects2 = plt.bar(index + bar_width, category_spending_planned, bar_width,  alpha=opacity, color='g', label='Planned')
+    rects1 = plt.bar(index, month_category_spending_actual, bar_width, alpha=opacity, color='b', label='Actual')
+    rects2 = plt.bar(index + bar_width, month_category_spending_planned, bar_width,  alpha=opacity, color='g', label='Planned')
 
     for rect in rects1 + rects2:
         height = rect.get_height()
@@ -136,13 +160,11 @@ def chart_page(month=None, year=None):
 
 
     plt.ylabel('Spending')
-    plt.title('Categorical Spending')
-    plt.xticks(index + bar_width, sorted_categories)
+    plt.title('Month Categorical Spending')
+    plt.xticks(index + bar_width, sorted_month_categories)
     plt.legend()
 
-
-    # 3. write to '/home/inherentVice/mysite/static/images/'
-    outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_plot.png'.format(year, month)
+    outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_month_plot.png'.format(year, month)
 
     DefaultSize = plt.gcf().get_size_inches()
     plt.gcf().set_size_inches( (DefaultSize[0]*2.75, DefaultSize[1]*2.75) )
@@ -154,6 +176,41 @@ def chart_page(month=None, year=None):
         if os.path.isfile(outputFileName):
             fileExists = True
 
+    # create plot
+    fig, ax = plt.subplots()
+    index = np.arange(n_groups_year)
+    bar_width = 0.50
+    opacity = 0.8
+
+    rects1 = plt.bar(index, year_category_spending_actual, bar_width, alpha=opacity, color='b', label='Actual')
+    rects2 = plt.bar(index + bar_width, year_category_spending_planned, bar_width,  alpha=opacity, color='g', label='Planned')
+
+    for rect in rects1 + rects2:
+        height = rect.get_height()
+        plt.text(rect.get_x() + rect.get_width()/2.0, height, '$%d ' % int(height), ha='center', va='bottom')
+
+    plt.xlabel('Categories')
+    plt.xticks(rotation=90)
+
+
+    plt.ylabel('Spending')
+    plt.title('Year Categorical Spending')
+    plt.xticks(index + bar_width, sorted_year_categories)
+    plt.legend()
+
+
+    # 3. write to '/home/inherentVice/mysite/static/images/'
+    outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_year_plot.png'.format(year, month)
+
+    DefaultSize = plt.gcf().get_size_inches()
+    plt.gcf().set_size_inches( (DefaultSize[0]*2.75, DefaultSize[1]*2.75) )
+    plt.savefig(outputFileName, dpi=300)
+
+    fileExists = False
+
+    while fileExists == False:
+        if os.path.isfile(outputFileName):
+            fileExists = True
     # 4. pass date to html page
     return render_template('chart.html', year=year, month=month)
 
