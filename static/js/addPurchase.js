@@ -16,12 +16,12 @@ function addPurchase() {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader("Authorization", "Basic " + btoa(passcode));
 
-    xhr.send(JSON.stringify({}));
+    xhr.send(JSON.stringify({
+
+    }));
     xhr.onload = function() {
-        console.log("Added Purchase");
-        console.log(this.responseText);
-        location.reload();
         alert(this.responseText);
+        location.reload();
     }
 }
 
@@ -31,7 +31,15 @@ function updatePurchase(purchase_id) {
     var category = document.getElementById("categoryTextBoxU").value;
     var date = document.getElementById("dateTextBoxU").value;
     var note = document.getElementById("noteTextBoxU").value;
-    var passcode = document.getElementById("passcodeTextBox").value;
+    var passcode = document.getElementById("passcodeTextBoxU").value;
+
+    var xhr = new XMLHttpRequest();
+    var url_tmp = "http://inherentvice.pythonanywhere.com/" + purchase_id + "/" + item + "/" + price + "/" + category + "/" + date + "/" + note;
+    console.log(url_tmp);
+
+    var url = url_tmp.replace(" ", "%20");
+
+    console.log(url);
 
     xhr.withCredentials = true;
     xhr.open("PUT", url, true);

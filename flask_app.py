@@ -113,19 +113,14 @@ def chart_page(month=None, year=None):
             spent = 0.0
         month_grouped.append( (spent,month_category_spending[month_category][0], month_category) )
 
-    month_grouped.sort(key=lambda tup: tup[0])
+    # month_grouped.sort(key=lambda tup: tup[0])
     month_category_spending_planned = [g[1] for g in month_grouped]
     month_category_spending_actual = [g[0] for g in month_grouped]
     sorted_month_categories = [g[2] for g in month_grouped]
 
     year_grouped = []
     for year_category in year_category_spending.keys():
-        query = """
-        select sum(spending.price)
-        from spending
-        where spending.date like('{0}-%')
-            and spending.category = '{1}'
-            """.format(year, year_category)
+        query = """select sum(spending.price) from spending where spending.date like('{0}-%') and spending.category = '{1}'""".format(year, year_category)
         print(query)
         db_comm.cursor.execute(query)
         spent = db_comm.cursor.fetchone()[0]
@@ -133,7 +128,7 @@ def chart_page(month=None, year=None):
             spent = 0.0
         year_grouped.append( (spent,year_category_spending[year_category][0], year_category) )
 
-    year_grouped.sort(key=lambda tup: tup[0])
+    # year_grouped.sort(key=lambda tup: tup[0])
     year_category_spending_planned = [g[1] for g in year_grouped]
     year_category_spending_actual = [g[0] for g in year_grouped]
     sorted_year_categories = [g[2] for g in year_grouped]

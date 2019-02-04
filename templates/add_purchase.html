@@ -14,6 +14,7 @@
 
 <form>
     {% if purchase != None %}
+
         Item: <input type="text" id="itemTextBoxU" name="item" value="{{purchase.item}}"><br>
         Price: <input type="text" id="priceTextBoxU" name="price" value="{{purchase.price}}"><br>
         Category: <input type="text" id="categoryTextBoxU" name="category" value="{{purchase.category}}"><br>
@@ -25,24 +26,27 @@
             Note: <input type="text" id="noteTextBoxU" name="note" value="--"><br>
         {% endif %}
 
-        Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
+        Passcode: <input type="text" id="passcodeTextBoxU" name="passcode" value=""><br>
+
         <button id="{{purchase.purchase_id}}" onclick="updatePurchase(this.id)">Update</button>
+        <p>Click the "Update" button to update the purchase.</p>
+
 
     {% else %}
         Item: <input type="text" id="itemTextBox" name="item" value=""><br>
         Price: <input type="text" id="priceTextBox" name="price" value=""><br>
         Category: <input type="text" id="categoryTextBox" name="category" value=""><br>
-        Date: <input type="text" id="dateTextBox" name="date" value="2019-01-11 00:00:00"><br>
+        Date: <input type="text" id="dateTextBox" name="date" value="2019-02-01 00:00:00"><br>
         Note: <input type="text" id="noteTextBox" name="note" value="--"><br>
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
         <button onclick="addPurchase()">Insert</button>
+
+        <p>Click the "Insert" button to insert the purchase.</p>
 
     {% endif %}
 
 
 </form>
-
-<p>Click the "Submit" button to save the purchase.</p>
 
 <script src="/static/js/addPurchase.js"></script>
 

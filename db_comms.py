@@ -13,12 +13,10 @@ class DBCommms:
 
     def update_purchase(self, purchase_id, item, price, category, date, note):
         print("     " + self.__class__.__name__)
-        print("     " + "update_purchase({}, {}, {}, {}, {}, {})", purchase_id, item, price, category, date, note)
+        print("     " + "update_purchase({}, {}, {}, {}, {}, {})".format(purchase_id, item, price, category, date, note))
 
         note = "NULL" if (note == "--" or note == "NULL" or note == None) else "'{0}'".format(note)
-        self.cursor.execute(
-        """UPDATE spending SET item = '{0}', price = {1}, category = '{2}', date = '{3}', note = {4}
-        WHERE spending.purchase_id = {5}""".format(item,
+        self.cursor.execute("""UPDATE spending SET item = '{0}', price = {1}, category = '{2}', date = '{3}', note = {4} WHERE spending.purchase_id = {5}""".format(item,
         price, category, date, note, purchase_id))
 
         self.db_conn.commit()
@@ -37,15 +35,15 @@ class DBCommms:
 
     def add_purchase(self, item, price, category, date, note):
         print("     " + self.__class__.__name__)
-        print("     " + "add_purchase({}, {}, {}, {}, {})", item, price, category, date, note)
+        print("     " + "add_purchase({}, {}, {}, {}, {})".format(item, price, category, date, note))
 
         # add purchase
         note = "NULL" if (note == "--" or note == "NULL" or note == None) else "'{0}'".format(note)
 
-        self.cursor.execute(
-            """INSERT INTO spending (item, price, category, date, note)
-            VALUES ('{0}', {1}, '{2}', '{3}', {4})""".format(item,
-            price, category, date, note))
+        q = """INSERT INTO spending (item, price, category, date, note) VALUES ('{0}', {1}, '{2}', '{3}', {4})""".format(item,
+            price, category, date, note)
+        print(q)
+        self.cursor.execute(q)
 
         self.db_conn.commit()
 
@@ -170,8 +168,7 @@ class DBCommms:
 
         # add budget category
         self.cursor.execute(
-            """INSERT INTO budget (category, amount, amount_frequency)
-            VALUES ('{0}', {1}, '{2}')""".format(category, amount, amount_frequency))
+            """INSERT INTO budget (category, amount, amount_frequency) VALUES ('{0}', {1}, '{2}')""".format(category, amount, amount_frequency))
 
         self.db_conn.commit()
 
@@ -182,8 +179,7 @@ class DBCommms:
         print("     " + "update_budget_category({}, {}, {}, {})", category_id, category, amount, amount_frequency)
 
         self.cursor.execute(
-        """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}'
-        WHERE budget.category_id = {3}""".format(category,
+        """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}' WHERE budget.category_id = {3}""".format(category,
         amount, amount_frequency, category_id))
 
         self.db_conn.commit()
