@@ -113,7 +113,7 @@ def chart_page(month=None, year=None):
             spent = 0.0
         month_grouped.append( (spent,month_category_spending[month_category][0], month_category) )
 
-    # month_grouped.sort(key=lambda tup: tup[0])
+    month_grouped.sort(key=lambda tup: tup[1])
     month_category_spending_planned = [g[1] for g in month_grouped]
     month_category_spending_actual = [g[0] for g in month_grouped]
     sorted_month_categories = [g[2] for g in month_grouped]
@@ -128,7 +128,7 @@ def chart_page(month=None, year=None):
             spent = 0.0
         year_grouped.append( (spent,year_category_spending[year_category][0], year_category) )
 
-    # year_grouped.sort(key=lambda tup: tup[0])
+    year_grouped.sort(key=lambda tup: tup[1])
     year_category_spending_planned = [g[1] for g in year_grouped]
     year_category_spending_actual = [g[0] for g in year_grouped]
     sorted_year_categories = [g[2] for g in year_grouped]
@@ -143,8 +143,11 @@ def chart_page(month=None, year=None):
     bar_width = 0.50
     opacity = 0.8
 
-    rects1 = plt.bar(index, month_category_spending_actual, bar_width, alpha=opacity, color='b', label='Actual')
-    rects2 = plt.bar(index + bar_width, month_category_spending_planned, bar_width,  alpha=opacity, color='g', label='Planned')
+    # |   xa1 xb1   xa2 xb2   xa3 xb3  |
+    #     |w|-|w|
+
+    rects1 = plt.bar(index, month_category_spending_actual, bar_width * 0.75, alpha=opacity, color='b', label='Actual')
+    rects2 = plt.bar(index + (bar_width), month_category_spending_planned, bar_width * 0.75,  alpha=opacity, color='g', label='Planned')
 
     for rect in rects1 + rects2:
         height = rect.get_height()
@@ -156,7 +159,7 @@ def chart_page(month=None, year=None):
 
     plt.ylabel('Spending')
     plt.title('Month Categorical Spending')
-    plt.xticks(index + bar_width, sorted_month_categories)
+    plt.xticks(index + (bar_width/2), sorted_month_categories)
     plt.legend()
 
     outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_month_plot.png'.format(year, month)
@@ -177,8 +180,8 @@ def chart_page(month=None, year=None):
     bar_width = 0.50
     opacity = 0.8
 
-    rects1 = plt.bar(index, year_category_spending_actual, bar_width, alpha=opacity, color='b', label='Actual')
-    rects2 = plt.bar(index + bar_width, year_category_spending_planned, bar_width,  alpha=opacity, color='g', label='Planned')
+    rects1 = plt.bar(index, year_category_spending_actual, bar_width * 0.75, alpha=opacity, color='b', label='Actual')
+    rects2 = plt.bar(index + bar_width , year_category_spending_planned, bar_width * 0.75,  alpha=opacity, color='g', label='Planned')
 
     for rect in rects1 + rects2:
         height = rect.get_height()
@@ -190,7 +193,7 @@ def chart_page(month=None, year=None):
 
     plt.ylabel('Spending')
     plt.title('Year Categorical Spending')
-    plt.xticks(index + bar_width, sorted_year_categories)
+    plt.xticks(index + (bar_width/2), sorted_year_categories)
     plt.legend()
 
 
