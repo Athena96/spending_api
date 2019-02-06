@@ -18,3 +18,24 @@ function deleteBudget(budget_id) {
         alert(this.responseText);
     }
 }
+
+function openPurhcasesPage(info) {
+
+    var parts = info.split("#");
+    var category = parts[0];
+    var month = "";
+    var year = "";
+
+    var xhr = new XMLHttpRequest();
+    var url = "";
+
+    if (parts.length == 3) {
+        month = parts[1];
+        year = parts[2];
+        url = "http://inherentvice.pythonanywhere.com/site/purchases/" + month + "/" + year + "/" + category;
+    } else {
+        year = parts[1];
+        url = "http://inherentvice.pythonanywhere.com/site/purchases/" + "ALL" + "/" + year + "/" + category;
+    }
+    window.open(url);
+}

@@ -17,9 +17,11 @@
 <h2>Purchases for {{month}}/{{year}}</h2>
 <h3>Total Spent for {{month}}/{{year}}: ${{spent_in_month}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Monthly Budget: ${{month_limit}}</h3>
 <h3>Total Spent for {{year}}: ${{spent_in_year}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Yearly Budget: ${{year_limit}}</h3>
+
 <p>
     <br />
 </p>
+
 <table class="a">
 
   <tr>
@@ -28,17 +30,20 @@
     <th>Category</th>
     <th>Date</th>
     <th>Note</th>
-    <th>Delete?</th>
+    <th>Delete</th>
   </tr>
+
   {% for purchase in purchases %}
+
     <tr>
         <td><button class="btnSmall select" id="{{purchase.purchase_id}}" onclick="openUpdatePage(this.id)"><u>{{ purchase.item }}</u></button></td>
         <td>${{ purchase.price }}</td>
         <td>{{ purchase.category }}</td>
         <td>{{ purchase.date }}</td>
         <td>{{ purchase.note }}</td>
-        <td><button class="btnSmall delete" id="{{purchase.purchase_id}}" onclick="deletePurchase(this.id)">{{ purchase.purchase_id }}</button></td>
+        <td><button class="btnSmall delete" id="{{purchase.purchase_id}}" onclick="deletePurchase(this.id)"><u>delete</u></button></td>
     </tr>
+
   {% endfor %}
 
 </table>

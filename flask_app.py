@@ -46,6 +46,20 @@ def purchases_page(month=None, year=None, category="ALL"):
     # sort purchases, before display
     month_purchases = sorted(month_purchases, key=lambda x: x.date, reverse=True)
 
+    if month == "ALL" and year != None:
+        print("YEAR ONLY PURCHASES~")
+        year_purchases = db_comm.get_list_purchases(year=year, category=category)
+
+        return render_template('purchases.html',
+        month="--",
+        year=year,
+        category=category,
+        purchases=year_purchases,
+        spent_in_month=spent_in_month_str,
+        spent_in_year=spent_in_year_str,
+        month_limit=pay["month"],
+        year_limit=pay["year"])
+
     return render_template('purchases.html',
     month=month,
     year=year,
@@ -68,8 +82,23 @@ def chart_page(month=None, year=None):
         month = m
         year = y
 
+    current_max_purchaseID = str(db_comm.cursor.execute("select max(spending.purchase_id) from spending").fetchone()[0])
+    print("current_max_purchaseID: ", current_max_purchaseID)
+
     # 1. delete everything in '/home/inherentVice/mysite/static/images/'
     mydir = '/home/inherentVice/mysite/static/images/'
+
+    # get file names
+    files = os.listdir(mydir)
+    if len(files) > 0:
+        aFile = files[0]
+        name_parts = aFile.split("_")
+        if (len(name_parts) == 4):
+            previous_max_purchaseID_name = name_parts[len(name_parts)-1]
+            previous_max_purchaseID = previous_max_purchaseID_name.split(".")[0]
+            if previous_max_purchaseID == current_max_purchaseID:
+                return render_template('chart.html', year=year, month=month, curr_version=current_max_purchaseID)
+
     filelist = [ f for f in os.listdir(mydir) ]
     for f in filelist:
         os.remove(os.path.join(mydir, f))
@@ -162,7 +191,7 @@ def chart_page(month=None, year=None):
     plt.xticks(index + (bar_width/2), sorted_month_categories)
     plt.legend()
 
-    outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_month_plot.png'.format(year, month)
+    outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_month_plot_{}.png'.format(year, month, current_max_purchaseID)
 
     DefaultSize = plt.gcf().get_size_inches()
     plt.gcf().set_size_inches( (DefaultSize[0]*2.75, DefaultSize[1]*2.75) )
@@ -198,7 +227,7 @@ def chart_page(month=None, year=None):
 
 
     # 3. write to '/home/inherentVice/mysite/static/images/'
-    outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_year_plot.png'.format(year, month)
+    outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_year_plot_{}.png'.format(year, month, current_max_purchaseID)
 
     DefaultSize = plt.gcf().get_size_inches()
     plt.gcf().set_size_inches( (DefaultSize[0]*2.75, DefaultSize[1]*2.75) )
@@ -210,7 +239,7 @@ def chart_page(month=None, year=None):
         if os.path.isfile(outputFileName):
             fileExists = True
     # 4. pass date to html page
-    return render_template('chart.html', year=year, month=month)
+    return render_template('chart.html', year=year, month=month, curr_version=current_max_purchaseID)
 
 
 # website page controllers for budget
