@@ -19,10 +19,9 @@ function addPurchase() {
     xhr.send(JSON.stringify({
 
     }));
-    xhr.onload = function() {
-        alert(this.responseText);
-        location.reload();
-    }
+    // xhr.onload = function() {
+    //     location.reload();
+    // }
 }
 
 function updatePurchase(purchase_id) {
@@ -49,10 +48,10 @@ function updatePurchase(purchase_id) {
 
     }));
 
-    xhr.onload = function() {
-        console.log("Updated Purchase")
-        console.log(this.responseText);
-        location.reload();
-        alert(this.responseText);
-    }
+    // xhr.onload = function() {
+    //     console.log("Updated Purchase")
+    //     console.log(this.responseText);
+    //     location.reload();
+    //     alert(this.responseText);
+    // }
 }

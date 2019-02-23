@@ -14,12 +14,12 @@ function addBudget() {
     xhr.setRequestHeader("Authorization", "Basic " + btoa(passcode));
 
     xhr.send(JSON.stringify({}));
-    xhr.onload = function() {
-        console.log("Added Budget")
-        console.log(this.responseText);
-        location.reload();
-        alert(this.responseText);
-    }
+    // xhr.onload = function() {
+    //     console.log("Added Budget")
+    //     console.log(this.responseText);
+    //     location.reload();
+    //     alert(this.responseText);
+    // }
 
 }
 
@@ -42,10 +42,10 @@ function updateBudget(budget_id) {
 
     }));
 
-    xhr.onload = function() {
-        console.log("Updated Budget")
-        console.log(this.responseText);
-        location.reload();
-        alert(this.responseText);
-    }
+    // xhr.onload = function() {
+    //     console.log("Updated Budget")
+    //     console.log(this.responseText);
+    //     location.reload();
+    //     alert(this.responseText);
+    // }
 }
