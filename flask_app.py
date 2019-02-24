@@ -77,18 +77,18 @@ def purchases_page(month=None, year=None, category="ALL"):
 @app.route("/site/chart/<string:month>/<string:year>", methods=["GET"])
 def chart_page(month=None, year=None):
     print("chart_page()")
-
-    # get current month and year
     if month == None and year == None:
         (m,y) = get_current_date()
         month = m
         year = y
 
-    ## check if i need to generate new graphs
-    # get ID of most recent purchase
     current_max_purchaseID = str(db_comm.cursor.execute("select max(spending.purchase_id) from spending").fetchone()[0])
-    # get ID of previously generated graph
+    print("current_max_purchaseID: ", current_max_purchaseID)
+
+    # 1. delete everything in '/home/inherentVice/mysite/static/images/'
     mydir = '/home/inherentVice/mysite/static/images/'
+
+    # get file names
     files = os.listdir(mydir)
     if len(files) > 0:
         aFile = files[0]
@@ -96,129 +96,145 @@ def chart_page(month=None, year=None):
         if (len(name_parts) == 4):
             previous_max_purchaseID_name = name_parts[len(name_parts)-1]
             previous_max_purchaseID = previous_max_purchaseID_name.split(".")[0]
-            # if the purchase ID's match, no need to generate new graph
             if previous_max_purchaseID == current_max_purchaseID:
                 return render_template('chart.html', year=year, month=month, curr_version=current_max_purchaseID)
 
-    ## Need to generate New graph
-
-    # delete previous graph images
     filelist = [ f for f in os.listdir(mydir) ]
     for f in filelist:
         os.remove(os.path.join(mydir, f))
 
-    # get all budget categories
+    # 2. generate new plot image
+
+    #   3.1 get all distinct categories
     db_comm.cursor.execute(
     '''
-    select budget.category, budget.amount, budget.amount_frequency
+    select distinct(budget.category), amount, amount_frequency
     from budget
     ''')
 
-    # create month and year spending dictionaries
-    month_spending = {}
-    year_spending = {}
-    for budget_category in db_comm.cursor.fetchall():
-        category = (budget_category[0].encode('ascii','ignore')).decode('UTF-8')
-        amount = float(budget_category[1])
-        amount_frequency = (budget_category[2].encode('ascii','ignore')).decode('UTF-8')
+    # month
+    month_category_spending = {}
+    year_category_spending = {}
+    for c in db_comm.cursor.fetchall():
+        category = (c[0].encode('ascii','ignore')).decode('UTF-8')
+        amount = float(c[1])
+        amount_frequency = (c[2].encode('ascii','ignore')).decode('UTF-8')
+
         if amount_frequency == "month":
-            month_spending[category] = (0.0, float(amount))
+            month_category_spending[category] = (float(amount), amount_frequency)
         elif amount_frequency == "year":
-            year_spending[category] = (0.0, float(amount))
+            year_category_spending[category] = (float(amount), amount_frequency)
 
-    # fretch, match, and save all purchase data
-    q = """select sum(spending.price), spending.category from spending where spending.date like('{0}-{1}%') and spending.category not in (select budget.category from budget where budget.amount_frequency = 'year') group by spending.category """.format(year, month)
-    db_comm.cursor.execute(q)
-
-    for month_purchase_aggregate in db_comm.cursor.fetchall():
-        category = (month_purchase_aggregate[1].encode('ascii','ignore')).decode('UTF-8')
-        spent = float(month_purchase_aggregate[0])
-        month_spending[category] = (spent, month_spending[category][1])
-
-
-    db_comm.cursor.execute(
-        """
-        select sum(spending.price), spending.category
+    print(month_category_spending)
+    print(year_category_spending)
+    #   3.2 get total spent per category
+    month_grouped = []
+    for month_category in month_category_spending.keys():
+        query = """
+        select sum(spending.price)
         from spending
-        where spending.date like('{0}-%')
-            and spending.category in (select budget.category from budget where budget.amount_frequency = 'year')
-        group by spending.category
-        """.format(year))
-    for year_purchase_aggregate in db_comm.cursor.fetchall():
-        category = (year_purchase_aggregate[1].encode('ascii','ignore')).decode('UTF-8')
-        spent = float(year_purchase_aggregate[0])
-        year_spending[category] = (spent, year_spending[category][1])
+        where spending.date like('{0}-{1}-%')
+            and spending.category = '{2}'
+            """.format(year, month, month_category)
+        db_comm.cursor.execute(query)
+        spent = db_comm.cursor.fetchone()[0]
+        if spent is None:
+            spent = 0.0
+        month_grouped.append( (spent,month_category_spending[month_category][0], month_category) )
 
-    # sort the data by budget.amount
-    month_spending_categories = sorted(month_spending.keys(), key=lambda x: month_spending[x][1])
-    month_spending_planned = [int(month_spending[category][1]) for category in month_spending_categories]
-    month_spending_actual = [int(month_spending[category][0]) for category in month_spending_categories]
+    month_grouped.sort(key=lambda tup: tup[1])
+    month_category_spending_planned = [g[1] for g in month_grouped]
+    month_category_spending_actual = [g[0] for g in month_grouped]
+    sorted_month_categories = [g[2] for g in month_grouped]
 
-    year_spending_categories = sorted(year_spending.keys(), key=lambda x: year_spending[x][1])
-    year_spending_planned = [int(year_spending[category][1]) for category in year_spending_categories]
-    year_spending_actual = [int(year_spending[category][0]) for category in year_spending_categories]
+    year_grouped = []
+    for year_category in year_category_spending.keys():
+        query = """select sum(spending.price) from spending where spending.date like('{0}-%') and spending.category = '{1}'""".format(year, year_category)
+        print(query)
+        db_comm.cursor.execute(query)
+        spent = db_comm.cursor.fetchone()[0]
+        if spent is None:
+            spent = 0.0
+        year_grouped.append( (spent,year_category_spending[year_category][0], year_category) )
 
+    year_grouped.sort(key=lambda tup: tup[1])
+    year_category_spending_planned = [g[1] for g in year_grouped]
+    year_category_spending_actual = [g[0] for g in year_grouped]
+    sorted_year_categories = [g[2] for g in year_grouped]
 
-    ## Plot the data
     # data to plot
-    n_groups_month = len(month_spending)
-    n_groups_year = len(year_spending)
+    n_groups = len(month_category_spending)
+    n_groups_year = len(year_category_spending)
 
-    # create MONTH plot
+    # create plot
     fig, ax = plt.subplots()
-    index = np.arange(n_groups_month)
+    index = np.arange(n_groups)
     bar_width = 0.50
     opacity = 0.8
 
-    rects1 = plt.bar(index, month_spending_actual, bar_width * 0.75, alpha=opacity, color='b', label='Actual')
-    rects2 = plt.bar(index + (bar_width), month_spending_planned, bar_width * 0.75,  alpha=opacity, color='g', label='Planned')
+    # |   xa1 xb1   xa2 xb2   xa3 xb3  |
+    #     |w|-|w|
+
+    rects1 = plt.bar(index, month_category_spending_actual, bar_width * 0.75, alpha=opacity, color='b', label='Actual')
+    rects2 = plt.bar(index + (bar_width), month_category_spending_planned, bar_width * 0.75,  alpha=opacity, color='g', label='Planned')
+
     for rect in rects1 + rects2:
         height = rect.get_height()
         plt.text(rect.get_x() + rect.get_width()/2.0, height, '$%d ' % int(height), ha='center', va='bottom')
 
     plt.xlabel('Categories')
     plt.xticks(rotation=90)
+
+
     plt.ylabel('Spending')
     plt.title('Month Categorical Spending')
-    plt.xticks(index + (bar_width/2), month_spending_categories)
+    plt.xticks(index + (bar_width/2), sorted_month_categories)
     plt.legend()
 
-    # write the file
     outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_month_plot_{}.png'.format(year, month, current_max_purchaseID)
+
     DefaultSize = plt.gcf().get_size_inches()
     plt.gcf().set_size_inches( (DefaultSize[0]*2.75, DefaultSize[1]*2.75) )
     plt.savefig(outputFileName, dpi=300)
+
     fileExists = False
+
     while fileExists == False:
         if os.path.isfile(outputFileName):
             fileExists = True
 
-
-    # create YEAR plot
+    # create plot
     fig, ax = plt.subplots()
     index = np.arange(n_groups_year)
     bar_width = 0.50
     opacity = 0.8
 
-    rects1 = plt.bar(index, year_spending_actual, bar_width * 0.75, alpha=opacity, color='b', label='Actual')
-    rects2 = plt.bar(index + bar_width , year_spending_planned, bar_width * 0.75,  alpha=opacity, color='g', label='Planned')
+    rects1 = plt.bar(index, year_category_spending_actual, bar_width * 0.75, alpha=opacity, color='b', label='Actual')
+    rects2 = plt.bar(index + bar_width , year_category_spending_planned, bar_width * 0.75,  alpha=opacity, color='g', label='Planned')
+
     for rect in rects1 + rects2:
         height = rect.get_height()
         plt.text(rect.get_x() + rect.get_width()/2.0, height, '$%d ' % int(height), ha='center', va='bottom')
 
     plt.xlabel('Categories')
     plt.xticks(rotation=90)
+
+
     plt.ylabel('Spending')
     plt.title('Year Categorical Spending')
-    plt.xticks(index + (bar_width/2), year_spending_categories)
+    plt.xticks(index + (bar_width/2), sorted_year_categories)
     plt.legend()
 
-    # write the file
+
+    # 3. write to '/home/inherentVice/mysite/static/images/'
     outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_year_plot_{}.png'.format(year, month, current_max_purchaseID)
+
     DefaultSize = plt.gcf().get_size_inches()
     plt.gcf().set_size_inches( (DefaultSize[0]*2.75, DefaultSize[1]*2.75) )
     plt.savefig(outputFileName, dpi=300)
+
     fileExists = False
+
     while fileExists == False:
         if os.path.isfile(outputFileName):
             fileExists = True
