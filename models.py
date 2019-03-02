@@ -16,3 +16,20 @@ class Budget:
         self.amount = amount
         self.amount_frequency = amount_frequency
         self.budget_id = budget_id
+
+    def get_startdate(self):
+        if "special" in self.amount_frequency:
+            parts = self.amount_frequency.split("_")
+            startdate = parts[1]
+            year = startdate[0:4]
+            month = startdate[4:6]
+            day = startdate[6:8]
+
+            return (int(year), int(month), int(day))
+
+    def get_duration(self):
+        if "special" in self.amount_frequency:
+            parts = self.amount_frequency.split("_")
+            duration = parts[2]
+            return int(duration)
+

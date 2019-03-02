@@ -47,7 +47,6 @@ def purchases_page(month=None, year=None, category="ALL"):
     month_purchases = sorted(month_purchases, key=lambda x: x.date, reverse=True)
 
     if month == "ALL" and year != None:
-        print("YEAR ONLY PURCHASES~")
         year_purchases = db_comm.get_list_purchases(year=year, category=category)
 
         return render_template('purchases.html',
@@ -77,10 +76,13 @@ def purchases_page(month=None, year=None, category="ALL"):
 @app.route("/site/chart/<string:month>/<string:year>", methods=["GET"])
 def chart_page(month=None, year=None):
     print("chart_page()")
+    no_date_provided = False
+
     if month == None and year == None:
         (m,y) = get_current_date()
         month = m
         year = y
+        no_date_provided = True
 
     current_max_purchaseID = str(db_comm.cursor.execute("select max(spending.purchase_id) from spending").fetchone()[0])
     print("current_max_purchaseID: ", current_max_purchaseID)
@@ -90,14 +92,15 @@ def chart_page(month=None, year=None):
 
     # get file names
     files = os.listdir(mydir)
-    if len(files) > 0:
-        aFile = files[0]
-        name_parts = aFile.split("_")
-        if (len(name_parts) == 4):
-            previous_max_purchaseID_name = name_parts[len(name_parts)-1]
-            previous_max_purchaseID = previous_max_purchaseID_name.split(".")[0]
-            if previous_max_purchaseID == current_max_purchaseID:
-                return render_template('chart.html', year=year, month=month, curr_version=current_max_purchaseID)
+    if no_date_provided == True:
+        if len(files) > 0:
+            aFile = files[0]
+            name_parts = aFile.split("_")
+            if (len(name_parts) == 4):
+                previous_max_purchaseID_name = name_parts[len(name_parts)-1]
+                previous_max_purchaseID = previous_max_purchaseID_name.split(".")[0]
+                if previous_max_purchaseID == current_max_purchaseID:
+                    return render_template('chart.html', year=year, month=month, curr_version=current_max_purchaseID)
 
     filelist = [ f for f in os.listdir(mydir) ]
     for f in filelist:
@@ -239,6 +242,9 @@ def chart_page(month=None, year=None):
         if os.path.isfile(outputFileName):
             fileExists = True
     # 4. pass date to html page
+
+    ### TODO generate ANOTHER chart for special budgets.
+
     return render_template('chart.html', year=year, month=month, curr_version=current_max_purchaseID)
 
 
@@ -260,6 +266,17 @@ def budgets_page(month=None, year=None):
         purchases = filter(lambda purchase: (purchase.category == budget.category), year_purchases)
         if budget.amount_frequency == "month":
             purchases = filter(lambda purchase: (month ==  "{}{}".format(purchase.date[5], purchase.date[6])), purchases)
+
+        # if "special" in budget.amount_frequency:
+        #     # if special, then i want to get purchases in the period of...
+        #     # (budget.amount_frequency.startdate, budget.amount_frequency.startdate + budget.amount_frequency.period)
+        #     # but to do that, i need to query ALL purchases... not just ones in this year.
+
+        #     # select sum(p.price) from spending where spending.category = {0}
+        #     #   and spending.date >= {budget.amount_frequency.startdate}
+        #     #   and spending.date <= {budget.amount_frequency.startdate + budget.amount_frequency.period}
+
+        #     # purchases = filter(lambda purchase: (month ==  "{}{}".format(purchase.date[5], purchase.date[6])), purchases)
 
         spent_so_far = sum([purchase.price for purchase in purchases])
         spent_so_far_str = "{}".format(round(spent_so_far, 2))
@@ -286,6 +303,8 @@ def budgets_page(month=None, year=None):
     year_budgets = filter(lambda x: x[5] == "year", budget_data)
     year_budgets = sorted(year_budgets, key=lambda x: x[4])
 
+    # TODO special budgets
+
     # calc spent data
     month_purchases = db_comm.get_list_purchases(month, year, 'ALL')
     spent_in_month = sum([purchase.price for purchase in month_purchases])
@@ -294,7 +313,7 @@ def budgets_page(month=None, year=None):
     spent_in_year = sum([purchase.price for purchase in year_purchases])
     spent_in_year_str = str(round(spent_in_year, 2))
 
-
+    # TODO add special budgets to output
     return render_template('budgets.html',
     month_budgets=month_budgets,
     year_budgets=year_budgets,
@@ -378,10 +397,16 @@ def delete_budget_category(category_id):
 def get_income_data():
     print("Helper: get_income_data()")
     data = {}
-    per_month_school = (280.0 + 211.0)
-    total_per_year = (1930.00 * 26.0) + (per_month_school * 12.0)
-    data["year"] = round(total_per_year, 2)
-    data["month"] = round((total_per_year / 12.0), 2)
+
+    query = "select year from income"
+    db_comm.cursor.execute(query)
+    data["year"] = db_comm.cursor.fetchone()[0]
+
+    query = "select month from income"
+    db_comm.cursor.execute(query)
+    data["month"] = db_comm.cursor.fetchone()[0]
+    print(data)
+
     return data
 
 def get_current_date():
