@@ -1,21 +1,18 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, render_template
 from db_comms import DBCommms
 from datetime import datetime
-import os
-
-from matplotlib.pyplot import figure
-import matplotlib.pyplot as plt; plt.rcdefaults()
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 # declare our Flask app
 app = Flask(__name__)
 
+
 # setup DB
 DATABASE = '/home/inherentVice/spending_log.db'
 db_comm = DBCommms(DATABASE)
 
+
+## Website page handlers
 
 # website page controllers for purchase
 
@@ -69,185 +66,6 @@ def purchases_page(month=None, year=None, category="ALL"):
     month_limit=pay["month"],
     year_limit=pay["year"])
 
-
-# website page controllers for charts
-
-@app.route("/site/chart", methods=["GET"])
-@app.route("/site/chart/<string:month>/<string:year>", methods=["GET"])
-def chart_page(month=None, year=None):
-    print("chart_page()")
-    no_date_provided = False
-
-    if month == None and year == None:
-        (m,y) = get_current_date()
-        month = m
-        year = y
-        no_date_provided = True
-
-    current_max_purchaseID = str(db_comm.cursor.execute("select max(spending.purchase_id) from spending").fetchone()[0])
-    print("current_max_purchaseID: ", current_max_purchaseID)
-
-    # 1. delete everything in '/home/inherentVice/mysite/static/images/'
-    mydir = '/home/inherentVice/mysite/static/images/'
-
-    # get file names
-    files = os.listdir(mydir)
-    if no_date_provided == True:
-        if len(files) > 0:
-            aFile = files[0]
-            name_parts = aFile.split("_")
-            if (len(name_parts) == 4):
-                previous_max_purchaseID_name = name_parts[len(name_parts)-1]
-                previous_max_purchaseID = previous_max_purchaseID_name.split(".")[0]
-                if previous_max_purchaseID == current_max_purchaseID:
-                    return render_template('chart.html', year=year, month=month, curr_version=current_max_purchaseID)
-
-    filelist = [ f for f in os.listdir(mydir) ]
-    for f in filelist:
-        os.remove(os.path.join(mydir, f))
-
-    # 2. generate new plot image
-
-    #   3.1 get all distinct categories
-    db_comm.cursor.execute(
-    '''
-    select distinct(budget.category), amount, amount_frequency
-    from budget
-    ''')
-
-    # month
-    month_category_spending = {}
-    year_category_spending = {}
-    for c in db_comm.cursor.fetchall():
-        category = (c[0].encode('ascii','ignore')).decode('UTF-8')
-        amount = float(c[1])
-        amount_frequency = (c[2].encode('ascii','ignore')).decode('UTF-8')
-
-        if amount_frequency == "month":
-            month_category_spending[category] = (float(amount), amount_frequency)
-        elif amount_frequency == "year":
-            year_category_spending[category] = (float(amount), amount_frequency)
-
-    print(month_category_spending)
-    print(year_category_spending)
-    #   3.2 get total spent per category
-    month_grouped = []
-    for month_category in month_category_spending.keys():
-        query = """
-        select sum(spending.price)
-        from spending
-        where spending.date like('{0}-{1}-%')
-            and spending.category = '{2}'
-            """.format(year, month, month_category)
-        db_comm.cursor.execute(query)
-        spent = db_comm.cursor.fetchone()[0]
-        if spent is None:
-            spent = 0.0
-        month_grouped.append( (spent,month_category_spending[month_category][0], month_category) )
-
-    month_grouped.sort(key=lambda tup: tup[1])
-    month_category_spending_planned = [g[1] for g in month_grouped]
-    month_category_spending_actual = [g[0] for g in month_grouped]
-    sorted_month_categories = [g[2] for g in month_grouped]
-
-    year_grouped = []
-    for year_category in year_category_spending.keys():
-        query = """select sum(spending.price) from spending where spending.date like('{0}-%') and spending.category = '{1}'""".format(year, year_category)
-        print(query)
-        db_comm.cursor.execute(query)
-        spent = db_comm.cursor.fetchone()[0]
-        if spent is None:
-            spent = 0.0
-        year_grouped.append( (spent,year_category_spending[year_category][0], year_category) )
-
-    year_grouped.sort(key=lambda tup: tup[1])
-    year_category_spending_planned = [g[1] for g in year_grouped]
-    year_category_spending_actual = [g[0] for g in year_grouped]
-    sorted_year_categories = [g[2] for g in year_grouped]
-
-    # data to plot
-    n_groups = len(month_category_spending)
-    n_groups_year = len(year_category_spending)
-
-    # create plot
-    fig, ax = plt.subplots()
-    index = np.arange(n_groups)
-    bar_width = 0.50
-    opacity = 0.8
-
-    # |   xa1 xb1   xa2 xb2   xa3 xb3  |
-    #     |w|-|w|
-
-    rects1 = plt.bar(index, month_category_spending_actual, bar_width * 0.75, alpha=opacity, color='b', label='Actual')
-    rects2 = plt.bar(index + (bar_width), month_category_spending_planned, bar_width * 0.75,  alpha=opacity, color='g', label='Planned')
-
-    for rect in rects1 + rects2:
-        height = rect.get_height()
-        plt.text(rect.get_x() + rect.get_width()/2.0, height, '$%d ' % int(height), ha='center', va='bottom')
-
-    plt.xlabel('Categories')
-    plt.xticks(rotation=90)
-
-
-    plt.ylabel('Spending')
-    plt.title('Month Categorical Spending')
-    plt.xticks(index + (bar_width/2), sorted_month_categories)
-    plt.legend()
-
-    outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_month_plot_{}.png'.format(year, month, current_max_purchaseID)
-
-    DefaultSize = plt.gcf().get_size_inches()
-    plt.gcf().set_size_inches( (DefaultSize[0]*2.75, DefaultSize[1]*2.75) )
-    plt.savefig(outputFileName, dpi=300)
-
-    fileExists = False
-
-    while fileExists == False:
-        if os.path.isfile(outputFileName):
-            fileExists = True
-
-    # create plot
-    fig, ax = plt.subplots()
-    index = np.arange(n_groups_year)
-    bar_width = 0.50
-    opacity = 0.8
-
-    rects1 = plt.bar(index, year_category_spending_actual, bar_width * 0.75, alpha=opacity, color='b', label='Actual')
-    rects2 = plt.bar(index + bar_width , year_category_spending_planned, bar_width * 0.75,  alpha=opacity, color='g', label='Planned')
-
-    for rect in rects1 + rects2:
-        height = rect.get_height()
-        plt.text(rect.get_x() + rect.get_width()/2.0, height, '$%d ' % int(height), ha='center', va='bottom')
-
-    plt.xlabel('Categories')
-    plt.xticks(rotation=90)
-
-
-    plt.ylabel('Spending')
-    plt.title('Year Categorical Spending')
-    plt.xticks(index + (bar_width/2), sorted_year_categories)
-    plt.legend()
-
-
-    # 3. write to '/home/inherentVice/mysite/static/images/'
-    outputFileName = '/home/inherentVice/mysite/static/images/{}-{}_year_plot_{}.png'.format(year, month, current_max_purchaseID)
-
-    DefaultSize = plt.gcf().get_size_inches()
-    plt.gcf().set_size_inches( (DefaultSize[0]*2.75, DefaultSize[1]*2.75) )
-    plt.savefig(outputFileName, dpi=300)
-
-    fileExists = False
-
-    while fileExists == False:
-        if os.path.isfile(outputFileName):
-            fileExists = True
-    # 4. pass date to html page
-
-    ### TODO generate ANOTHER chart for special budgets.
-
-    return render_template('chart.html', year=year, month=month, curr_version=current_max_purchaseID)
-
-
 # website page controllers for budget
 
 @app.route("/site/budgets", methods=["GET"])
@@ -267,6 +85,7 @@ def budgets_page(month=None, year=None):
         if budget.amount_frequency == "month":
             purchases = filter(lambda purchase: (month ==  "{}{}".format(purchase.date[5], purchase.date[6])), purchases)
 
+        # TODO how to deal with Special Budgets
         # if "special" in budget.amount_frequency:
         #     # if special, then i want to get purchases in the period of...
         #     # (budget.amount_frequency.startdate, budget.amount_frequency.startdate + budget.amount_frequency.period)
@@ -303,7 +122,7 @@ def budgets_page(month=None, year=None):
     year_budgets = filter(lambda x: x[5] == "year", budget_data)
     year_budgets = sorted(year_budgets, key=lambda x: x[4])
 
-    # TODO special budgets
+    # TODO how to deal with special budgets
 
     # calc spent data
     month_purchases = db_comm.get_list_purchases(month, year, 'ALL')
@@ -327,9 +146,11 @@ def budgets_page(month=None, year=None):
 @app.route("/site/add_budget/<string:budget_id>", methods=["GET"])
 def add_budget_page(budget_id=None):
     print("add_budget_page()")
-    budget = db_comm.get_a_budget(budget_id)
+    budget = db_comm.get_budget(budget_id)
     return render_template('add_budget.html', budget=budget)
 
+
+## API handlers
 
 # income API endpoints
 
@@ -367,10 +188,10 @@ def delete_purchase(purchase_id):
 
 # budget API endpoints
 
-@app.route('/budget', methods=['GET'])
-def get_budget():
-    print("get_budget()")
-    result = db_comm.get_budget()
+@app.route('/budgets', methods=['GET'])
+def get_budgets():
+    print("get_budgets()")
+    result = db_comm.get_budgets()
     return result
 
 @app.route('/budget/<string:category>/<string:amount>/<string:amount_frequency>', methods=['POST'])
@@ -392,6 +213,7 @@ def delete_budget_category(category_id):
     print("delete_budget_category()")
     result = db_comm.delete_budget_category(category_id)
     return result
+
 
 # helpers
 def get_income_data():

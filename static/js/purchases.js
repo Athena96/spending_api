@@ -11,7 +11,6 @@ function deletePurchase(purchase_id) {
 
     xhr.onload = function() {
         console.log("Deleted");
-        console.log(this.responseText);
         location.reload();
         alert(this.responseText);
     }
