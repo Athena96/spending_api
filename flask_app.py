@@ -4,6 +4,8 @@ from datetime import datetime
 from models import Purchase
 from models import Budget
 from datetime import timedelta
+import time
+
 
 # declare our Flask app
 app = Flask(__name__)
@@ -74,59 +76,45 @@ def purchases_page(month=None, year=None, category="ALL"):
 @app.route("/site/budgets", methods=["GET"])
 @app.route("/site/budgets/<string:month>/<string:year>", methods=["GET"])
 def budgets_page(month=None, year=None):
-    # TODO SIMPLIFY
-    print("budgets_page()")
-    if month == None and year == None:
-        (page_month,page_year) = get_current_date()
-        print((page_month,page_year))
+    start_time = time.time()
 
     pay = get_income_data()
     budgets = db_comm.get_budgets()
-    year_purchases = db_comm.get_purchases(year=page_year)
+
+    if month == None and year == None:
+        (month,year) = get_current_date()
+
+    year_purchases = db_comm.get_purchases(year=year)
 
     budget_data = []
     for budget in budgets:
-        purchases = filter(lambda purchase: (purchase.category == budget.category), year_purchases)
-        if budget.amount_frequency == "month":
-            purchases = filter(lambda purchase: (page_month ==  "{}{}".format(purchase.date[5], purchase.date[6])), purchases)
+        category_purchases = filter(lambda purchase: (purchase.category == budget.category), year_purchases)
+
+        spent_so_far_str = ""
+        percent = ""
+        remaining = 0.0
 
         if "special" in budget.amount_frequency:
-            (year, month, day) = budget.get_startdate()
-            duration_days = budget.get_duration()
-            start_date = datetime(year=year, month=month, day=day)
-            end_date = start_date + timedelta(days=duration_days)
+            (s_year, s_month, s_day) = budget.get_startdate()
+            start_date = datetime(year=s_year, month=s_month, day=s_day)
+            end_date = start_date + timedelta(days=budget.get_duration())
 
-            cmd = """select sum(spending.price) from spending where spending.category = '{0}' and spending.date >= '{1}-{2}-{3} 00:00:00' and spending.date <= '{4}-{5}-{6} 23:59:59'""".format(budget.category, year, '{:02d}'.format(month), '{:02d}'.format(day), end_date.year, '{:02d}'.format(end_date.month), '{:02d}'.format(end_date.day))
-            print(cmd)
-            print(db_comm.cursor.execute(cmd))
+            cmd = """select sum(spending.price) from spending where spending.category = '{0}' and spending.date >= '{1}-{2}-{3} 00:00:00' and spending.date <= '{4}-{5}-{6} 23:59:59'""".format(budget.category, s_year, '{:02d}'.format(s_month), '{:02d}'.format(s_day), end_date.year, '{:02d}'.format(end_date.month), '{:02d}'.format(end_date.day))
+            db_comm.cursor.execute(cmd)
 
             spent_so_far = db_comm.cursor.fetchone()[0]
             if spent_so_far is None:
                 spent_so_far = 0.0
-
             spent_so_far_str = "{}".format(round(spent_so_far, 2))
 
-            p = (spent_so_far / budget.amount)
-            percent = ""
-            if p >= 0.0 and p < 0.9:
-                percent = "green"
-            elif p >= 0.9 and p < 0.99:
-                percent = "orange"
-            elif p >= 0.99 and p <= 1.00:
-                percent = "blue"
-            else:
-                percent = "red"
-            remaining = round((budget.amount - spent_so_far),2)
-            entry = (budget.budget_id, budget.category, spent_so_far_str, percent, budget.amount, budget.amount_frequency, remaining)
-            budget_data.append(entry)
-            continue
+        elif budget.amount_frequency == "month" or budget.amount_frequency == "year":
+            if budget.amount_frequency == "month":
+                category_purchases = filter(lambda purchase: ("{}{}".format(purchase.date[5], purchase.date[6]) == month), category_purchases)
 
-
-        spent_so_far = sum([purchase.price for purchase in purchases])
-        spent_so_far_str = "{}".format(round(spent_so_far, 2))
+            spent_so_far = sum([purchase.price for purchase in category_purchases])
+            spent_so_far_str = "{}".format(round(spent_so_far, 2))
 
         p = (spent_so_far / budget.amount)
-        percent = ""
         if p >= 0.0 and p < 0.9:
             percent = "green"
         elif p >= 0.9 and p < 0.99:
@@ -135,11 +123,12 @@ def budgets_page(month=None, year=None):
             percent = "blue"
         else:
             percent = "red"
+
         remaining = round((budget.amount - spent_so_far),2)
+
         entry = (budget.budget_id, budget.category, spent_so_far_str, percent, budget.amount, budget.amount_frequency, remaining)
         budget_data.append(entry)
 
-    # separate into month and year
     month_budgets = filter(lambda x: x[5] == "month", budget_data)
     month_budgets = sorted(month_budgets, key=lambda x: x[4])
 
@@ -149,19 +138,20 @@ def budgets_page(month=None, year=None):
     special_budgets = filter(lambda x: ("special" in x[5]), budget_data)
     special_budgets = sorted(special_budgets, key=lambda x: x[4])
 
-    # calc spent data
-    month_purchases = db_comm.get_purchases(page_month, page_year, 'ALL')
+    month_purchases = filter(lambda purchase: ( "{}{}".format(purchase.date[5], purchase.date[6]) == month  and "{}".format(purchase.date[0:4]) == year), year_purchases)
     spent_in_month = sum([purchase.price for purchase in month_purchases])
     spent_in_month_str = str(round(spent_in_month, 2))
 
     spent_in_year = sum([purchase.price for purchase in year_purchases])
     spent_in_year_str = str(round(spent_in_year, 2))
 
+    print("DURATION: ", (time.time() - start_time))
+
     return render_template('budgets.html',
     month_budgets=month_budgets,
     year_budgets=year_budgets,
     special_budgets=special_budgets,
-    month=page_month, year=page_year,
+    month=month, year=year,
     spent_in_month=spent_in_month_str,
     spent_in_year=spent_in_year_str,
     month_limit=pay["month"],
