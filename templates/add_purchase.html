@@ -16,7 +16,16 @@
 
         Item: <input type="text" id="itemTextBoxU" name="item" value="{{purchase.item}}"><br>
         Price: <input type="text" id="priceTextBoxU" name="price" value="{{purchase.price}}"><br>
-        Category: <input type="text" id="categoryTextBoxU" name="category" value="{{purchase.category}}"><br>
+        <!--Category: <input type="text" id="categoryTextBoxU" name="category" value="{{purchase.category}}"><br>-->
+        <select id="mySelectCategoryU">
+            {% for budget in budgets %}
+                {% if budget.category ==  purchase.category %}
+                    <option selected value="{{budget.category}}">{{budget.category}}</option>
+                {% else %}
+                    <option value="{{budget.category}}">{{budget.category}}</option>
+                {% endif %}
+            {% endfor %}
+        </select><br>
         Date: <input type="text" id="dateTextBoxU" name="date" value="{{purchase.date}}"><br>
 
         {% if purchase.note != None %}
@@ -34,7 +43,13 @@
     {% else %}
         Item: <input type="text" id="itemTextBox" name="item" value=""><br>
         Price: <input type="text" id="priceTextBox" name="price" value=""><br>
-        Category: <input type="text" id="categoryTextBox" name="category" value=""><br>
+        <!--Category: <input type="text" id="categoryTextBox" name="category" value=""><br>-->
+        Category:
+        <select id="mySelectCategory">
+            {% for budget in budgets %}
+                <option value="{{budget.category}}">{{budget.category}}</option>
+            {% endfor %}
+        </select><br>
         Date: <input type="text" id="dateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
         Note: <input type="text" id="noteTextBox" name="note" value=""><br>
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>

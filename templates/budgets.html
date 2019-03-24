@@ -40,9 +40,10 @@
     </tr>
   {% endfor %}
 </table>
-<p>
 
+<p>
 </p>
+
 <h2>Year Budgets</h2>
 <table class="a">
   <tr>
@@ -53,6 +54,26 @@
     <th>Delete</th>
   </tr>
   {% for budget in year_budgets %}
+    <tr>
+        <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p></td>
+        <td><button class="btnSmall select" id="{{budget[1]}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget[2] }}</u></button></td>
+        <td>${{ budget[4] }}</td>
+        <td>  <font color="{{budget[3]}}">${{ budget[6] }}</font></td>
+        <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)"><u>delete</u></button></td>
+    </tr>
+  {% endfor %}
+</table>
+
+<h2>Special Budgets</h2>
+<table class="a">
+  <tr>
+    <th>Category</th>
+    <th>Spent</th>
+    <th>Budgeted</th>
+    <th>Remaining</th>
+    <th>Delete</th>
+  </tr>
+  {% for budget in special_budgets %}
     <tr>
         <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p></td>
         <td><button class="btnSmall select" id="{{budget[1]}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget[2] }}</u></button></td>

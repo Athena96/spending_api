@@ -5,8 +5,21 @@ class Purchase:
         self.price = price
         self.category = category
         self.date = date
-        self.note = note # set to None if not present
+        if note == "--" or note == "NULL" or note == None or note == "":
+            self.note = None
+        else:
+            self.note = note
         self.purchase_id = purchase_id
+
+    def to_dict(self):
+        contents = {}
+        contents["purchase_id"] = self.purchase_id
+        contents["item"] = self.item
+        contents["price"] = self.price
+        contents["category"] = self.category
+        contents["date"] = self.date
+        contents["note"] = self.note
+        return contents
 
 
 class Budget:
@@ -32,4 +45,12 @@ class Budget:
             parts = self.amount_frequency.split("_")
             duration = parts[2]
             return int(duration)
+
+    def to_dict(self):
+        contents = {}
+        contents["category"] = self.category
+        contents["amount"] = self.amount
+        contents["amount_frequency"] = self.amount_frequency
+        contents["category_id"] = self.budget_id
+        return contents
 

@@ -14,29 +14,32 @@ class DBCommms:
     # Purchase Methods
 
     # add, update, delete
-    def add_purchase(self, item, price, category, date, note):
+    def add_purchase(self, purchase):
         print("     " + self.__class__.__name__)
-        print("     " + "add_purchase({}, {}, {}, {}, {})".format(item, price, category, date, note))
+        print("     " + "add_purchase({})".format(purchase))
 
         # add purchase
-        note = "NULL" if (note == "--" or note == "NULL" or note == None) else "'{0}'".format(note)
+        sql_note = "NULL" if (purchase.note == None) else "'{0}'".format(purchase.note)
 
-        q = """INSERT INTO spending (item, price, category, date, note) VALUES ('{0}', {1}, '{2}', '{3}', {4})""".format(item,
-            price, category, date, note)
-        print(q)
-        self.cursor.execute(q)
+        cmd = """INSERT INTO spending (item, price, category, date, note) VALUES ('{0}', {1}, '{2}', '{3}', {4})""".format(purchase.item,
+            purchase.price, purchase.category, purchase.date, sql_note)
+        print(cmd)
+        self.cursor.execute(cmd)
 
         self.db_conn.commit()
 
         return jsonify({'result': 'successfuly added purchase!'})
 
-    def update_purchase(self, purchase_id, item, price, category, date, note):
+    def update_purchase(self, purchase):
         print("     " + self.__class__.__name__)
-        print("     " + "update_purchase({}, {}, {}, {}, {}, {})".format(purchase_id, item, price, category, date, note))
+        print("     " + "update_purchase({})".format(purchase))
 
-        note = "NULL" if (note == "--" or note == "NULL" or note == None) else "'{0}'".format(note)
-        self.cursor.execute("""UPDATE spending SET item = '{0}', price = {1}, category = '{2}', date = '{3}', note = {4} WHERE spending.purchase_id = {5}""".format(item,
-        price, category, date, note, purchase_id))
+        sql_note = "NULL" if (purchase.note == None) else "'{0}'".format(purchase.note)
+
+        cmd = """UPDATE spending SET item = '{0}', price = {1}, category = '{2}', date = '{3}', note = {4} WHERE spending.purchase_id = {5}""".format(purchase.item,
+        purchase.price, purchase.category, purchase.date, sql_note, purchase.purchase_id)
+        print(cmd)
+        self.cursor.execute(cmd)
 
         self.db_conn.commit()
 
@@ -52,9 +55,9 @@ class DBCommms:
         return jsonify({'result': 'successfuly deleted purchase!'})
 
     # fetch
-    def get_list_purchases(self, month=None, year=None, category="ALL"):
+    def get_purchases(self, month=None, year=None, category="ALL"):
         print("     " + self.__class__.__name__)
-        print("     " + "get_list_purchases({},{},{})".format(month, year, category))
+        print("     " + "get_purchases({},{},{})".format(month, year, category))
         base_query = "select * from spending"
 
         date_query = ""
@@ -95,49 +98,31 @@ class DBCommms:
         # send data
         return res
 
-    def get_purchases(self, month=None, year=None, category="ALL"):
-        print("     " + self.__class__.__name__)
-        print("     " + "get_purchases({},{},{})".format(month, year, category))
-
-        purchases = self.get_list_purchases(month, year, category)
-
-        data = []
-        for purchase in purchases:
-            contents = {}
-            contents["purchase_id"] = purchase.purchase_id
-            contents["item"] = purchase.item
-            contents["price"] = purchase.price
-            contents["category"] = purchase.category
-            contents["date"] = purchase.date
-            contents["note"] = purchase.note
-            data.append(contents)
-
-        # send data
-        return jsonify(data)
-
 
     # Budget Methods
 
     # add, update, delete
-    def add_budget_category(self, category, amount, amount_frequency):
+    def add_budget_category(self, budget):
         print("     " + self.__class__.__name__)
-        print("     " + "add_budget_category({}, {}, {}, )", category, amount, amount_frequency)
+        print("     " + "add_budget_category({})", budget)
 
         # add budget category
-        self.cursor.execute(
-            """INSERT INTO budget (category, amount, amount_frequency) VALUES ('{0}', {1}, '{2}')""".format(category, amount, amount_frequency))
+        cmd = """INSERT INTO budget (category, amount, amount_frequency) VALUES ('{0}', {1}, '{2}')""".format(budget.category, budget.amount, budget.amount_frequency)
+        print(cmd)
+        self.cursor.execute(cmd)
 
         self.db_conn.commit()
 
         return jsonify({'result': 'successfuly added budget category!'})
 
-    def update_budget_category(self, category_id, category, amount, amount_frequency):
+    def update_budget_category(self, budget):
         print("     " + self.__class__.__name__)
-        print("     " + "update_budget_category({}, {}, {}, {})", category_id, category, amount, amount_frequency)
+        print("     " + "update_budget_category({})", budget)
 
-        self.cursor.execute(
-        """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}' WHERE budget.category_id = {3}""".format(category,
-        amount, amount_frequency, category_id))
+        cmd = """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}' WHERE budget.category_id = {3}""".format(budget.category,
+        budget.amount, budget.amount_frequency, budget.budget_id)
+        print(cmd)
+        self.cursor.execute(cmd)
 
         self.db_conn.commit()
 
@@ -154,9 +139,9 @@ class DBCommms:
         return jsonify({'result': 'successfuly deleted budget category!'})
 
     # fetch
-    def get_list_budgets(self):
+    def get_budgets(self):
         print("     " + self.__class__.__name__)
-        print("     " + "get_list_budgets()")
+        print("     " + "get_budgets()")
 
         # query
         self.cursor.execute("SELECT * FROM budget")
@@ -180,29 +165,11 @@ class DBCommms:
 
         res = None
         for category, amount, amount_frequency, category_id in self.cursor:
-            res = (category, amount, amount_frequency, category_id)
+            res = Budget(category, amount, amount_frequency, category_id)
 
         # send data
         return res
 
-    def get_budgets(self):
-        print("     " + self.__class__.__name__)
-        print("     " + "get_budget()")
-
-        budgets = self.get_list_budgets()
-
-        # get list of categories
-        data = []
-        for budget in budgets:
-            contents = {}
-            contents["category"] = budget.category
-            contents["amount"] = budget.amount
-            contents["amount_frequency"] = budget.amount_frequency
-            contents["category_id"] = budget.budget_id
-            data.append(contents)
-
-        # send data
-        return jsonify(data)
 
     def __exit__(self):
         print("in __exit__")
