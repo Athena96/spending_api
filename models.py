@@ -1,21 +1,21 @@
-class Purchase:
+class Transaction:
 
-    def __init__(self, item, price, category, date, note, purchase_id=None):
-        self.item = item
-        self.price = price
+    def __init__(self, title, amount, category, date, note, transaction_id=None):
+        self.title = title
+        self.amount = amount
         self.category = category
         self.date = date
         if note == "--" or note == "NULL" or note == None or note == "":
             self.note = None
         else:
             self.note = note
-        self.purchase_id = purchase_id
+        self.transaction_id = transaction_id
 
     def to_dict(self):
         contents = {}
-        contents["purchase_id"] = self.purchase_id
-        contents["item"] = self.item
-        contents["price"] = self.price
+        contents["transaction_id"] = self.transaction_id
+        contents["title"] = self.title
+        contents["amount"] = self.amount
         contents["category"] = self.category
         contents["date"] = self.date
         contents["note"] = self.note

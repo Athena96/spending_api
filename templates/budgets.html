@@ -9,14 +9,17 @@
 </head>
 
 <body>
-    <button class="btn purchases" onclick="location.href='http://inherentvice.pythonanywhere.com/site/purchases'">Purchases</button>
+    <button class="btn transactions" onclick="location.href='http://inherentvice.pythonanywhere.com/site/transactions'">Transaction</button>
     <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets'">Budgets</button>
-    <button class="btn add_purchase" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_purchase'">Add Purchase</button>
+    <button class="btn add_transaction" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_transaction'">Add Transaction</button>
     <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
 
 <h2>Budgets for {{month}}/{{year}}</h2>
-<h3>Total Spent for {{month}}/{{year}}: ${{spent_in_month}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Monthly Budget: ${{month_limit}}</h3>
-<h3>Total Spent for {{year}}: ${{spent_in_year}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Yearly Budget: ${{year_limit}}</h3>
+<h3>Total Spent for {{month}}/{{year}}: ${{spent_in_month}}</h3>
+<h3>Monthly Budget: ${{month_income}}</h3>
+<h3>Total Spent for {{year}}: ${{spent_in_year}}</h3>
+<h3>Yearly Budget: ${{year_income}}</h3>
+
 <p>
     <br />
 </p>
@@ -35,7 +38,19 @@
         <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p></td>
         <td><button class="btnSmall select" id="{{budget[1]}}#{{month}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget[2] }}</u></button></td>
         <td>${{ budget[4] }}</td>
-        <td><font color="{{budget[3]}}">${{ budget[6] }}</font></td>
+        {% if budget[3] >=  0.0 and budget[3] <  0.85 %}
+            <td><font color="green">${{ budget[6] }}</font></td>
+        {% else %}
+            {% if budget[3] >= 0.85 and  budget[3] < 0.99 %}
+                <td><font color="orange">${{ budget[6] }}</font></td>
+            {% else %}
+                {% if budget[3] >= 0.99 and  budget[3] <= 1.00 %}
+                    <td><font color="blue">${{ budget[6] }}</font></td>
+                {% else %}
+                    <td><font color="red">${{ budget[6] }}</font></td>
+                {% endif %}
+            {% endif %}
+        {% endif %}
         <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)"><u>delete</u></button></td>
     </tr>
   {% endfor %}
@@ -58,7 +73,19 @@
         <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p></td>
         <td><button class="btnSmall select" id="{{budget[1]}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget[2] }}</u></button></td>
         <td>${{ budget[4] }}</td>
-        <td>  <font color="{{budget[3]}}">${{ budget[6] }}</font></td>
+        {% if budget[3] >=  0.0 and budget[3] <  0.85 %}
+            <td><font color="green">${{ budget[6] }}</font></td>
+        {% else %}
+            {% if budget[3] >= 0.85 and  budget[3] < 0.99 %}
+                <td><font color="orange">${{ budget[6] }}</font></td>
+            {% else %}
+                {% if budget[3] >= 0.99 and  budget[3] <= 1.00 %}
+                    <td><font color="blue">${{ budget[6] }}</font></td>
+                {% else %}
+                    <td><font color="red">${{ budget[6] }}</font></td>
+                {% endif %}
+            {% endif %}
+        {% endif %}
         <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)"><u>delete</u></button></td>
     </tr>
   {% endfor %}
@@ -78,7 +105,19 @@
         <td><p><button class="btnSmall select" id="{{budget[0]}}" onclick="openUpdatePage(this.id)"><u>{{ budget[1] }}</u></button></p></td>
         <td><button class="btnSmall select" id="{{budget[1]}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget[2] }}</u></button></td>
         <td>${{ budget[4] }}</td>
-        <td>  <font color="{{budget[3]}}">${{ budget[6] }}</font></td>
+        {% if budget[3] >=  0.0 and budget[3] <  0.85 %}
+            <td><font color="green">${{ budget[6] }}</font></td>
+        {% else %}
+            {% if budget[3] >= 0.85 and  budget[3] < 0.99 %}
+                <td><font color="orange">${{ budget[6] }}</font></td>
+            {% else %}
+                {% if budget[3] >= 0.99 and  budget[3] <= 1.00 %}
+                    <td><font color="blue">${{ budget[6] }}</font></td>
+                {% else %}
+                    <td><font color="red">${{ budget[6] }}</font></td>
+                {% endif %}
+            {% endif %}
+        {% endif %}
         <td><button class="btnSmall delete" id="{{budget[0]}}" onclick="deleteBudget(this.id)"><u>delete</u></button></td>
     </tr>
   {% endfor %}

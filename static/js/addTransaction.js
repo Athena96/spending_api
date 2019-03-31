@@ -7,10 +7,10 @@ function formatSingleDigit(digit) {
     }
 }
 
-function addPurchase() {
+function addTransaction() {
 
-    var item = document.getElementById("itemTextBox").value;
-    var price = document.getElementById("priceTextBox").value;
+    var title = document.getElementById("titleTextBox").value;
+    var amount = document.getElementById("amountTextBox").value;
     //var category = document.getElementById("categoryTextBox").value;
     var category = document.getElementById("mySelectCategory").value;
     var date = document.getElementById("dateTextBox").value;
@@ -41,7 +41,7 @@ function addPurchase() {
         }
     });
 
-    var url_tmp = "http://inherentvice.pythonanywhere.com/" + item + "/" + price + "/" + category + "/" + date + "/" + note;
+    var url_tmp = "http://inherentvice.pythonanywhere.com/" + title + "/" + amount + "/" + category + "/" + date + "/" + note;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.open("POST", url);
@@ -49,7 +49,6 @@ function addPurchase() {
     xhr.setRequestHeader("cache-control", "no-cache");
     xhr.send(data);
 
-    // PLAN B
     // var settings = {
     //     "async": true,
     //     "crossDomain": true,
@@ -66,9 +65,9 @@ function addPurchase() {
     // });
 }
 
-function updatePurchase(purchase_id) {
-    var item = document.getElementById("itemTextBoxU").value;
-    var price = document.getElementById("priceTextBoxU").value;
+function updateTransaction(transaction_id) {
+    var title = document.getElementById("titleTextBoxU").value;
+    var amount = document.getElementById("amountTextBoxU").value;
     var category = document.getElementById("mySelectCategoryU").value;
     var date = document.getElementById("dateTextBoxU").value;
     var note = document.getElementById("noteTextBoxU").value;
@@ -78,7 +77,7 @@ function updatePurchase(purchase_id) {
     var passcode = document.getElementById("passcodeTextBoxU").value;
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = "http://inherentvice.pythonanywhere.com/" + purchase_id + "/" + item + "/" + price + "/" + category + "/" + date + "/" + note;
+    var url_tmp = "http://inherentvice.pythonanywhere.com/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + note;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.withCredentials = true;
@@ -90,7 +89,7 @@ function updatePurchase(purchase_id) {
     }));
 
     // xhr.onload = function() {
-    //     console.log("Updated Purchase")
+    //     console.log("Updated Transaction")
     //     console.log(this.responseText);
     //     location.reload();
     //     alert(this.responseText);

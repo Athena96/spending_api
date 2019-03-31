@@ -1,11 +1,9 @@
 from flask import Flask, jsonify, render_template
 from db_comms import DBCommms
 from datetime import datetime
-from models import Purchase
+from models import Transaction
 from models import Budget
 from datetime import timedelta
-import time
-
 
 # declare our Flask app
 app = Flask(__name__)
@@ -18,88 +16,82 @@ db_comm = DBCommms(DATABASE)
 
 ## Website page handlers
 
-# website page controllers for purchase
+# website page controllers for transaction
 
-@app.route("/site/add_purchase", methods=["GET"])
-@app.route("/site/add_purchase/<string:purchase_id>", methods=["GET"])
-def add_purchase_page(purchase_id=None):
-    print("add_purchase_page()")
-    purchase = db_comm.get_purchase(purchase_id)
+@app.route("/site/add_transaction", methods=["GET"])
+@app.route("/site/add_transaction/<string:transaction_id>", methods=["GET"])
+def add_transaction_page(transaction_id=None):
+    print("add_transaction_page()")
+    transaction = db_comm.get_transaction(transaction_id)
     budgets = db_comm.get_budgets()
-    return render_template('add_purchase.html', purchase=purchase, budgets=budgets)
+    return render_template('add_transaction.html', transaction=transaction, budgets=budgets)
 
-@app.route("/site/purchases", methods=["GET"])
-@app.route("/site/purchases/<string:month>/<string:year>/<string:category>", methods=["GET"])
-def purchases_page(month=None, year=None, category="ALL"):
-    print("purchases_page()")
+@app.route("/site/transactions", methods=["GET"])
+@app.route("/site/transactions/<string:month>/<string:year>/<string:category>", methods=["GET"])
+def transactions_page(month=None, year=None, category="ALL"):
+    print("transactions_page()")
+
     if month == None and year == None:
         (month,year) = get_current_date()
 
-    pay = get_income_data()
-
-    month_purchases = db_comm.get_purchases(month, year, category)
-    spent_in_month = sum([purchase.price for purchase in month_purchases])
-    spent_in_month_str = str(round(spent_in_month, 2))
-
-    year_purchases = db_comm.get_purchases(year=year)
-    spent_in_year = sum([purchase.price for purchase in year_purchases])
+    year_transactions = db_comm.get_transactions(year=year, category=category)
+    spent_in_year = sum([transaction.amount for transaction in year_transactions if ("income" not in transaction.category)])
     spent_in_year_str = str(round(spent_in_year, 2))
 
-    # sort purchases, before display
-    month_purchases = sorted(month_purchases, key=lambda x: x.date, reverse=True)
+    month_transactions = [transaction for transaction in year_transactions if (transaction.date[5:7] == month)]
+    spent_in_month = sum([transaction.amount for transaction in month_transactions if ("income" not in transaction.category)])
+    spent_in_month_str = str(round(spent_in_month, 2))
 
-    if month == "ALL" and year != None:
-        year_purchases = db_comm.get_purchases(year=year, category=category)
+    transactions = sorted(month_transactions, key=lambda x: x.date, reverse=True)
 
-        return render_template('purchases.html',
-        month="--",
-        year=year,
-        category=category,
-        purchases=year_purchases,
-        spent_in_month=spent_in_month_str,
-        spent_in_year=spent_in_year_str,
-        month_limit=pay["month"],
-        year_limit=pay["year"])
+    year_income = sum([transaction.amount for transaction in year_transactions if ("income" in transaction.category)])
+    month_income = sum([transaction.amount for transaction in year_transactions if (("income" in transaction.category) and (transaction.date[5:7] == month))])
 
-    return render_template('purchases.html',
+    return render_template('transactions.html',
     month=month,
     year=year,
     category=category,
-    purchases=month_purchases,
+    transactions=transactions,
     spent_in_month=spent_in_month_str,
     spent_in_year=spent_in_year_str,
-    month_limit=pay["month"],
-    year_limit=pay["year"])
+    month_income=month_income,
+    year_income=year_income)
 
 # website page controllers for budget
 
 @app.route("/site/budgets", methods=["GET"])
 @app.route("/site/budgets/<string:month>/<string:year>", methods=["GET"])
 def budgets_page(month=None, year=None):
-    start_time = time.time()
+    # todo get income data
 
-    pay = get_income_data()
     budgets = db_comm.get_budgets()
 
     if month == None and year == None:
-        (month,year) = get_current_date()
+        curr_date = get_current_date()
+        month = curr_date[0]
+        year = curr_date[1]
 
-    year_purchases = db_comm.get_purchases(year=year)
+    year_transactions = db_comm.get_transactions(year=year)
+    spent_in_year = sum([transaction.amount for transaction in year_transactions if ("income" not in transaction.category)])
+    spent_in_year_str = str(round(spent_in_year, 2))
+
+    month_transactions = [transaction for transaction in year_transactions if (("income" not in transaction.category) and (transaction.date[5:7] == month))]
+    spent_in_month = sum([transaction.amount for transaction in month_transactions])
+    spent_in_month_str = str(round(spent_in_month, 2))
 
     budget_data = []
     for budget in budgets:
-        category_purchases = filter(lambda purchase: (purchase.category == budget.category), year_purchases)
+        if "income" in budget.category:
+            continue
 
         spent_so_far_str = ""
-        percent = ""
-        remaining = 0.0
 
         if "special" in budget.amount_frequency:
             (s_year, s_month, s_day) = budget.get_startdate()
             start_date = datetime(year=s_year, month=s_month, day=s_day)
             end_date = start_date + timedelta(days=budget.get_duration())
 
-            cmd = """select sum(spending.price) from spending where spending.category = '{0}' and spending.date >= '{1}-{2}-{3} 00:00:00' and spending.date <= '{4}-{5}-{6} 23:59:59'""".format(budget.category, s_year, '{:02d}'.format(s_month), '{:02d}'.format(s_day), end_date.year, '{:02d}'.format(end_date.month), '{:02d}'.format(end_date.day))
+            cmd = """select sum(ledger.amount) from ledger where ledger.category = '{0}' and ledger.date >= '{1}-{2}-{3} 00:00:00' and ledger.date <= '{4}-{5}-{6} 23:59:59'""".format(budget.category, s_year, '{:02d}'.format(s_month), '{:02d}'.format(s_day), end_date.year, '{:02d}'.format(end_date.month), '{:02d}'.format(end_date.day))
             db_comm.cursor.execute(cmd)
 
             spent_so_far = db_comm.cursor.fetchone()[0]
@@ -108,23 +100,15 @@ def budgets_page(month=None, year=None):
             spent_so_far_str = "{}".format(round(spent_so_far, 2))
 
         elif budget.amount_frequency == "month" or budget.amount_frequency == "year":
+            category_transactions = filter(lambda transaction: (transaction.category == budget.category), year_transactions)
             if budget.amount_frequency == "month":
-                category_purchases = filter(lambda purchase: ("{}{}".format(purchase.date[5], purchase.date[6]) == month), category_purchases)
+                category_transactions = filter(lambda transaction: (transaction.date[5:7] == month), category_transactions)
 
-            spent_so_far = sum([purchase.price for purchase in category_purchases])
+            spent_so_far = sum([transaction.amount for transaction in category_transactions])
             spent_so_far_str = "{}".format(round(spent_so_far, 2))
 
-        p = (spent_so_far / budget.amount)
-        if p >= 0.0 and p < 0.9:
-            percent = "green"
-        elif p >= 0.9 and p < 0.99:
-            percent = "orange"
-        elif p >= 0.99 and p <= 1.00:
-            percent = "blue"
-        else:
-            percent = "red"
-
-        remaining = round((budget.amount - spent_so_far),2)
+        percent = -(spent_so_far / budget.amount)
+        remaining = round((budget.amount + spent_so_far),2)
 
         entry = (budget.budget_id, budget.category, spent_so_far_str, percent, budget.amount, budget.amount_frequency, remaining)
         budget_data.append(entry)
@@ -138,14 +122,8 @@ def budgets_page(month=None, year=None):
     special_budgets = filter(lambda x: ("special" in x[5]), budget_data)
     special_budgets = sorted(special_budgets, key=lambda x: x[4])
 
-    month_purchases = filter(lambda purchase: ( "{}{}".format(purchase.date[5], purchase.date[6]) == month  and "{}".format(purchase.date[0:4]) == year), year_purchases)
-    spent_in_month = sum([purchase.price for purchase in month_purchases])
-    spent_in_month_str = str(round(spent_in_month, 2))
-
-    spent_in_year = sum([purchase.price for purchase in year_purchases])
-    spent_in_year_str = str(round(spent_in_year, 2))
-
-    print("DURATION: ", (time.time() - start_time))
+    year_income = sum([transaction.amount for transaction in year_transactions if ("income" in transaction.category)])
+    month_income = sum([transaction.amount for transaction in year_transactions if (("income" in transaction.category) and (transaction.date[5:7] == month))])
 
     return render_template('budgets.html',
     month_budgets=month_budgets,
@@ -154,8 +132,8 @@ def budgets_page(month=None, year=None):
     month=month, year=year,
     spent_in_month=spent_in_month_str,
     spent_in_year=spent_in_year_str,
-    month_limit=pay["month"],
-    year_limit=pay["year"])
+    month_income=month_income,
+    year_income=year_income)
 
 @app.route("/site/add_budget", methods=["GET"])
 @app.route("/site/add_budget/<string:budget_id>", methods=["GET"])
@@ -167,40 +145,34 @@ def add_budget_page(budget_id=None):
 
 ## API handlers
 
-# income API endpoints
 
-@app.route("/year_income", methods=["GET"])
-def get_income():
-    print("get_income()")
-    return jsonify(get_income_data())
-
-# purchase API endpoints
+# transaction API endpoints
 
 @app.route('/<string:year>', methods=['GET'])
-@app.route('/<string:month>/<string:year>/<string:category>', methods=['GET']) #TODO change order year/month
-def get_all_purchases_for_year(month=None, year=None, category="ALL"):
-    print("get_all_purchases_for_year()")
-    result = to_json(db_comm.get_purchases(month,year,category))
+@app.route('/<string:month>/<string:year>/<string:category>', methods=['GET'])
+def get_all_transactions_for_year(month=None, year=None, category="ALL"):
+    print("get_all_transaction_for_year()")
+    result = jsonify([transaction.to_dict() for transaction in db_comm.get_transactions(month,year,category)])
     return result
 
-@app.route('/<string:item>/<string:price>/<string:category>/<string:date>/<string:note>', methods=['POST'])
-def add_purchase(item, price, category, date, note):
-    print("add_purchase()")
-    purchase = Purchase(item, price, category, date, note)
-    result = db_comm.add_purchase(purchase)
+@app.route('/<string:title>/<string:amount>/<string:category>/<string:date>/<string:note>', methods=['POST'])
+def add_transaction(title, amount, category, date, note):
+    print("add_transaction()")
+    transaction = Transaction(title, amount, category, date, note)
+    result = db_comm.add_transaction(transaction)
     return result
 
-@app.route('/<string:purchase_id>/<string:item>/<string:price>/<string:category>/<string:date>/<string:note>', methods=['PUT'])
-def update_purchase(purchase_id, item, price, category, date, note):
-    print("update_purchase()")
-    purchase = Purchase(item, price, category, date, note, purchase_id)
-    result = db_comm.update_purchase(purchase)
+@app.route('/<string:transaction_id>/<string:title>/<string:amount>/<string:category>/<string:date>/<string:note>', methods=['PUT'])
+def update_transaction(transaction_id, title, amount, category, date, note):
+    print("update_transaction()")
+    transaction = Transaction(title, amount, category, date, note, transaction_id)
+    result = db_comm.update_transaction(transaction)
     return result
 
-@app.route('/<string:purchase_id>', methods=['DELETE'])
-def delete_purchase(purchase_id):
-    print("delete_purchase()")
-    result = db_comm.delete_purchase(purchase_id)
+@app.route('/<string:transaction_id>', methods=['DELETE'])
+def delete_transaction(transaction_id):
+    print("delete_transaction()")
+    result = db_comm.delete_transaction(transaction_id)
     return result
 
 # budget API endpoints
@@ -208,7 +180,7 @@ def delete_purchase(purchase_id):
 @app.route('/budgets', methods=['GET'])
 def get_budgets():
     print("get_budgets()")
-    result = to_json(db_comm.get_budgets())
+    result = jsonify([budget.to_dict() for budget in db_comm.get_budgets()])
     return result
 
 @app.route('/budget/<string:category>/<string:amount>/<string:amount_frequency>', methods=['POST'])
@@ -233,21 +205,6 @@ def delete_budget_category(category_id):
 
 
 # helpers
-def get_income_data():
-    print("Helper: get_income_data()")
-    data = {}
-
-    query = "select year from income"
-    db_comm.cursor.execute(query)
-    data["year"] = db_comm.cursor.fetchone()[0]
-
-    query = "select month from income"
-    db_comm.cursor.execute(query)
-    data["month"] = db_comm.cursor.fetchone()[0]
-    print(data)
-
-    return data
-
 def get_current_date():
     print("Helper: get_current_date()")
     year = "{}".format(datetime.now().year)
@@ -259,10 +216,4 @@ def get_current_date():
         month = "{}".format(curr_month)
 
     return (month,year)
-
-def to_json(data):
-    json_data = []
-    for element in data:
-        json_data.append(element.to_dict())
-    return jsonify(json_data)
 

@@ -1,5 +1,5 @@
 from flask import jsonify
-from models import Purchase
+from models import Transaction
 from models import Budget
 
 import sqlite3
@@ -11,64 +11,64 @@ class DBCommms:
         self.db_conn = sqlite3.connect(database_path)
         self.cursor = self.db_conn.cursor()
 
-    # Purchase Methods
+    # Transaction Methods
 
     # add, update, delete
-    def add_purchase(self, purchase):
+    def add_transaction(self, transaction):
         print("     " + self.__class__.__name__)
-        print("     " + "add_purchase({})".format(purchase))
+        print("     " + "add_transaction({})".format(transaction))
 
-        # add purchase
-        sql_note = "NULL" if (purchase.note == None) else "'{0}'".format(purchase.note)
+        # add transaction
+        sql_note = "NULL" if (transaction.note == None) else "'{0}'".format(transaction.note)
 
-        cmd = """INSERT INTO spending (item, price, category, date, note) VALUES ('{0}', {1}, '{2}', '{3}', {4})""".format(purchase.item,
-            purchase.price, purchase.category, purchase.date, sql_note)
+        cmd = """INSERT INTO ledger (title, amount, category, date, note) VALUES ('{0}', {1}, '{2}', '{3}', {4})""".format(transaction.title,
+            transaction.amount, transaction.category, transaction.date, sql_note)
         print(cmd)
         self.cursor.execute(cmd)
 
         self.db_conn.commit()
 
-        return jsonify({'result': 'successfuly added purchase!'})
+        return jsonify({'result': 'successfuly added transaction!'})
 
-    def update_purchase(self, purchase):
+    def update_transaction(self, transaction):
         print("     " + self.__class__.__name__)
-        print("     " + "update_purchase({})".format(purchase))
+        print("     " + "update_transaction({})".format(transaction))
 
-        sql_note = "NULL" if (purchase.note == None) else "'{0}'".format(purchase.note)
+        sql_note = "NULL" if (transaction.note == None) else "'{0}'".format(transaction.note)
 
-        cmd = """UPDATE spending SET item = '{0}', price = {1}, category = '{2}', date = '{3}', note = {4} WHERE spending.purchase_id = {5}""".format(purchase.item,
-        purchase.price, purchase.category, purchase.date, sql_note, purchase.purchase_id)
+        cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', note = {4} WHERE ledger.transaction_id = {5}""".format(transaction.title,
+        transaction.amount, transaction.category, transaction.date, sql_note, transaction.transaction_id)
         print(cmd)
         self.cursor.execute(cmd)
 
         self.db_conn.commit()
 
-        return jsonify({'result': 'successfuly updated purchase!'})
+        return jsonify({'result': 'successfuly updated transaction!'})
 
-    def delete_purchase(self, purchase_id):
+    def delete_transaction(self, transaction_id):
         print("     " + self.__class__.__name__)
-        print("     " + "delete_purchase({})", purchase_id)
+        print("     " + "delete_transaction({})", transaction_id)
 
-        self.cursor.execute("DELETE FROM spending WHERE spending.purchase_id = {0};".format(int(purchase_id)))
+        self.cursor.execute("DELETE FROM ledger WHERE ledger.transaction_id = {0};".format(int(transaction_id)))
         self.db_conn.commit()
 
-        return jsonify({'result': 'successfuly deleted purchase!'})
+        return jsonify({'result': 'successfuly deleted transaction!'})
 
     # fetch
-    def get_purchases(self, month=None, year=None, category="ALL"):
+    def get_transactions(self, month=None, year=None, category="ALL"):
         print("     " + self.__class__.__name__)
-        print("     " + "get_purchases({},{},{})".format(month, year, category))
-        base_query = "select * from spending"
+        print("     " + "get_transaction({},{},{})".format(month, year, category))
+        base_query = "select * from ledger"
 
         date_query = ""
         if month is None:
-            date_query = "spending.date like('{}%')".format(year)
+            date_query = "ledger.date like('{}%')".format(year)
         else:
-            date_query = "spending.date like('{}-{}-%')".format(year, month)
+            date_query = "ledger.date like('{}-{}-%')".format(year, month)
 
         category_query = ""
         if category != "ALL":
-            category_query = "spending.category = '{}'".format(category)
+            category_query = "ledger.category = '{}'".format(category)
 
         q = base_query + " where " + date_query + (" and " if category != "ALL" else "") + category_query
         print("     " + q)
@@ -76,24 +76,24 @@ class DBCommms:
         self.cursor.execute(q)
 
         data = []
-        for purchase_id, item, price, category, date, note in self.cursor:
-            purchase = Purchase(item, price, category, date, note, purchase_id)
-            data.append(purchase)
+        for transaction_id, title, amount, category, date, note in self.cursor:
+            transaction = Transaction(title, amount, category, date, note, transaction_id)
+            data.append(transaction)
 
         # send data
         return data
 
-    def get_purchase(self, purchase_id):
+    def get_transaction(self, transaction_id):
         print("     " + self.__class__.__name__)
-        print("     " + "get_purchase({})".format(purchase_id))
-        if purchase_id is None:
+        print("     " + "get_transaction({})".format(transaction_id))
+        if transaction_id is None:
             return None
 
-        self.cursor.execute("SELECT * FROM spending where spending.purchase_id = {}".format(purchase_id))
+        self.cursor.execute("SELECT * FROM ledger where ledger.transaction_id = {}".format(transaction_id))
 
         res = None
-        for purchase_id, item, price, category, date, note in  self.cursor:
-            res = Purchase(item, price, category, date, note, purchase_id)
+        for transaction_id, title, amount, category, date, note in  self.cursor:
+            res = Transaction(title, amount, category, date, note, transaction_id)
 
         # send data
         return res

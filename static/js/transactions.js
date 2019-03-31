@@ -1,7 +1,7 @@
-function deletePurchase(purchase_id) {
+function deleteTransaction(transaction_id) {
 
     var xhr = new XMLHttpRequest();
-    var url = "http://inherentvice.pythonanywhere.com/" + purchase_id;
+    var url = "http://inherentvice.pythonanywhere.com/" + transaction_id;
     xhr.open("DELETE", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
 
@@ -16,8 +16,8 @@ function deletePurchase(purchase_id) {
     }
 }
 
-function openUpdatePage(purchase_id) {
+function openUpdatePage(transaction_id) {
     var xhr = new XMLHttpRequest();
-    var url = "http://inherentvice.pythonanywhere.com/site/add_purchase/" + purchase_id;
+    var url = "http://inherentvice.pythonanywhere.com/site/add_transaction/" + transaction_id;
     window.open(url);
 }

@@ -33,8 +33,8 @@ tr:nth-child(even) {
 
 .btn:hover {background: #eee;}
 
-.purchases {color: green;}
+.transactions {color: green;}
 .budgets {color: dodgerblue;}
-.add_purchase {color: purple;}
+.add_transaction {color: purple;}
 .add_budget {color: orange;}
 .chart {color: gold;}

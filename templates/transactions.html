@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<head>
+
+<link rel="stylesheet" type="text/css" href="/static/css/transactions.css">
+
+</head>
+
+<body>
+    <button class="btn transactions" onclick="location.href='http://inherentvice.pythonanywhere.com/site/transactions'">Transactions</button>
+    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets'">Budgets</button>
+    <button class="btn add_transaction" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_transaction'">Add Transaction</button>
+    <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
+
+<h2>Transactions for {{month}}/{{year}}</h2>
+<h3>Total Spent for {{month}}/{{year}}: ${{spent_in_month}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Monthly Income: ${{month_income}}</h3>
+<h3>Total Spent for {{year}}: ${{spent_in_year}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Yearly Income: ${{year_income}}</h3>
+
+<p>
+    <br />
+</p>
+
+<table class="a">
+
+  <tr>
+    <th>Title</th>
+    <th>Amount</th>
+    <th>Category</th>
+    <th>Date</th>
+    <th>Note</th>
+    <th>Delete</th>
+  </tr>
+
+  {% for transaction in transactions %}
+
+    <tr>
+        <td><button class="btnSmall select" id="{{transaction.transaction_id}}" onclick="openUpdatePage(this.id)"><u>{{ transaction.title }}</u></button></td>
+        <td>${{ transaction.amount }}</td>
+        <td>{{ transaction.category }}</td>
+        <td>{{ transaction.date }}</td>
+        <td>{{ transaction.note }}</td>
+        <td><button class="btnSmall delete" id="{{transaction.transaction_id}}" onclick="deleteTransaction(this.id)"><u>delete</u></button></td>
+    </tr>
+
+  {% endfor %}
+
+</table>
+
+<script src="/static/js/transactions.js"></script>
+
+</body>
+

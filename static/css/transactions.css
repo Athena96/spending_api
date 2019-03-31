@@ -47,11 +47,11 @@ table.a {
 
 .btn:hover {background: #eee;}
 
-.purchases {color: green;}
+.transactions {color: green;}
 .budgets {color: dodgerblue;}
 .chart {color: gold;}
 
-.add_purchase {color: purple;}
+.add_transaction {color: purple;}
 .add_budget {color: orange;}
 .delete {color: red;}
 .select {color: black;}
