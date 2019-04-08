@@ -28,10 +28,10 @@
         </select><br>
         Date: <input type="text" id="dateTextBoxU" name="date" value="{{transaction.date}}"><br>
 
-        {% if transaction.note != None %}
-            Note: <input type="text" id="noteTextBoxU" name="note" value="{{transaction.note}}"><br>
+        {% if transaction.description != None %}
+            Description: <input type="text" id="descriptionTextBoxU" name="description" value="{{transaction.description}}"><br>
         {% else %}
-            Note: <input type="text" id="noteTextBoxU" name="note" value=""><br>
+            Description: <input type="text" id="descriptionTextBoxU" name="description" value=""><br>
         {% endif %}
 
         Passcode: <input type="text" id="passcodeTextBoxU" name="passcode" value=""><br>
@@ -51,7 +51,7 @@
             {% endfor %}
         </select><br>
         Date: <input type="text" id="dateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
-        Note: <input type="text" id="noteTextBox" name="note" value=""><br>
+        Description: <input type="text" id="descriptionTextBox" name="description" value=""><br>
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
         <button onclick="addTransaction()">Insert</button>
 

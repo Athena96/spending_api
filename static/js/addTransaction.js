@@ -25,9 +25,9 @@ function addTransaction() {
         var year = currentDate.getFullYear();
         date = year + "-" + month + "-" + date + " " + hour + ":" + min + ":" + sec;
     }
-    var note = document.getElementById("noteTextBox").value;
-    if (note == "" || note == null) {
-        note = "--";
+    var description = document.getElementById("descriptionTextBox").value;
+    if (description == "" || description == null || description == " ") {
+        description = null;
     }
     var passcode = document.getElementById("passcodeTextBox").value;
 
@@ -41,7 +41,7 @@ function addTransaction() {
         }
     });
 
-    var url_tmp = "http://inherentvice.pythonanywhere.com/" + title + "/" + amount + "/" + category + "/" + date + "/" + note;
+    var url_tmp = "http://inherentvice.pythonanywhere.com/" + title + "/" + amount + "/" + category + "/" + date + "/" + description;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.open("POST", url);
@@ -70,14 +70,14 @@ function updateTransaction(transaction_id) {
     var amount = document.getElementById("amountTextBoxU").value;
     var category = document.getElementById("mySelectCategoryU").value;
     var date = document.getElementById("dateTextBoxU").value;
-    var note = document.getElementById("noteTextBoxU").value;
-    if (note == "" || note == null) {
-        note = "--";
+    var description = document.getElementById("descriptionTextBox").value;
+    if (description == "" || description == null || description == " ") {
+        description = null;
     }
     var passcode = document.getElementById("passcodeTextBoxU").value;
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = "http://inherentvice.pythonanywhere.com/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + note;
+    var url_tmp = "http://inherentvice.pythonanywhere.com/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + description;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.withCredentials = true;
