@@ -65,6 +65,7 @@ def budgets_page(month=None, year=None):
     # todo get income data
 
     budgets = db_comm.get_budgets()
+    print(budgets)
 
     if month == None and year == None:
         curr_date = get_current_date()
@@ -91,6 +92,7 @@ def budgets_page(month=None, year=None):
             start_date = datetime(year=s_year, month=s_month, day=s_day)
             end_date = start_date + timedelta(days=budget.get_duration())
 
+            # todo make function for this
             cmd = """select sum(ledger.amount) from ledger where ledger.category = '{0}' and ledger.date >= '{1}-{2}-{3} 00:00:00' and ledger.date <= '{4}-{5}-{6} 23:59:59'""".format(budget.category, s_year, '{:02d}'.format(s_month), '{:02d}'.format(s_day), end_date.year, '{:02d}'.format(end_date.month), '{:02d}'.format(end_date.day))
             db_comm.cursor.execute(cmd)
 
@@ -111,6 +113,7 @@ def budgets_page(month=None, year=None):
         remaining = round((budget.amount + spent_so_far),2)
 
         entry = (budget.budget_id, budget.category, spent_so_far_str, percent, budget.amount, budget.amount_frequency, remaining)
+        print("entry: ", entry)
         budget_data.append(entry)
 
     month_budgets = filter(lambda x: x[5] == "month", budget_data)
@@ -183,17 +186,17 @@ def get_budgets():
     result = jsonify([budget.to_dict() for budget in db_comm.get_budgets()])
     return result
 
-@app.route('/budget/<string:category>/<string:amount>/<string:amount_frequency>', methods=['POST'])
-def add_budget_category(category, amount, amount_frequency):
+@app.route('/budget/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>', methods=['POST'])
+def add_budget_category(category, amount, amount_frequency, description):
     print("add_budget_category()")
-    budget = Budget(category, amount, amount_frequency)
+    budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, description=description)
     result = db_comm.add_budget_category(budget)
     return result
 
-@app.route('/budget/<string:category_id>/<string:category>/<string:amount>/<string:amount_frequency>', methods=['PUT'])
-def update_budget_category(category_id, category, amount, amount_frequency):
+@app.route('/budget/<string:category_id>/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>', methods=['PUT'])
+def update_budget_category(category_id, category, amount, amount_frequency, description):
     print("update_budget_category()")
-    budget = Budget(category, amount, amount_frequency, category_id)
+    budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=category_id)
     result = db_comm.update_budget_category(budget)
     return result
 

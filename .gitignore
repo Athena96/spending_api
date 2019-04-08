@@ -1,3 +1,1 @@
-__pycache__/
-*_month_plot_*
-*_year_plot_*
+*.pyc 

@@ -4,6 +4,79 @@ from models import Budget
 
 import sqlite3
 
+# -- Month budgets
+# 	select budget.category, budget.amount, sum(ledger.amount) as spent, (budget.amount + sum(ledger.amount)) as remaining
+# 	from budget
+# 	left join ledger
+# 	on budget.category = ledger.category
+# 	where budget.amount_frequency like('month') and ledger.date like('2019-04%')
+# 	group by budget.category
+
+# union
+
+# 	select budget.category, budget.amount, '0.00' as spent, budget.amount as remaining
+# 	from budget
+# 	where budget.amount_frequency like('month')
+# 	and budget.category not in (
+# 		select budget.category
+# 		from budget
+# 		left join ledger
+# 		on budget.category = ledger.category
+# 		where budget.amount_frequency like('month') and ledger.date like('2019-04%')
+# 		group by budget.category
+# 	)
+# -- Year Budgets
+
+
+# 	select budget.category, budget.amount, sum(ledger.amount) as spent, (budget.amount + sum(ledger.amount)) as remaining
+# 	from budget
+# 	left join ledger
+# 	on budget.category = ledger.category
+# 	where budget.amount_frequency like('year') and ledger.date like('2019-%')
+# 	group by budget.category
+
+# union
+
+# 	select budget.category, budget.amount, '0.00' as spent, budget.amount as remaining
+# 	from budget
+# 	where budget.amount_frequency like('year')
+# 	and budget.category not in (
+# 		select budget.category
+# 		from budget
+# 		left join ledger
+# 		on budget.category = ledger.category
+# 		where budget.amount_frequency like('year') and ledger.date like('2019-%')
+# 		group by budget.category
+# 	)
+
+
+# -- Special Budgets
+
+
+
+# 	select budget.category, budget.amount, sum(ledger.amount) as spent, (budget.amount + sum(ledger.amount)) as remaining
+# 	from budget
+# 	left join ledger
+# 	on budget.category = ledger.category
+# 	where budget.amount_frequency like('special') and ledger.date >=
+# 	group by budget.category
+
+# union
+
+# 	select budget.category, budget.amount, '0.00' as spent, budget.amount as remaining
+# 	from budget
+# 	where budget.amount_frequency like('special')
+# 	and budget.category not in (
+# 		select budget.category
+# 		from budget
+# 		left join ledger
+# 		on budget.category = ledger.category
+# 		where budget.amount_frequency like('special') and ledger.date like('2019-%')
+# 		group by budget.category
+# 	)
+
+
+
 class DBCommms:
 
     def __init__(self, database_path):
@@ -106,8 +179,10 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "add_budget_category({})", budget)
 
+        sql_description = "NULL" if (budget.description == None) else "'{0}'".format(budget.description)
+
         # add budget category
-        cmd = """INSERT INTO budget (category, amount, amount_frequency) VALUES ('{0}', {1}, '{2}')""".format(budget.category, budget.amount, budget.amount_frequency)
+        cmd = """INSERT INTO budget (category, amount, amount_frequency, description) VALUES ('{0}', {1}, '{2}', {3})""".format(budget.category, budget.amount, budget.amount_frequency, sql_description)
         print(cmd)
         self.cursor.execute(cmd)
 
@@ -119,8 +194,10 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "update_budget_category({})", budget)
 
-        cmd = """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}' WHERE budget.category_id = {3}""".format(budget.category,
-        budget.amount, budget.amount_frequency, budget.budget_id)
+        sql_description = "NULL" if (budget.description == None) else "'{0}'".format(budget.description)
+
+        cmd = """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}', description = {3} WHERE budget.category_id = {4}""".format(budget.category,
+        budget.amount, budget.amount_frequency, sql_description, budget.budget_id)
         print(cmd)
         self.cursor.execute(cmd)
 
@@ -148,8 +225,9 @@ class DBCommms:
 
         # get list of categories
         data = []
-        for category, amount, amount_frequency, category_id in self.cursor:
-            budget = Budget(category, amount, amount_frequency, category_id)
+        for category, amount, amount_frequency, category_id, description in self.cursor:
+            budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=category_id)
+            print("get_budgets: ", (category, amount, amount_frequency, description, category_id))
             data.append(budget)
 
         # send data
@@ -164,8 +242,8 @@ class DBCommms:
         self.cursor.execute("SELECT * FROM budget where budget.category_id = {}".format(budget_id))
 
         res = None
-        for category, amount, amount_frequency, category_id in self.cursor:
-            res = Budget(category, amount, amount_frequency, category_id)
+        for category, amount, amount_frequency, category_id, description in self.cursor:
+            res = Budget(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=category_id)
 
         # send data
         return res

@@ -2,10 +2,11 @@ function addBudget() {
     var category = document.getElementById("categoryTextBox").value;
     var amount = document.getElementById("amountTextBox").value;
     var amountFrequency = document.getElementById("amountFrequencyTextBox").value;
+    var description = document.getElementById("descriptionTextBox").value;
     var passcode = document.getElementById("passcodeTextBox").value;
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = "http://inherentvice.pythonanywhere.com/budget/" + category + "/" + amount + "/" + amountFrequency;
+    var url_tmp = "http://inherentvice.pythonanywhere.com/budget/" + category + "/" + amount + "/" + amountFrequency + "/" + description;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.withCredentials = true;
@@ -27,10 +28,11 @@ function updateBudget(budget_id) {
     var category = document.getElementById("categoryTextBoxU").value;
     var amount = document.getElementById("amountTextBoxU").value;
     var amountFrequency = document.getElementById("amountFrequencyTextBoxU").value;
+    var description = document.getElementById("descriptionTextBoxU").value;
     var passcode = document.getElementById("passcodeTextBox").value;
 
     var xhr = new XMLHttpRequest();
-    var url_w_spc = "http://inherentvice.pythonanywhere.com/budget/" + budget_id + "/" + category + "/" + amount + "/" + amountFrequency;
+    var url_w_spc = "http://inherentvice.pythonanywhere.com/budget/" + budget_id + "/" + category + "/" + amount + "/" + amountFrequency + "/" + description;
     var url = url_w_spc.replace(" ", "%20");
 
     xhr.withCredentials = true;

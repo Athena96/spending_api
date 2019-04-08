@@ -24,10 +24,14 @@ class Transaction:
 
 class Budget:
 
-    def __init__(self, category, amount, amount_frequency, budget_id=None):
+    def __init__(self, category, amount, amount_frequency, description=None, budget_id=None):
         self.category = category
         self.amount = amount
         self.amount_frequency = amount_frequency
+        if description == "--" or description == "NULL" or description == None or description == "":
+            self.description = None
+        else:
+            self.description = description
         self.budget_id = budget_id
 
     def get_startdate(self):
