@@ -28,7 +28,7 @@
     <th>Amount</th>
     <th>Category</th>
     <th>Date</th>
-    <th>Note</th>
+    <th>Description</th>
     <th>Delete</th>
   </tr>
 
@@ -39,7 +39,7 @@
         <td>${{ transaction.amount }}</td>
         <td>{{ transaction.category }}</td>
         <td>{{ transaction.date }}</td>
-        <td>{{ transaction.note }}</td>
+        <td>{{ transaction.description }}</td>
         <td><button class="btnSmall delete" id="{{transaction.transaction_id}}" onclick="deleteTransaction(this.id)"><u>delete</u></button></td>
     </tr>
 

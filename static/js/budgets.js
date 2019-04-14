@@ -1,20 +1,4 @@
 
-function updateIncome() {
-
-    // /year_income/<string:year_income>
-    var year_income = document.getElementById("yearIncomeBox").value;
-    alert("new year_income: " + year_income)
-    var xhr = new XMLHttpRequest();
-    var url = "http://inherentvice.pythonanywhere.com/year_income/" + year_income;
-
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify({}));
-    xhr.onload = function() {
-        console.log("Updated Income to: $" + year_income)
-        location.reload();
-    }
-}
 
 function openUpdatePage(budget_id) {
     var xhr = new XMLHttpRequest();
