@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<head>
+
+<link rel="stylesheet" type="text/css" href="/static/css/transactions.css">
+
+</head>
+
+<body>
+    <button class="btn transactions" onclick="location.href='http://inherentvice.pythonanywhere.com/site/transactions'">Transactions</button>
+    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets'">Budgets</button>
+    <button class="btn add_transaction" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_transaction'">Add Transaction</button>
+    <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
+
+<ul>
+
+    {% for link in budgets_links %}
+        <li><button class="btn budget_pages" onclick="{{link[0]}}">{{link[1]}}-{{link[2]}} Budgets</button></li>
+    {% endfor %}
+
+</ul>
+
+<!--<script src="/static/js/transactions.js"></script>-->
+
+</body>
+
+

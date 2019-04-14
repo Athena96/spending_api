@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, render_template
+from dateutil.rrule import rrule, MONTHLY
 from db_comms import DBCommms
 from datetime import datetime
 from datetime import timedelta
@@ -23,6 +24,36 @@ def add_transaction_page(transaction_id=None):
     transaction = db_comm.get_transaction(transaction_id)
     budgets = db_comm.get_budgets()
     return render_template('add_transaction.html', transaction=transaction, budgets=budgets)
+
+@app.route("/site/transactions", methods=["GET"])
+def transactions_root_page():
+
+    transaction_links = []
+
+    cmd = """select min(ledger.date)
+            from ledger"""
+    db_comm.cursor.execute(cmd)
+    min_date = db_comm.cursor.fetchone()[0]
+    min_month = int(min_date[5:7])
+    min_year = int(min_date[0:4])
+
+    cmd = """select max(ledger.date)
+            from ledger"""
+    db_comm.cursor.execute(cmd)
+    max_date = db_comm.cursor.fetchone()[0]
+    max_month = int(max_date[5:7])
+    max_year = int(max_date[0:4])
+
+    print("min_date: " , min_date)
+    print("max_date: " , max_date)
+
+    for (m,y) in months(min_month, min_year, max_month, max_year):
+        month_str = single_digit_num_str(m)
+        # "location.href='http://inherentvice.pythonanywhere.com/site/transactions/{}/{}'".format()
+        transaction_links.append(("location.href='http://inherentvice.pythonanywhere.com/site/transactions/{}/{}'".format(month_str, y), month_str, y))
+
+    return render_template('root_transactions.html',
+    transaction_links=transaction_links)
 
 @app.route("/site/transactions/<string:month>/<string:year>", methods=["GET"])
 @app.route("/site/transactions/<string:month>/<string:year>/<string:category>", methods=["GET"])
@@ -61,6 +92,36 @@ def add_budget_page(budget_id=None):
 
     budget = db_comm.get_budget(budget_id)
     return render_template('add_budget.html', budget=budget)
+
+@app.route("/site/budgets", methods=["GET"])
+def budgets_root_page():
+
+    budgets_links = []
+
+    cmd = """select min(ledger.date)
+            from ledger"""
+    db_comm.cursor.execute(cmd)
+    min_date = db_comm.cursor.fetchone()[0]
+    min_month = int(min_date[5:7])
+    min_year = int(min_date[0:4])
+
+    cmd = """select max(ledger.date)
+            from ledger"""
+    db_comm.cursor.execute(cmd)
+    max_date = db_comm.cursor.fetchone()[0]
+    max_month = int(max_date[5:7])
+    max_year = int(max_date[0:4])
+
+    print("min_date: " , min_date)
+    print("max_date: " , max_date)
+
+    for (m,y) in months(min_month, min_year, max_month, max_year):
+        month_str = single_digit_num_str(m)
+        # "location.href='http://inherentvice.pythonanywhere.com/site/budgets/{}/{}'".format()
+        budgets_links.append(("location.href='http://inherentvice.pythonanywhere.com/site/budgets/{}/{}'".format(month_str, y), month_str, y))
+
+    return render_template('root_budgets.html',
+    budgets_links=budgets_links)
 
 @app.route("/site/budgets/<string:month>/<string:year>", methods=["GET"])
 def budgets_page(month=None, year=None):
@@ -215,11 +276,19 @@ def get_current_date():
 
     year = "{}".format(datetime.now().year)
     curr_month = datetime.now().month
-    month = ""
-    if curr_month < 10:
-        month = "0{}".format(curr_month)
-    else:
-        month = "{}".format(curr_month)
-
+    month = single_digit_num_str(curr_month)
     return (month,year)
+
+def single_digit_num_str(num):
+    str_num = ""
+    if num < 10:
+        str_num = "0{}".format(num)
+    else:
+        str_num = "{}".format(num)
+    return str_num
+
+def months(start_month, start_year, end_month, end_year):
+    start = datetime(start_year, start_month, 1)
+    end = datetime(end_year, end_month, 1)
+    return [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, until=end)]
 
