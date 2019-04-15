@@ -70,7 +70,7 @@ function updateTransaction(transaction_id) {
     var amount = document.getElementById("amountTextBoxU").value;
     var category = document.getElementById("mySelectCategoryU").value;
     var date = document.getElementById("dateTextBoxU").value;
-    var description = document.getElementById("descriptionTextBox").value;
+    var description = document.getElementById("descriptionTextBoxU").value;
     if (description == "" || description == null || description == " ") {
         description = null;
     }
