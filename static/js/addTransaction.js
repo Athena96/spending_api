@@ -11,7 +11,6 @@ function addTransaction() {
 
     var title = document.getElementById("titleTextBox").value;
     var amount = document.getElementById("amountTextBox").value;
-    //var category = document.getElementById("categoryTextBox").value;
     var category = document.getElementById("mySelectCategory").value;
     var date = document.getElementById("dateTextBox").value;
     if (date == "" || date == null) {

@@ -40,7 +40,11 @@
         <td>${{ transaction.amount }}</td>
         <td>{{ transaction.category }}</td>
         <td>{{ transaction.date }}</td>
-        <td>{{ transaction.description }}</td>
+        {% if transaction.description != None %}
+            <td>{{ transaction.description }}</td>
+        {% else %}
+            <td></td>
+        {% endif %}
         <td><button class="btnSmall delete" id="{{transaction.transaction_id}}" onclick="deleteTransaction(this.id)"><u>delete</u></button></td>
     </tr>
 

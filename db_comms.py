@@ -77,6 +77,7 @@ class DBCommms:
 
         data = []
         for transaction_id, title, amount, category, date, description in self.cursor:
+            description = None if description == "null" else description
             transaction = Transaction(title, amount, category, date, description, transaction_id)
             data.append(transaction)
 
@@ -94,6 +95,7 @@ class DBCommms:
 
         res = None
         for transaction_id, title, amount, category, date, description in self.cursor:
+            description = None if description == "null" else description
             res = Transaction(title, amount, category, date, description, transaction_id)
 
         return res
@@ -120,7 +122,7 @@ class DBCommms:
 
         sql_description = "NULL" if (budget.description == None) else "'{0}'".format(budget.description)
 
-        cmd = """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}', description = {3} WHERE budget.budget_id = {4}""".format(budget.category,
+        cmd = """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}', description = {3} WHERE budget.category_id = {4}""".format(budget.category,
         budget.amount, budget.amount_frequency, sql_description, budget.budget_id)
         print(cmd)
 
@@ -134,7 +136,7 @@ class DBCommms:
         print("     " + "delete_budget({})", budget_id)
 
         # TODO is int() necessary?
-        cmd = "DELETE FROM budget WHERE budget.budget_id = {0};".format(int(budget_id))
+        cmd = "DELETE FROM budget WHERE budget.category_id = {0};".format(int(budget_id))
         print(cmd)
 
         self.cursor.execute(cmd)
@@ -151,6 +153,7 @@ class DBCommms:
 
         data = []
         for category, amount, amount_frequency, budget_id, description in self.cursor:
+            description = None if description == "null" else description
             if "special" in amount_frequency:
                 budget = SpecialBudget(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=budget_id)
             else:
@@ -166,11 +169,12 @@ class DBCommms:
         if budget_id is None:
             return None
 
-        cmd = "SELECT * FROM budget where budget.budget_id = {}".format(budget_id)
+        cmd = "SELECT * FROM budget where budget.category_id = {}".format(budget_id)
         self.cursor.execute(cmd)
 
         res = None
         for category, amount, amount_frequency, budget_id, description in self.cursor:
+            description = None if description == "null" else description
             if "special" in amount_frequency:
                 res = SpecialBudget(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=budget_id)
             else:

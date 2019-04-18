@@ -219,6 +219,7 @@ def get_transactions(month=None, year=None, category="ALL"):
 def add_transaction(title, amount, category, date, description):
     print("add_transaction()")
 
+    description = None if description == "null" else description
     transaction = Transaction(title, amount, category, date, description)
     result = db_comm.add_transaction(transaction)
     return result
@@ -251,6 +252,7 @@ def get_budgets():
 def add_budget(category, amount, amount_frequency, description):
     print("add_budget()")
 
+    description = None if description == "null" else description
     budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, description=description)
     result = db_comm.add_budget(budget)
     return result

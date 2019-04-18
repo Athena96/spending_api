@@ -3,6 +3,10 @@ function addBudget() {
     var amount = document.getElementById("amountTextBox").value;
     var amountFrequency = document.getElementById("amountFrequencyTextBox").value;
     var description = document.getElementById("descriptionTextBox").value;
+    if (description == "" || description == null || description == " ") {
+        description = null;
+    }
+
     var passcode = document.getElementById("passcodeTextBox").value;
 
     var xhr = new XMLHttpRequest();
@@ -29,6 +33,10 @@ function updateBudget(budget_id) {
     var amount = document.getElementById("amountTextBoxU").value;
     var amountFrequency = document.getElementById("amountFrequencyTextBoxU").value;
     var description = document.getElementById("descriptionTextBoxU").value;
+    if (description == "" || description == null || description == " ") {
+        description = null;
+    }
+
     var passcode = document.getElementById("passcodeTextBox").value;
 
     var xhr = new XMLHttpRequest();

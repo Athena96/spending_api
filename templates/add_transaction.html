@@ -16,7 +16,6 @@
 
         Title: <input type="text" id="titleTextBoxU" name="title" value="{{transaction.title}}"><br>
         Amount: <input type="text" id="amountTextBoxU" name="amount" value="{{transaction.amount}}"><br>
-        <!--Category: <input type="text" id="categoryTextBoxU" name="category" value="{{transaction.category}}"><br>-->
         <select id="mySelectCategoryU">
             {% for budget in budgets %}
                 {% if budget.category ==  transaction.category %}
@@ -43,7 +42,6 @@
     {% else %}
         Title: <input type="text" id="titleTextBox" name="title" value=""><br>
         Amount: <input type="text" id="amountTextBox" name="amount" value=""><br>
-        <!--Category: <input type="text" id="categoryTextBox" name="category" value=""><br>-->
         Category:
         <select id="mySelectCategory">
             {% for budget in budgets %}
