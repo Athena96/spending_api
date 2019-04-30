@@ -34,10 +34,15 @@ function openPurhcasesPage(info) {
     if (parts.length == 3) {
         month = parts[1];
         year = parts[2];
-        url = "http://inherentvice.pythonanywhere.com/site/transactions/" + month + "/" + year + "/" + category;
+        // .../year:2019/month:04                   all txns for april 2019
+        // .../year:2019/month:04/category:grocery  all grocery txns for april 2019
+        // .../year:2019                            all txns for 2019
+        // .../year:2019/category:grocery           all grocery txns for 2019
+
+        url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/year:" + year + "/month:" + month + "/category:" + category;
     } else {
         year = parts[1];
-        url = "http://inherentvice.pythonanywhere.com/site/transactions/" + "ALL" + "/" + year + "/" + category;
+        url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/year:" + year + "/category:" + category;
     }
     window.open(url);
 }

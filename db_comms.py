@@ -56,7 +56,7 @@ class DBCommms:
 
     def get_transactions(self, month=None, year=None, category="ALL"):
         print("     " + self.__class__.__name__)
-        print("     " + "get_transaction({},{},{})".format(month, year, category))
+        print("     " + "get_transaction(month:{},year:{},category:{})".format(month, year, category))
 
         base_query = "select * from ledger"
 
@@ -99,6 +99,27 @@ class DBCommms:
             res = Transaction(title, amount, category, date, description, transaction_id)
 
         return res
+
+    def get_min_max_transaction_dates(self):
+        print("     " + self.__class__.__name__)
+        print("     " + "get_min_max_transaction_dates()")
+
+        cmd = """select min(ledger.date)
+            from ledger"""
+        self.cursor.execute(cmd)
+        min_date = self.cursor.fetchone()[0]
+        min_month = int(min_date[5:7])
+        min_year = int(min_date[0:4])
+
+        cmd = """select max(ledger.date)
+            from ledger"""
+        self.cursor.execute(cmd)
+        max_date = self.cursor.fetchone()[0]
+        max_month = int(max_date[5:7])
+        max_year = int(max_date[0:4])
+
+        return (min_month, min_year, max_month, max_year)
+
 
     # Budget Methods
 

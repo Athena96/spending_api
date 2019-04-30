@@ -1,3 +1,4 @@
+from datetime import datetime
 
 class Transaction:
 
@@ -57,3 +58,28 @@ class SpecialBudget(Budget):
     #     Budget.__init__(self, category, amount, amount_frequency, description=None, budget_id=None)
     #     self.start_date = start_date
     #     self.duration = duration
+
+class BudgetPageInfo:
+
+    def __init__(self, budget, spent_so_far_month, spent_so_far_year):
+        self.budget = budget
+
+        self.percent_month = -(spent_so_far_month / (budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0) ))
+        self.percent_year = -(spent_so_far_year / (budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0) ))
+
+
+        num_rem_mo_in_yr = (12.0 - (datetime.now().month + datetime.now().day/30.0))
+
+        if budget.amount_frequency == "month":
+            self.remaining_month = "{}".format(round(budget.amount + spent_so_far_month,2))
+        else:
+            self.remaining_month = "{}".format(round((budget.amount + spent_so_far_year) / num_rem_mo_in_yr,2))
+        # self.remaining_month = "{}".format(round(((budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0)) + spent_so_far_month),2))
+
+        self.remaining_year = "{}".format(round(((budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0)) + spent_so_far_year),2))
+
+        self.spent_so_far_month = "{}".format(round(spent_so_far_month, 2))
+        self.spent_so_far_year = "{}".format(round(spent_so_far_year, 2))
+
+
+
