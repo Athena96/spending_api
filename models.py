@@ -1,11 +1,25 @@
 from datetime import datetime
 
+class Category:
+
+    def __init__(self, name, is_income):
+        self.name = name
+        self.is_income = is_income
+
+    def __eq__(self, other):
+        if isinstance(other, Category):
+            return other.name == self.name and other.is_income == self.is_income
+        else:
+            return NotImplemented
+
+    # todo implement __ne__
+
 class Transaction:
 
     def __init__(self, title, amount, category, date, description=None, transaction_id=None):
         self.title = title
-        self.amount = amount
-        self.category = category
+        self.amount = float(amount)
+        self.category = Category(name=category, is_income=True if self.amount > 0 else False)
         self.date = date
         self.description = description
         self.transaction_id = transaction_id
@@ -15,7 +29,7 @@ class Transaction:
         contents["transaction_id"] = self.transaction_id
         contents["title"] = self.title
         contents["amount"] = self.amount
-        contents["category"] = self.category
+        contents["category"] = self.category.name
         contents["date"] = self.date
         contents["description"] = self.description
         return contents
@@ -23,15 +37,15 @@ class Transaction:
 class Budget:
 
     def __init__(self, category, amount, amount_frequency, description=None, budget_id=None):
-        self.category = category
-        self.amount = amount
+        self.amount = float(amount)
+        self.category = Category(name=category, is_income=True if self.amount > 0 else False)
         self.amount_frequency = amount_frequency
         self.description = description
         self.budget_id = budget_id
 
     def to_dict(self):
         contents = {}
-        contents["category"] = self.category
+        contents["category"] = self.category.name
         contents["amount"] = self.amount
         contents["amount_frequency"] = self.amount_frequency
         contents["budget_id"] = self.budget_id
@@ -64,22 +78,19 @@ class BudgetPageInfo:
     def __init__(self, budget, spent_so_far_month, spent_so_far_year):
         self.budget = budget
 
-        self.percent_month = -(spent_so_far_month / (budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0) ))
-        self.percent_year = -(spent_so_far_year / (budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0) ))
+        self.percent_month = (spent_so_far_month / (budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0) ))
+        self.percent_year = (spent_so_far_year / (budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0) ))
 
 
         num_rem_mo_in_yr = (12.0 - (datetime.now().month + datetime.now().day/30.0))
 
         if budget.amount_frequency == "month":
-            self.remaining_month = "{}".format(round(budget.amount + spent_so_far_month,2))
+            self.remaining_month = "{}".format(round((budget.amount - spent_so_far_month),2))
         else:
-            self.remaining_month = "{}".format(round((budget.amount + spent_so_far_year) / num_rem_mo_in_yr,2))
+            self.remaining_month = "{}".format(round((budget.amount - spent_so_far_year) / num_rem_mo_in_yr,2))
         # self.remaining_month = "{}".format(round(((budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0)) + spent_so_far_month),2))
 
-        self.remaining_year = "{}".format(round(((budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0)) + spent_so_far_year),2))
+        self.remaining_year = "{}".format(round(((budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0)) - spent_so_far_year),2))
 
         self.spent_so_far_month = "{}".format(round(spent_so_far_month, 2))
         self.spent_so_far_year = "{}".format(round(spent_so_far_year, 2))
-
-
-

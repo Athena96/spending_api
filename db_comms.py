@@ -20,7 +20,7 @@ class DBCommms:
         sql_note = "NULL" if (transaction.description == None) else "'{0}'".format(transaction.description)
 
         cmd = """INSERT INTO ledger (title, amount, category, date, description) VALUES ('{0}', {1}, '{2}', '{3}', {4})""".format(transaction.title,
-            transaction.amount, transaction.category, transaction.date, sql_note)
+            transaction.amount, transaction.category.name, transaction.date, sql_note)
         print(cmd)
 
         self.cursor.execute(cmd)
@@ -35,7 +35,7 @@ class DBCommms:
         sql_note = "NULL" if (transaction.description == None) else "'{0}'".format(transaction.description)
 
         cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = {4} WHERE ledger.transaction_id = {5}""".format(transaction.title,
-        transaction.amount, transaction.category, transaction.date, sql_note, transaction.transaction_id)
+        transaction.amount, transaction.category.name, transaction.date, sql_note, transaction.transaction_id)
         print(cmd)
 
         self.cursor.execute(cmd)
@@ -129,7 +129,7 @@ class DBCommms:
 
         sql_description = "NULL" if (budget.description == None) else "'{0}'".format(budget.description)
 
-        cmd = """INSERT INTO budget (category, amount, amount_frequency, description) VALUES ('{0}', {1}, '{2}', {3})""".format(budget.category, budget.amount, budget.amount_frequency, sql_description)
+        cmd = """INSERT INTO budget (category, amount, amount_frequency, description) VALUES ('{0}', {1}, '{2}', {3})""".format(budget.category.name, budget.amount, budget.amount_frequency, sql_description)
         print(cmd)
 
         self.cursor.execute(cmd)
@@ -143,7 +143,7 @@ class DBCommms:
 
         sql_description = "NULL" if (budget.description == None) else "'{0}'".format(budget.description)
 
-        cmd = """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}', description = {3} WHERE budget.category_id = {4}""".format(budget.category,
+        cmd = """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}', description = {3} WHERE budget.category_id = {4}""".format(budget.category.name,
         budget.amount, budget.amount_frequency, sql_description, budget.budget_id)
         print(cmd)
 
