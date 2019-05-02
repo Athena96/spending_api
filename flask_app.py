@@ -27,10 +27,11 @@ def transactions_root_page():
     transaction_links = []
     for (m,y) in months(min_month, min_year, max_month, max_year):
         month_str = single_digit_num_str(m)
-        transaction_links.append(("location.href='http://inherentvice.pythonanywhere.com/site/transactions/year:{}/month:{}'".format(y, month_str), month_str, y))
+        date = datetime(year=y, month=m, day=1)
+        transaction_links.append(("location.href='http://inherentvice.pythonanywhere.com/site/transactions/year:{}/month:{}'".format(y, month_str), month_str, y, date))
 
     return render_template('root_transactions.html',
-    transaction_links=transaction_links)
+    transaction_links=sorted(transaction_links, key=lambda x: x[3], reverse=True))
 
 @app.route("/site/add_transaction", methods=["GET"])
 @app.route("/site/add_transaction/<string:transaction_id>", methods=["GET"])
@@ -84,10 +85,11 @@ def budgets_root_page():
     budgets_links = []
     for (m,y) in months(min_month, min_year, max_month, max_year):
         month_str = single_digit_num_str(m)
-        budgets_links.append(("location.href='http://inherentvice.pythonanywhere.com/site/budgets/{}/{}'".format(month_str, y), month_str, y))
+        date = datetime(year=y, month=m, day=1)
+        budgets_links.append(("location.href='http://inherentvice.pythonanywhere.com/site/budgets/{}/{}'".format(month_str, y), month_str, y, date))
 
     return render_template('root_budgets.html',
-    budgets_links=budgets_links)
+    budgets_links=sorted(budgets_links, key=lambda x: x[3], reverse=True))
 
 @app.route("/site/add_budget", methods=["GET"])
 @app.route("/site/add_budget/<string:budget_id>", methods=["GET"])

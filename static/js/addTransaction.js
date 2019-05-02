@@ -10,8 +10,11 @@ function formatSingleDigit(digit) {
 function addTransaction() {
 
     var title = document.getElementById("titleTextBox").value;
-    var amount = document.getElementById("amountTextBox").value;
     var category = document.getElementById("mySelectCategory").value;
+    var amount = document.getElementById("amountTextBox").value;
+    if (!category.includes("income")) {
+        amount = amount * -1.0;
+    }
     var date = document.getElementById("dateTextBox").value;
     if (date == "" || date == null) {
         var currentDate = new Date();
