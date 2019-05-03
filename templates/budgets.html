@@ -121,6 +121,54 @@
   {% endfor %}
 </table>
 
+<h2>Special Budgets</h2>
+<table class="a">
+  <tr>
+    <th>Category <i>(click to edit)</i></th>
+    <th>Spent Month</th>
+    <th>Spent Special Period</th>
+    <th>Budgeted</th>
+    <th>Remaining Month (avg)</th>
+    <th>Remaining Year</th>
+    <th>Delete</th>
+  </tr>
+  {% for budget_info in special_budgets %}
+    <tr>
+        <td><p><button class="btnSmall select" id="{{budget_info.budget.budget_id}}" onclick="openUpdatePage(this.id)"><b><u>{{ budget_info.budget.category.name }}</u></b></button></p></td>
+        <td><button class="btnSmall select" id="{{budget_info.budget.category.name}}#{{month}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_month }}</u></button></td>
+        <td><button class="btnSmall select" id="{{budget_info.budget.category.name}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_year }}</u></button></td>
+        <td>${{ budget_info.budget.amount }}</td>
+        {% if budget_info.percent_month >=  0.0 and budget_info.percent_month <  0.85 %}
+            <td><font color="green">${{ budget_info.remaining_month }}</font></td>
+        {% else %}
+            {% if budget_info.percent_month >= 0.85 and  budget_info.percent_month < 0.99 %}
+                <td><font color="orange">${{ budget_info.remaining_month }}</font></td>
+            {% else %}
+                {% if budget_info.percent_month >= 0.99 and  budget_info.percent_month <= 1.00 %}
+                    <td><font color="blue">${{ budget_info.remaining_month }}</font></td>
+                {% else %}
+                    <td><font color="red">${{ budget_info.remaining_month }}</font></td>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        {% if budget_info.percent_year >=  0.0 and budget_info.percent_year <  0.85 %}
+            <td><font color="green">${{ budget_info.remaining_year }}</font></td>
+        {% else %}
+            {% if budget_info.percent_year >= 0.85 and  budget_info.percent_year < 0.99 %}
+                <td><font color="orange">${{ budget_info.remaining_year }}</font></td>
+            {% else %}
+                {% if budget_info.percent_year >= 0.99 and  budget_info.percent_year <= 1.00 %}
+                    <td><font color="blue">${{ budget_info.remaining_year }}</font></td>
+                {% else %}
+                    <td><font color="red">${{ budget_info.remaining_year }}</font></td>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        <td><button class="btnSmall delete" id="{{budget_info.budget.budget_id}}" onclick="deleteBudget(this.id)"><u>delete</u></button></td>
+    </tr>
+  {% endfor %}
+</table>
+
 <script src="/static/js/budgets.js"></script>
 
 </body>

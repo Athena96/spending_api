@@ -74,12 +74,17 @@ class SpecialBudget(Budget):
     #     self.duration = duration
 
 class BudgetPageInfo:
+    # todo inhereitance, act diff depending on if its special or not
 
     def __init__(self, budget, spent_so_far_month, spent_so_far_year):
         self.budget = budget
 
-        self.percent_month = (spent_so_far_month / (budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0) ))
-        self.percent_year = (spent_so_far_year / (budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0) ))
+        if type(budget) is SpecialBudget:
+             self.percent_month = (spent_so_far_month / budget.amount)
+             self.percent_year = (spent_so_far_year / budget.amount)
+        else:
+            self.percent_month = (spent_so_far_month / (budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0) ))
+            self.percent_year = (spent_so_far_year / (budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0) ))
 
 
         num_rem_mo_in_yr = (12.0 - (datetime.now().month + datetime.now().day/30.0))
@@ -88,9 +93,11 @@ class BudgetPageInfo:
             self.remaining_month = "{}".format(round((budget.amount - spent_so_far_month),2))
         else:
             self.remaining_month = "{}".format(round((budget.amount - spent_so_far_year) / num_rem_mo_in_yr,2))
-        # self.remaining_month = "{}".format(round(((budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0)) + spent_so_far_month),2))
 
-        self.remaining_year = "{}".format(round(((budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0)) - spent_so_far_year),2))
+        if type(budget) is SpecialBudget:
+            self.remaining_year = "{}".format(round((budget.amount - spent_so_far_year),2))
+        else:
+            self.remaining_year = "{}".format(round(((budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0)) - spent_so_far_year),2))
 
         self.spent_so_far_month = "{}".format(round(spent_so_far_month, 2))
         self.spent_so_far_year = "{}".format(round(spent_so_far_year, 2))

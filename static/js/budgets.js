@@ -31,6 +31,7 @@ function openPurhcasesPage(info) {
     var xhr = new XMLHttpRequest();
     var url = "";
 
+
     if (parts.length == 3) {
         month = parts[1];
         year = parts[2];

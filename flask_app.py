@@ -126,7 +126,6 @@ def add_budget_page(budget_id=None):
 @app.route("/site/budgets/<string:month>/<string:year>", methods=["GET"])
 def budgets_page(month=None, year=None):
     print("budgets_page()")
-
     budgets = db_comm.get_budgets()
 
     year_transactions = db_comm.get_transactions(year=year)
@@ -146,23 +145,41 @@ def budgets_page(month=None, year=None):
             continue
 
         if type(budget) is SpecialBudget:
+
+            # get original start date and duration
             (s_year, s_month, s_day) = budget.start_date
             start_date = datetime(year=s_year, month=s_month, day=s_day)
-            end_date = start_date + timedelta(days=budget.duration)
+            duration = timedelta(days=budget.duration)
+
+            # get new start and end date that it currently falls in
+            (start_date, end_date) = get_curr_start_end(start_date, duration)
 
             cmd = """select sum(ledger.amount)
             from ledger where ledger.category = '{0}'
             and ledger.date >= '{1}-{2}-{3} 00:00:00'
-            and ledger.date <= '{4}-{5}-{6} 23:59:59'""".format(budget.category.name, s_year,
-            '{:02d}'.format(s_month), '{:02d}'.format(s_day), end_date.year,
+            and ledger.date <= '{4}-{5}-{6} 23:59:59'""".format(budget.category.name, start_date.year,
+            '{:02d}'.format(start_date.month), '{:02d}'.format(start_date.day), end_date.year,
             '{:02d}'.format(end_date.month), '{:02d}'.format(end_date.day))
             db_comm.cursor.execute(cmd)
 
             # todo
-            # spent_so_far = db_comm.cursor.fetchone()[0]
-            # if spent_so_far is None:
-            #     spent_so_far = 0.0
-            # spent_so_far_str = "{}".format(round(spent_so_far, 2))
+            spent_so_far_year_num = db_comm.cursor.fetchone()[0]
+            if spent_so_far_year_num is None:
+                spent_so_far_year_num = 0.0
+            spent_so_far_year = round(spent_so_far_year_num, 2)
+
+
+            (m,y) = get_current_date()
+
+            cmd = """select sum(ledger.amount)
+            from ledger where ledger.category = '{0}'
+            and ledger.date like( '%{1}-{2}%' )""".format(budget.category.name, y, m)
+            db_comm.cursor.execute(cmd)
+
+            spent_so_far_month_num = db_comm.cursor.fetchone()[0]
+            if spent_so_far_month_num is None:
+                spent_so_far_month_num = 0.0
+            spent_so_far_month = round(spent_so_far_month_num, 2)
 
         elif budget.amount_frequency == "month" or budget.amount_frequency == "year":
             filtered_year_category_transactions = list(filter(lambda transaction: (transaction.category == budget.category), year_transactions))
@@ -180,7 +197,7 @@ def budgets_page(month=None, year=None):
     year_budgets = filter(lambda x: x.budget.amount_frequency == "year", budget_data)
     year_budgets = sorted(year_budgets, key=lambda x: x.budget.amount, reverse=True)
 
-    special_budgets = filter(lambda x: ("special" in x.budget.amount_frequency), budget_data)
+    special_budgets = filter(lambda x: (type(x.budget) is SpecialBudget), budget_data)
     special_budgets = sorted(special_budgets, key=lambda x: x.budget.amount, reverse=True)
 
     return render_template('budgets.html',
@@ -261,6 +278,20 @@ def delete_budget(budget_id):
     return result
 
 # helpers
+def get_curr_start_end(start_date, duration):
+    print("Helper: get_curr_start_end()")
+    today = datetime.now()
+
+    curr_start = start_date
+    prev_start = None
+
+    while today > curr_start:
+        prev_start = curr_start
+        curr_start = curr_start + duration
+
+    return (prev_start, prev_start + duration)
+
+
 def get_current_date():
     print("Helper: get_current_date()")
 
