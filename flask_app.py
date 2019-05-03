@@ -24,14 +24,26 @@ def transactions_root_page():
 
     (min_month, min_year, max_month, max_year) = db_comm.get_min_max_transaction_dates()
 
-    transaction_links = []
-    for (m,y) in months(min_month, min_year, max_month, max_year):
-        month_str = single_digit_num_str(m)
-        date = datetime(year=y, month=m, day=1)
-        transaction_links.append(("location.href='http://inherentvice.pythonanywhere.com/site/transactions/year:{}/month:{}'".format(y, month_str), month_str, y, date))
+    years = {}
+    for (month,year) in months(min_month, min_year, max_month, max_year):
 
-    return render_template('root_transactions.html',
-    transaction_links=sorted(transaction_links, key=lambda x: x[3], reverse=True))
+        if year not in years.keys():
+            years[year] = []
+
+        date = datetime(year=year, month=month, day=1)
+        month_str = single_digit_num_str(month)
+        month_year_str = "{}-{}".format(month_str, year)
+        link = "location.href='http://inherentvice.pythonanywhere.com/site/transactions/year:{}/month:{}'".format(year, month_str)
+
+        tup = (date, month_year_str, link)
+        years[year].append(tup)
+
+    final_year_links = []
+    for year in sorted(years.keys(), reverse=True):
+        finTup = (year, sorted(years[year], key=lambda x: x[0], reverse=True))
+        final_year_links.append(finTup)
+
+    return render_template('root_transactions.html', transaction_links=final_year_links)
 
 @app.route("/site/add_transaction", methods=["GET"])
 @app.route("/site/add_transaction/<string:transaction_id>", methods=["GET"])
@@ -82,14 +94,26 @@ def budgets_root_page():
 
     (min_month, min_year, max_month, max_year) = db_comm.get_min_max_transaction_dates()
 
-    budgets_links = []
-    for (m,y) in months(min_month, min_year, max_month, max_year):
-        month_str = single_digit_num_str(m)
-        date = datetime(year=y, month=m, day=1)
-        budgets_links.append(("location.href='http://inherentvice.pythonanywhere.com/site/budgets/{}/{}'".format(month_str, y), month_str, y, date))
+    years = {}
+    for (month,year) in months(min_month, min_year, max_month, max_year):
 
-    return render_template('root_budgets.html',
-    budgets_links=sorted(budgets_links, key=lambda x: x[3], reverse=True))
+        if year not in years.keys():
+            years[year] = []
+
+        date = datetime(year=year, month=month, day=1)
+        month_str = single_digit_num_str(month)
+        month_year_str = "{}-{}".format(month_str, year)
+        link = "location.href='http://inherentvice.pythonanywhere.com/site/budgets/{}/{}'".format(month_str, year)
+
+        tup = (date, month_year_str, link)
+        years[year].append(tup)
+
+    final_year_links = []
+    for year in sorted(years.keys(), reverse=True):
+        finTup = (year, sorted(years[year], key=lambda x: x[0], reverse=True))
+        final_year_links.append(finTup)
+
+    return render_template('root_budgets.html', budgets_links=final_year_links)
 
 @app.route("/site/add_budget", methods=["GET"])
 @app.route("/site/add_budget/<string:budget_id>", methods=["GET"])

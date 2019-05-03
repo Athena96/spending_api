@@ -14,10 +14,14 @@
     <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
 
 <ul>
-
-    {% for link in budgets_links %}
-        <li><button class="btn budget_pages" onclick="{{link[0]}}">{{link[1]}}-{{link[2]}} Budgets</button></li>
-    {% endfor %}
+        {% for link in budgets_links %}
+            <li> <p><b>{{link[0]}}</b></p></li>
+            <ul>
+            {% for finLink in link[1] %}
+                <li><button class="btn budget_pages" onclick="{{finLink[2]}}">{{finLink[1]}} Budgets</button></li>
+            {% endfor %}
+            </ul>
+        {% endfor %}
 
 </ul>
 
