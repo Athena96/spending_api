@@ -66,15 +66,7 @@ class SpecialBudget(Budget):
         parts = self.amount_frequency.split("_")
         self.duration = int(parts[2])
 
-
-    # def __init__(self, category, amount, start_date, duration, description=None, budget_id=None):
-    #     amount_frequency = "special_{}{}{}_{}".format(start_date[0], start_date[1], start_date[2], duration)
-    #     Budget.__init__(self, category, amount, amount_frequency, description=None, budget_id=None)
-    #     self.start_date = start_date
-    #     self.duration = duration
-
 class BudgetPageInfo:
-    # todo inhereitance, act diff depending on if its special or not
 
     def __init__(self, budget, spent_so_far_month, spent_so_far_year):
         self.budget = budget
@@ -85,7 +77,6 @@ class BudgetPageInfo:
         else:
             self.percent_month = (spent_so_far_month / (budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0) ))
             self.percent_year = (spent_so_far_year / (budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0) ))
-
 
         num_rem_mo_in_yr = (12.0 - (datetime.now().month + datetime.now().day/30.0))
 
