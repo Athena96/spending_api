@@ -50,16 +50,16 @@ def transactions_page(year=None, month=None, category="ALL"):
     print("transactions_page()")
 
     year_transactions = db_comm.get_transactions(year=year, category=category)
-    spent_in_year = sum([transaction.amount for transaction in year_transactions if ("income" not in transaction.category)])
+    spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category.is_income)])
     spent_in_year_str = str(round(spent_in_year, 2))
 
-    year_income = sum([transaction.amount for transaction in year_transactions if ("income" in transaction.category)])
-    month_income = sum([transaction.amount for transaction in year_transactions if (("income" in transaction.category) and (transaction.date[5:7] == month))])
+    year_income = sum([transaction.amount for transaction in year_transactions if transaction.category.is_income])
+    month_income = sum([transaction.amount for transaction in year_transactions if (transaction.category.is_income and (transaction.date[5:7] == month))])
 
     spent_in_month_str = "0.00"
     if month is not None:
         month_transactions = [transaction for transaction in year_transactions if (transaction.date[5:7] == month)]
-        spent_in_month = sum([transaction.amount for transaction in month_transactions if ("income" not in transaction.category)])
+        spent_in_month = sum([transaction.amount for transaction in month_transactions if (not transaction.category.is_income)])
         spent_in_month_str = str(round(spent_in_month, 2))
 
     transactions = sorted(year_transactions if month is None else month_transactions, key=lambda x: x.date, reverse=True)
@@ -106,23 +106,22 @@ def budgets_page(month=None, year=None):
     budgets = db_comm.get_budgets()
 
     year_transactions = db_comm.get_transactions(year=year)
-    spent_in_year = sum([transaction.amount for transaction in year_transactions if ("income" not in transaction.category)])
+    spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category.is_income)])
     spent_in_year_str = str(round(spent_in_year, 2))
 
-    month_transactions = [transaction for transaction in year_transactions if (("income" not in transaction.category) and (transaction.date[5:7] == month))]
+    month_transactions = [transaction for transaction in year_transactions if ((not transaction.category.is_income) and (transaction.date[5:7] == month))]
     spent_in_month = sum([transaction.amount for transaction in month_transactions])
     spent_in_month_str = str(round(spent_in_month, 2))
 
-    year_income = sum([transaction.amount for transaction in year_transactions if ("income" in transaction.category)])
-    month_income = sum([transaction.amount for transaction in year_transactions if (("income" in transaction.category) and (transaction.date[5:7] == month))])
+    year_income = sum([transaction.amount for transaction in year_transactions if transaction.category.is_income])
+    month_income = sum([transaction.amount for transaction in year_transactions if (transaction.category.is_income and (transaction.date[5:7] == month))])
 
     budget_data = []
     for budget in budgets:
-        if "income" in budget.category:
+        if budget.category.is_income:
             continue
 
         if type(budget) is SpecialBudget:
-
             (s_year, s_month, s_day) = budget.start_date
             start_date = datetime(year=s_year, month=s_month, day=s_day)
             end_date = start_date + timedelta(days=budget.duration)
@@ -130,7 +129,7 @@ def budgets_page(month=None, year=None):
             cmd = """select sum(ledger.amount)
             from ledger where ledger.category = '{0}'
             and ledger.date >= '{1}-{2}-{3} 00:00:00'
-            and ledger.date <= '{4}-{5}-{6} 23:59:59'""".format(budget.category, s_year,
+            and ledger.date <= '{4}-{5}-{6} 23:59:59'""".format(budget.category.name, s_year,
             '{:02d}'.format(s_month), '{:02d}'.format(s_day), end_date.year,
             '{:02d}'.format(end_date.month), '{:02d}'.format(end_date.day))
             db_comm.cursor.execute(cmd)
@@ -152,13 +151,13 @@ def budgets_page(month=None, year=None):
         budget_data.append(b)
 
     month_budgets = filter(lambda x: x.budget.amount_frequency == "month", budget_data)
-    month_budgets = sorted(month_budgets, key=lambda x: x.budget.amount)
+    month_budgets = sorted(month_budgets, key=lambda x: x.budget.amount, reverse=True)
 
     year_budgets = filter(lambda x: x.budget.amount_frequency == "year", budget_data)
-    year_budgets = sorted(year_budgets, key=lambda x: x.budget.amount)
+    year_budgets = sorted(year_budgets, key=lambda x: x.budget.amount, reverse=True)
 
     special_budgets = filter(lambda x: ("special" in x.budget.amount_frequency), budget_data)
-    special_budgets = sorted(special_budgets, key=lambda x: x.budget.amount)
+    special_budgets = sorted(special_budgets, key=lambda x: x.budget.amount, reverse=True)
 
     return render_template('budgets.html',
     month_budgets=month_budgets,
@@ -260,4 +259,3 @@ def months(start_month, start_year, end_month, end_year):
     start = datetime(start_year, start_month, 1)
     end = datetime(end_year, end_month, 1)
     return [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, until=end)]
-

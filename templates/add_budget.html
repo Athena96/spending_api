@@ -13,7 +13,7 @@
 <form>
 
     {% if budget != None %}
-        Category: <input type="text" id="categoryTextBoxU" name="item" value="{{budget.category}}"><br>
+        Category: <input type="text" id="categoryTextBoxU" name="item" value="{{budget.category.name}}"><br>
         Amount: <input type="text" id="amountTextBoxU" name="price" value="{{budget.amount}}"><br>
         Amount Frequency: <input type="text" id="amountFrequencyTextBoxU" name="category" value="{{budget.amount_frequency}}"><br>
         Description: <input type="text" id="descriptionTextBoxU" name="description" value="{{budget.description}}"><br>
@@ -35,4 +35,3 @@
 <script src="/static/js/addBudget.js"></script>
 
 </body>
-

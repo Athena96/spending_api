@@ -38,7 +38,7 @@
     <tr>
         <td><button class="btnSmall select" id="{{transaction.transaction_id}}" onclick="openUpdatePage(this.id)"><u>{{ transaction.title }}</u></button></td>
         <td>${{ transaction.amount }}</td>
-        <td>{{ transaction.category }}</td>
+        <td>{{ transaction.category.name }}</td>
         <td>{{ transaction.date }}</td>
         {% if transaction.description != None %}
             <td>{{ transaction.description }}</td>
@@ -55,4 +55,3 @@
 <script src="/static/js/transactions.js"></script>
 
 </body>
-

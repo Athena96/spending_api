@@ -35,9 +35,9 @@
   </tr>
   {% for budget_info in month_budgets %}
     <tr>
-        <td><p><button class="btnSmall select" id="{{budget_info.budget.budget_id}}" onclick="openUpdatePage(this.id)"><b><u>{{ budget_info.budget.category }}</u></b></button></p></td>
-        <td><button class="btnSmall select" id="{{budget_info.budget.category}}#{{month}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_month }}</u></button></td>
-        <td><button class="btnSmall select" id="{{budget_info.budget.category}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{budget_info.spent_so_far_year }}</u></button></td>
+        <td><p><button class="btnSmall select" id="{{budget_info.budget.budget_id}}" onclick="openUpdatePage(this.id)"><b><u>{{ budget_info.budget.category.name }}</u></b></button></p></td>
+        <td><button class="btnSmall select" id="{{budget_info.budget.category.name}}#{{month}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_month }}</u></button></td>
+        <td><button class="btnSmall select" id="{{budget_info.budget.category.name}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{budget_info.spent_so_far_year }}</u></button></td>
         <td>${{ budget_info.budget.amount }}</td>
         {% if budget_info.percent_month >=  0.0 and budget_info.percent_month <  0.85 %}
             <td><font color="green">${{ budget_info.remaining_month }}</font></td>
@@ -86,9 +86,9 @@
   </tr>
   {% for budget_info in year_budgets %}
     <tr>
-        <td><p><button class="btnSmall select" id="{{budget_info.budget.budget_id}}" onclick="openUpdatePage(this.id)"><b><u>{{ budget_info.budget.category }}</u></b></button></p></td>
-        <td><button class="btnSmall select" id="{{budget_info.budget.category}}#{{month}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_month }}</u></button></td>
-        <td><button class="btnSmall select" id="{{budget_info.budget.category}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_year }}</u></button></td>
+        <td><p><button class="btnSmall select" id="{{budget_info.budget.budget_id}}" onclick="openUpdatePage(this.id)"><b><u>{{ budget_info.budget.category.name }}</u></b></button></p></td>
+        <td><button class="btnSmall select" id="{{budget_info.budget.category.name}}#{{month}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_month }}</u></button></td>
+        <td><button class="btnSmall select" id="{{budget_info.budget.category.name}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_year }}</u></button></td>
         <td>${{ budget_info.budget.amount }}</td>
         {% if budget_info.percent_month >=  0.0 and budget_info.percent_month <  0.85 %}
             <td><font color="green">${{ budget_info.remaining_month }}</font></td>
@@ -124,5 +124,3 @@
 <script src="/static/js/budgets.js"></script>
 
 </body>
-
-
