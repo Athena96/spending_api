@@ -83,6 +83,32 @@ class DBCommms:
 
         return data
 
+    def get_special_transactions(self, start_date, end_date, category=None):
+        print("     " + self.__class__.__name__)
+
+        base_query = "select * from ledger"
+
+        date_query = "ledger.date >= '{}-{}-{} 00:00:00' and ledger.date <= '{}-{}-{} 23:59:59'".format(start_date.year,
+            '{:02d}'.format(start_date.month), '{:02d}'.format(start_date.day), end_date.year,
+            '{:02d}'.format(end_date.month), '{:02d}'.format(end_date.day))
+
+        category_query = ""
+        if category is not None:
+            category_query = "ledger.category = '{}'".format(category.name)
+
+        cmd = base_query + " where " + date_query + (" and " if category is not None else "") + category_query
+        print(cmd)
+
+        self.cursor.execute(cmd)
+
+        data = []
+        for transaction_id, title, amount, category, date, description in self.cursor:
+            description = None if description == "null" else description
+            transaction = Transaction(title, amount, category, date, description, transaction_id)
+            data.append(transaction)
+
+        return data
+
     def get_transaction(self, transaction_id):
         print("     " + self.__class__.__name__)
         print("     " + "get_transaction({})".format(transaction_id))
@@ -174,6 +200,7 @@ class DBCommms:
 
         data = []
         for category, amount, amount_frequency, budget_id, description in self.cursor:
+
             description = None if description == "null" else description
             if "special" in amount_frequency:
                 budget = SpecialBudget(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=budget_id)

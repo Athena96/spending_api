@@ -1,7 +1,7 @@
 function deleteTransaction(transaction_id) {
 
     var xhr = new XMLHttpRequest();
-    var url = "http://inherentvice.pythonanywhere.com/" + transaction_id;
+    var url = "http://inherentvice.pythonanywhere.com/transaction/" + transaction_id;
     xhr.open("DELETE", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
 

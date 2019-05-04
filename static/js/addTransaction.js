@@ -43,7 +43,7 @@ function addTransaction() {
         }
     });
 
-    var url_tmp = "http://inherentvice.pythonanywhere.com/" + title + "/" + amount + "/" + category + "/" + date + "/" + description;
+    var url_tmp = "http://inherentvice.pythonanywhere.com/transaction/" + title + "/" + amount + "/" + category + "/" + date + "/" + description;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.open("POST", url);
@@ -79,7 +79,7 @@ function updateTransaction(transaction_id) {
     var passcode = document.getElementById("passcodeTextBoxU").value;
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = "http://inherentvice.pythonanywhere.com/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + description;
+    var url_tmp = "http://inherentvice.pythonanywhere.com/transaction/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + description;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.withCredentials = true;
