@@ -12,7 +12,10 @@ function addTransaction() {
     var title = document.getElementById("titleTextBox").value;
     var category = document.getElementById("mySelectCategory").value;
     var categories = document.getElementById("mySelectCategories").value;
-    var final_cat = category + "," + categories;
+    var final_cat = category
+    if (categories != null && categories != "" ) {
+        final_cat = final_cat + "," + categories;
+    }
     var amount = document.getElementById("amountTextBox").value;
     if (!category.includes("income")) {
         amount = amount * -1.0;
