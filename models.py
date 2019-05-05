@@ -19,7 +19,17 @@ class Transaction:
     def __init__(self, title, amount, category, date, description=None, transaction_id=None):
         self.title = title
         self.amount = float(amount)
-        self.category = Category(name=category, is_income=True if self.amount > 0 else False)
+
+        categories = []
+        first = True
+        for c in category.split(","):
+            if first:
+                first = False
+                categories.append(Category(name=c, is_income=True if self.amount > 0 else False))
+            else:
+                categories.append(Category(name=c, is_income=False))
+        print("categories: ",categories)
+        self.category = categories
         self.date = date
         self.description = description
         self.transaction_id = transaction_id
@@ -33,6 +43,11 @@ class Transaction:
         contents["date"] = self.date
         contents["description"] = self.description
         return contents
+
+    def get_categories(self,):
+        l = list([c.name for c in self.category])
+
+        return l
 
 class Budget:
 

@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <head>
-
+<link rel="icon" href="/favicon.ico">
 <link rel="stylesheet" type="text/css" href="/static/css/transactions.css">
 
 </head>
@@ -38,7 +38,7 @@
     <tr>
         <td><button class="btnSmall select" id="{{transaction.transaction_id}}" onclick="openUpdatePage(this.id)"><u>{{ transaction.title }}</u></button></td>
         <td>${{ transaction.amount }}</td>
-        <td>{{ transaction.category.name }}</td>
+        <td>{{ transaction.get_categories() }}</td>
         <td>{{ transaction.date }}</td>
         {% if transaction.description != None %}
             <td>{{ transaction.description }}</td>

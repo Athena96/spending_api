@@ -66,16 +66,16 @@ def transactions_page(year=None, month=None, category="ALL"):
     print("transactions_page()")
 
     year_transactions = db_comm.get_transactions(year=year, category=category)
-    spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category.is_income)])
+    spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income)])
     spent_in_year_str = str(round(spent_in_year, 2))
 
-    year_income = sum([transaction.amount for transaction in year_transactions if transaction.category.is_income])
-    month_income = sum([transaction.amount for transaction in year_transactions if (transaction.category.is_income and (transaction.date[5:7] == month))])
+    year_income = sum([transaction.amount for transaction in year_transactions if transaction.category[0].is_income])
+    month_income = sum([transaction.amount for transaction in year_transactions if (transaction.category[0].is_income and (transaction.date[5:7] == month))])
 
     spent_in_month_str = "0.00"
     if month is not None:
         month_transactions = [transaction for transaction in year_transactions if (transaction.date[5:7] == month)]
-        spent_in_month = sum([transaction.amount for transaction in month_transactions if (not transaction.category.is_income)])
+        spent_in_month = sum([transaction.amount for transaction in month_transactions if (not transaction.category[0].is_income)])
         spent_in_month_str = str(round(spent_in_month, 2))
 
     transactions = sorted(year_transactions if month is None else month_transactions, key=lambda x: x.date, reverse=True)
@@ -135,20 +135,25 @@ def add_budget_page(budget_id=None):
 def budgets_page(year=None, month=None):
     print("budgets_page()")
     budgets = db_comm.get_budgets()
+    for b in budgets:
+        print("j ",b.category.name)
 
     year_transactions = db_comm.get_transactions(year=year)
-    spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category.is_income)])
+    spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income)])
     spent_in_year_str = str(round(spent_in_year, 2))
 
-    month_transactions = [transaction for transaction in year_transactions if ((not transaction.category.is_income) and (transaction.date[5:7] == month))]
+    month_transactions = [transaction for transaction in year_transactions if ((not transaction.category[0].is_income) and (transaction.date[5:7] == month))]
     spent_in_month = sum([transaction.amount for transaction in month_transactions])
     spent_in_month_str = str(round(spent_in_month, 2))
 
-    year_income = sum([transaction.amount for transaction in year_transactions if transaction.category.is_income])
-    month_income = sum([transaction.amount for transaction in year_transactions if (transaction.category.is_income and (transaction.date[5:7] == month))])
+    year_income = sum([transaction.amount for transaction in year_transactions if transaction.category[0].is_income])
+    month_income = sum([transaction.amount for transaction in year_transactions if (transaction.category[0].is_income and (transaction.date[5:7] == month))])
 
     budget_data = []
     for budget in budgets:
+
+        print("budget, ", budget.category.name)
+
         if budget.category.is_income:
             continue
 
@@ -176,14 +181,13 @@ def budgets_page(year=None, month=None):
             b = BudgetPageInfo(budget, spent_so_far_month, spent_so_far_year, spent_so_far_period)
 
         elif budget.amount_frequency == "month" or budget.amount_frequency == "year":
-            filtered_year_category_transactions = list(filter(lambda transaction: (transaction.category == budget.category), year_transactions))
+            filtered_year_category_transactions = list(filter(lambda transaction: (budget.category.name in transaction.get_categories()), year_transactions))
             spent_so_far_year = sum([transaction.amount for transaction in filtered_year_category_transactions])
 
             filtered_month_category_transactions = filter(lambda transaction: (transaction.date[5:7] == month), filtered_year_category_transactions)
             spent_so_far_month = sum([transaction.amount for transaction in filtered_month_category_transactions])
 
             b = BudgetPageInfo(budget, spent_so_far_month, spent_so_far_year)
-
 
         budget_data.append(b)
 
