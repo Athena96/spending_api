@@ -68,7 +68,7 @@ class DBCommms:
 
         category_query = ""
         if category != "ALL":
-            category_query = "ledger.category = '{}'".format(category)
+            category_query = "ledger.category like '%{}%'".format(category)
 
         cmd = base_query + " where " + date_query + (" and " if category != "ALL" else "") + category_query
         print(cmd)
