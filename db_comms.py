@@ -20,7 +20,7 @@ class DBCommms:
         sql_note = "NULL" if (transaction.description == None) else "'{0}'".format(transaction.description)
 
         cmd = """INSERT INTO ledger (title, amount, category, date, description) VALUES ('{0}', {1}, '{2}', '{3}', {4})""".format(transaction.title,
-            transaction.amount, transaction.category.name, transaction.date, sql_note)
+            transaction.amount, ",".join(transaction.get_categories()), transaction.date, sql_note)
         print(cmd)
 
         self.cursor.execute(cmd)
@@ -35,7 +35,7 @@ class DBCommms:
         sql_note = "NULL" if (transaction.description == None) else "'{0}'".format(transaction.description)
 
         cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = {4} WHERE ledger.transaction_id = {5}""".format(transaction.title,
-        transaction.amount, transaction.category.name, transaction.date, sql_note, transaction.transaction_id)
+        transaction.amount, ",".join(transaction.get_categories()), transaction.date, sql_note, transaction.transaction_id)
         print(cmd)
 
         self.cursor.execute(cmd)
