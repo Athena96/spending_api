@@ -20,32 +20,8 @@ db_comm = DBCommms(DATABASE)
 @app.route("/site/transactions", methods=["GET"])
 def transactions_root_page():
     print("transactions_root_page()")
-    (min_year, month_year_list) = db_comm.get_min_max_transaction_dates()
-
-    final_year_links = []
-    curr_year = min_year
-    year_idx = 0
-    year_first = True
-    for (month,year) in month_year_list:
-        if curr_year != year:
-            curr_year = year
-            year_idx += 1
-            year_first = True
-
-        month_str = single_digit_num_str(month)
-        month_year_str = "{}-{}".format(month_str, year)
-        link = "location.href='http://inherentvice.pythonanywhere.com/site/transactions/year:{}/month:{}'".format(year, month_str)
-
-        tup = (month_year_str, link)
-
-        if year_first:
-            finTup = (year, [])
-            final_year_links.append(finTup)
-            year_first = False
-
-        final_year_links[year_idx][1].append(tup)
-
-    return render_template('root_transactions.html', transaction_links=((obj[0],(sorted(obj[1], reverse=True))) for obj in sorted(final_year_links, reverse=True)))
+    transaction_links = root_page_helper("transactions")
+    return render_template('root_transactions.html', transaction_links=transaction_links)
 
 @app.route("/site/add_transaction", methods=["GET"])
 @app.route("/site/add_transaction/<string:transaction_id>", methods=["GET"])
@@ -123,32 +99,8 @@ def transactions_page(year=None, month=None, category="ALL", special_category=No
 @app.route("/site/budgets", methods=["GET"])
 def budgets_root_page():
     print("budgets_root_page()")
-    (min_year, month_year_list) = db_comm.get_min_max_transaction_dates()
-
-    final_year_links = []
-    curr_year = min_year
-    year_idx = 0
-    year_first = True
-    for (month,year) in month_year_list:
-        if curr_year != year:
-            curr_year = year
-            year_idx += 1
-            year_first = True
-
-        month_str = single_digit_num_str(month)
-        month_year_str = "{}-{}".format(month_str, year)
-        link = "location.href='http://inherentvice.pythonanywhere.com/site/budgets/year:{}/month:{}'".format(year, month_str)
-
-        tup = (month_year_str, link)
-
-        if year_first:
-            finTup = (year, [])
-            final_year_links.append(finTup)
-            year_first = False
-
-        final_year_links[year_idx][1].append(tup)
-
-    return render_template('root_budgets.html', budget_links=((obj[0],(sorted(obj[1], reverse=True))) for obj in sorted(final_year_links, reverse=True)))
+    budget_links = root_page_helper("budgets")
+    return render_template('root_budgets.html', budget_links=budget_links)
 
 @app.route("/site/add_budget", methods=["GET"])
 @app.route("/site/add_budget/<string:budget_id>", methods=["GET"])
@@ -330,3 +282,28 @@ def single_digit_num_str(num):
     else:
         str_num = "{}".format(num)
     return str_num
+
+def root_page_helper(type):
+    (min_year, month_year_list) = db_comm.get_min_max_transaction_dates()
+
+    final_year_links = []
+    curr_year = min_year
+    year_idx = 0
+    year_first = True
+    for (month,year) in month_year_list:
+        if curr_year != year:
+            curr_year = year
+            year_idx += 1
+            year_first = True
+
+        month_str = single_digit_num_str(month)
+        month_year_str = "{}-{}".format(month_str, year)
+        link = "location.href='http://inherentvice.pythonanywhere.com/site/{}/year:{}/month:{}'".format(type, year, month_str)
+
+        if year_first:
+            final_year_links.append((year, []))
+            year_first = False
+
+        final_year_links[year_idx][1].append((month_year_str, link))
+
+    return ((obj[0],(sorted(obj[1], reverse=True))) for obj in sorted(final_year_links, reverse=True))
