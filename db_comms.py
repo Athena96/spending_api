@@ -1,8 +1,17 @@
 import sqlite3
 from flask import jsonify
+from datetime import datetime
+from dateutil.rrule import rrule, MONTHLY
 from models import Transaction
 from models import Budget
 from models import SpecialBudget
+
+# helper
+def months(start_month, start_year, end_month, end_year):
+    print("Helper: months()")
+    start = datetime(start_year, start_month, 1)
+    end = datetime(end_year, end_month, 1)
+    return [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, until=end)]
 
 class DBCommms:
 
@@ -144,8 +153,7 @@ class DBCommms:
         max_month = int(max_date[5:7])
         max_year = int(max_date[0:4])
 
-        return (min_month, min_year, max_month, max_year)
-
+        return (min_year, months(min_month, min_year, max_month, max_year))
 
     # Budget Methods
 

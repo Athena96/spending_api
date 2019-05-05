@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, render_template
-from dateutil.rrule import rrule, MONTHLY
 from datetime import datetime
 from datetime import timedelta
 from db_comms import DBCommms
@@ -8,7 +7,6 @@ from models import Transaction
 from models import Budget
 from models import SpecialBudget
 from models import BudgetPageInfo
-
 
 # declare our Flask app
 app = Flask(__name__)
@@ -22,14 +20,13 @@ db_comm = DBCommms(DATABASE)
 @app.route("/site/transactions", methods=["GET"])
 def transactions_root_page():
     print("transactions_root_page()")
-
-    (min_month, min_year, max_month, max_year) = db_comm.get_min_max_transaction_dates()
+    (min_year, month_year_list) = db_comm.get_min_max_transaction_dates()
 
     final_year_links = []
     curr_year = min_year
     year_idx = 0
     year_first = True
-    for (month,year) in months(min_month, min_year, max_month, max_year):
+    for (month,year) in month_year_list:
         if curr_year != year:
             curr_year = year
             year_idx += 1
@@ -126,14 +123,13 @@ def transactions_page(year=None, month=None, category="ALL", special_category=No
 @app.route("/site/budgets", methods=["GET"])
 def budgets_root_page():
     print("budgets_root_page()")
-
-    (min_month, min_year, max_month, max_year) = db_comm.get_min_max_transaction_dates()
+    (min_year, month_year_list) = db_comm.get_min_max_transaction_dates()
 
     final_year_links = []
     curr_year = min_year
     year_idx = 0
     year_first = True
-    for (month,year) in months(min_month, min_year, max_month, max_year):
+    for (month,year) in month_year_list:
         if curr_year != year:
             curr_year = year
             year_idx += 1
@@ -237,7 +233,7 @@ def budgets_page(year=None, month=None):
     month_income=month_income,
     year_income=year_income)
 
-# Transaction API endpoints: Transactions
+# Transaction API endpoints
 
 @app.route('/transaction/<string:year>', methods=['GET'])
 @app.route('/transaction/<string:month>/<string:year>/<string:category>', methods=['GET'])
@@ -271,7 +267,7 @@ def delete_transaction(transaction_id):
     result = db_comm.delete_transaction(transaction_id)
     return result
 
-# Transaction API endpoints: Budgets
+# Budget API endpoints
 
 @app.route('/budgets', methods=['GET'])
 def get_budgets():
@@ -318,7 +314,6 @@ def get_curr_start_end(start_date, duration):
 
     return (prev_start, prev_start + duration)
 
-
 def get_current_date():
     print("Helper: get_current_date()")
 
@@ -335,9 +330,3 @@ def single_digit_num_str(num):
     else:
         str_num = "{}".format(num)
     return str_num
-
-def months(start_month, start_year, end_month, end_year):
-    print("Helper: months()")
-    start = datetime(start_year, start_month, 1)
-    end = datetime(end_year, end_month, 1)
-    return [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, until=end)]
