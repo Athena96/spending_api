@@ -24,25 +24,30 @@ function deleteBudget(budget_id) {
 function openPurhcasesPage(info) {
 
     var parts = info.split("#");
-    var category = parts[0];
+    var category = parts[1];
     var month = "";
     var year = "";
 
     var xhr = new XMLHttpRequest();
     var url = "";
+    var title = parts[0];
 
-    if (parts.length == 3) {
-        month = parts[1];
-        year = parts[2];
+    if (title == "month_year") {
+        month = parts[2];
+        year = parts[3];
         // .../year:2019/month:04                   all txns for april 2019
         // .../year:2019/month:04/category:grocery  all grocery txns for april 2019
         // .../year:2019                            all txns for 2019
         // .../year:2019/category:grocery           all grocery txns for 2019
 
         url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/year:" + year + "/month:" + month + "/category:" + category;
-    } else {
-        year = parts[1];
+    } else if (title == "year") {
+        year = parts[2];
         url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/year:" + year + "/category:" + category;
+    } else if (title == "special") {
+        var special_category = parts[1];
+        var special_frequency = parts[2];
+        url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/special_category:" + special_category + "/special_frequency:" + special_frequency;
     }
     window.open(url);
 }

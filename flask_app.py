@@ -3,6 +3,7 @@ from dateutil.rrule import rrule, MONTHLY
 from datetime import datetime
 from datetime import timedelta
 from db_comms import DBCommms
+from models import Category
 from models import Transaction
 from models import Budget
 from models import SpecialBudget
@@ -58,12 +59,42 @@ def add_transaction_page(transaction_id=None):
     budgets = db_comm.get_budgets()
     return render_template('add_transaction.html', transaction=transaction, budgets=budgets)
 
+@app.route("/site/transactions/special_category:<string:special_category>/special_frequency:<string:special_frequency>/", methods=["GET"])
 @app.route("/site/transactions/year:<string:year>", methods=["GET"])
 @app.route("/site/transactions/year:<string:year>/month:<string:month>", methods=["GET"])
 @app.route("/site/transactions/year:<string:year>/category:<string:category>", methods=["GET"])
 @app.route("/site/transactions/year:<string:year>/month:<string:month>/category:<string:category>", methods=["GET"])
-def transactions_page(year=None, month=None, category="ALL"):
+def transactions_page(year=None, month=None, category="ALL", special_category=None, special_frequency=None):
     print("transactions_page()")
+
+    if special_category is not None and special_frequency is not None:
+        print("SPECIAL")
+        s_duration = int(special_frequency.split("_")[2])
+        startdate = special_frequency.split("_")[1]
+        s_year = int(startdate[0:4])
+        s_month = int(startdate[4:6])
+        s_day = int(startdate[6:8])
+        print(s_year, s_month, s_day)
+
+        # get original start date and duration
+        start_date = datetime(year=s_year, month=s_month, day=s_day)
+        duration = timedelta(days=s_duration)
+
+        # get new start and end date that it currently falls in
+        (start_date, end_date) = get_curr_start_end(start_date, duration)
+
+        # get transactions for special budget
+        special_budget_period_transactions = db_comm.get_special_transactions(start_date=start_date, end_date=end_date, category=Category(name=special_category, is_income=False))
+
+        return render_template('transactions.html',
+        month=month,
+        year=year,
+        category=special_category,
+        transactions=special_budget_period_transactions,
+        spent_in_month=0.0,
+        spent_in_year=0.0,
+        month_income=0.0,
+        year_income=0.0)
 
     year_transactions = db_comm.get_transactions(year=year, category=category)
     spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income)])
