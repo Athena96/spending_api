@@ -135,8 +135,6 @@ def add_budget_page(budget_id=None):
 def budgets_page(year=None, month=None):
     print("budgets_page()")
     budgets = db_comm.get_budgets()
-    for b in budgets:
-        print("j ",b.category.name)
 
     year_transactions = db_comm.get_transactions(year=year)
     spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income)])
@@ -151,8 +149,6 @@ def budgets_page(year=None, month=None):
 
     budget_data = []
     for budget in budgets:
-
-        print("budget, ", budget.category.name)
 
         if budget.category.is_income:
             continue
