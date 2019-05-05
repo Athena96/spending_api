@@ -6,13 +6,6 @@ from models import Transaction
 from models import Budget
 from models import SpecialBudget
 
-# helper
-def months(start_month, start_year, end_month, end_year):
-    print("Helper: months()")
-    start = datetime(start_year, start_month, 1)
-    end = datetime(end_year, end_month, 1)
-    return [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, until=end)]
-
 class DBCommms:
 
     def __init__(self, database_path):
@@ -239,3 +232,10 @@ class DBCommms:
 
     def __exit__(self):
         print("in __exit__")
+
+# helper
+def months(start_month, start_year, end_month, end_year):
+    print("Helper: months()")
+    start = datetime(start_year, start_month, 1)
+    end = datetime(end_year, end_month, 1)
+    return [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, until=end)]
