@@ -18,14 +18,14 @@
         Amount Frequency: <input type="text" id="amountFrequencyTextBoxU" name="category" value="{{budget.amount_frequency}}"><br>
         Description: <input type="text" id="descriptionTextBoxU" name="description" value="{{budget.description}}"><br>
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
-        <button id="{{budget.budget_id}}" onclick="updateBudget(this.id)">Update</button>
+        <button class="button buttonUpdate" id="{{budget.budget_id}}" onclick="updateBudget(this.id)">Update</button>
     {% else %}
         Category: <input type="text" id="categoryTextBox" name="item" value=""><br>
         Amount: <input type="text" id="amountTextBox" name="price" value=""><br>
         Amount Frequency: <input type="text" id="amountFrequencyTextBox" name="category" value=""><br>
         Description: <input type="text" id="descriptionTextBox" name="description" value="{{budget.description}}"><br>
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
-        <button onclick="addBudget()">Insert</button>
+        <button class="button" onclick="addBudget()">Insert</button>
     {% endif %}
 
 </form>

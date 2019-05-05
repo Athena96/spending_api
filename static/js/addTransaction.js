@@ -13,7 +13,6 @@ function addTransaction() {
     var category = document.getElementById("mySelectCategory").value;
     var categories = document.getElementById("mySelectCategories").value;
     var final_cat = category + "," + categories;
-    console.log(final_cat);
     var amount = document.getElementById("amountTextBox").value;
     if (!category.includes("income")) {
         amount = amount * -1.0;
@@ -47,8 +46,6 @@ function addTransaction() {
     });
 
     var url_tmp = "http://inherentvice.pythonanywhere.com/transaction/" + title + "/" + amount + "/" + final_cat + "/" + date + "/" + description;
-    alert(url_tmp);
-    console.log(url_tmp);
     var url = url_tmp.replace(" ", "%20");
 
     xhr.open("POST", url);
@@ -85,7 +82,6 @@ function updateTransaction(transaction_id) {
 
     var xhr = new XMLHttpRequest();
     var url_tmp = "http://inherentvice.pythonanywhere.com/transaction/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + description;
-    alert(url_tmp);
     var url = url_tmp.replace(" ", "%20");
 
     xhr.withCredentials = true;

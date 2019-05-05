@@ -27,7 +27,7 @@
 
         Passcode: <input type="text" id="passcodeTextBoxU" name="passcode" value=""><br>
 
-        <button id="{{transaction.transaction_id}}" onclick="updateTransaction(this.id)">Update</button>
+        <button class="button buttonUpdate" id="{{transaction.transaction_id}}" onclick="updateTransaction(this.id)">Update</button>
         <p>Click the "Update" button to update the transaction.</p>
 
 
@@ -44,7 +44,7 @@
         Date: <input type="text" id="dateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
         Description: <input type="text" id="descriptionTextBox" name="description" value=""><br>
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
-        <button onclick="addTransaction()">Insert</button>
+        <button class="button" onclick="addTransaction()">Insert</button>
 
         <p>Click the "Insert" button to insert the transaction.</p>
 
