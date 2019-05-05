@@ -29,21 +29,15 @@ function addTransaction() {
     }
     var passcode = document.getElementById("passcodeTextBox").value;
 
-    var data = null;
     var xhr = new XMLHttpRequest();
-    xhr.withCredentials = true;
-    xhr.addEventListener("readystatechange", function () {
-        if (this.readyState === 4) {
-            console.log(this.responseText);
-        }
-    });
     var url_tmp = "http://inherentvice.pythonanywhere.com/transaction/" + title + "/" + amount + "/" + final_cat + "/" + date + "/" + description;
     var url = url_tmp.replace(" ", "%20");
 
+    xhr.withCredentials = true;
     xhr.open("POST", url);
     xhr.setRequestHeader("Authorization", ("Basic " + btoa(passcode)));
     xhr.setRequestHeader("cache-control", "no-cache");
-    xhr.send(data);
+    xhr.send(JSON.stringify({}));
 }
 
 function updateTransaction(transaction_id) {

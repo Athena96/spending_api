@@ -49,7 +49,6 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "delete_transaction({})", transaction_id)
 
-        # TODO is int() necessary?
         cmd = "DELETE FROM ledger WHERE ledger.transaction_id = {0};".format(int(transaction_id))
         self.cursor.execute(cmd)
         self.db_conn.commit()
@@ -183,7 +182,6 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "delete_budget({})", budget_id)
 
-        # TODO is int() necessary?
         cmd = "DELETE FROM budget WHERE budget.category_id = {0};".format(int(budget_id))
         print(cmd)
 
@@ -235,7 +233,8 @@ class DBCommms:
 
 # helper
 def months(start_month, start_year, end_month, end_year):
-    print("Helper: months()")
+    print("Helper: months({},{},{},{})".format(start_month, start_year, end_month, end_year))
+
     start = datetime(start_year, start_month, 1)
     end = datetime(end_year, end_month, 1)
     return [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, until=end)]

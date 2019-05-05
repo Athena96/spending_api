@@ -47,7 +47,6 @@ def transactions_page(year=None, month=None, category="ALL", special_category=No
         s_year = int(startdate[0:4])
         s_month = int(startdate[4:6])
         s_day = int(startdate[6:8])
-        print(s_year, s_month, s_day)
 
         # get original start date and duration
         start_date = datetime(year=s_year, month=s_month, day=s_day)
@@ -93,6 +92,7 @@ def transactions_page(year=None, month=None, category="ALL", special_category=No
 @app.route("/site/budgets", methods=["GET"])
 def budgets_root_page():
     print("budgets_root_page()")
+
     budget_links = root_page_helper("budgets")
     return render_template('root_budgets.html', budget_links=budget_links)
 
@@ -107,6 +107,7 @@ def add_budget_page(budget_id=None):
 @app.route("/site/budgets/year:<string:year>/month:<string:month>", methods=["GET"])
 def budgets_page(year=None, month=None):
     print("budgets_page()")
+
     budgets = db_comm.get_budgets()
 
     year_transactions = db_comm.get_transactions(year=year)
@@ -237,9 +238,9 @@ def delete_budget(budget_id):
 
 # helpers
 def get_curr_start_end(start_date, duration):
-    print("Helper: get_curr_start_end()")
-    today = datetime.now()
+    print("Helper: get_curr_start_end({}, {})".format(start_date, duration))
 
+    today = datetime.now()
     curr_start = start_date
     prev_start = None
 
@@ -258,7 +259,8 @@ def get_current_date():
     return (month,year)
 
 def single_digit_num_str(num):
-    print("Helper: single_digit_num_str()")
+    print("Helper: single_digit_num_str({})".format(num))
+
     str_num = ""
     if num < 10:
         str_num = "0{}".format(num)
@@ -267,6 +269,7 @@ def single_digit_num_str(num):
     return str_num
 
 def root_page_helper(type):
+    print("Helper: root_page_helper({})".format(type))
     (min_year, month_year_list) = db_comm.get_min_max_transaction_dates()
 
     final_year_links = []

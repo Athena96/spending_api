@@ -12,8 +12,6 @@ class Category:
         else:
             return NotImplemented
 
-    # todo implement __ne__
-
 class Transaction:
 
     def __init__(self, title, amount, category, date, description=None, transaction_id=None):
@@ -28,7 +26,6 @@ class Transaction:
                 categories.append(Category(name=c, is_income=True if self.amount > 0 else False))
             else:
                 categories.append(Category(name=c, is_income=False))
-        print("categories: ",categories)
         self.category = categories
         self.date = date
         self.description = description
@@ -45,9 +42,7 @@ class Transaction:
         return contents
 
     def get_categories(self,):
-        l = list([c.name for c in self.category])
-
-        return l
+        return list([c.name for c in self.category])
 
 class Budget:
 
