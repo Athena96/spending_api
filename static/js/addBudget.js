@@ -1,3 +1,4 @@
+
 function addBudget() {
     var category = document.getElementById("categoryTextBox").value;
     var amount = document.getElementById("amountTextBox").value;
@@ -6,7 +7,6 @@ function addBudget() {
     if (description == "" || description == null || description == " ") {
         description = null;
     }
-
     var passcode = document.getElementById("passcodeTextBox").value;
 
     var xhr = new XMLHttpRequest();
@@ -17,15 +17,7 @@ function addBudget() {
     xhr.open("POST", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader("Authorization", "Basic " + btoa(passcode));
-
     xhr.send(JSON.stringify({}));
-    // xhr.onload = function() {
-    //     console.log("Added Budget")
-    //     console.log(this.responseText);
-    //     location.reload();
-    //     alert(this.responseText);
-    // }
-
 }
 
 function updateBudget(budget_id) {
@@ -36,7 +28,6 @@ function updateBudget(budget_id) {
     if (description == "" || description == null || description == " ") {
         description = null;
     }
-
     var passcode = document.getElementById("passcodeTextBox").value;
 
     var xhr = new XMLHttpRequest();
@@ -47,15 +38,5 @@ function updateBudget(budget_id) {
     xhr.open("PUT", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader("Authorization", "Basic " + btoa(passcode));
-
-    xhr.send(JSON.stringify({
-
-    }));
-
-    // xhr.onload = function() {
-    //     console.log("Updated Budget")
-    //     console.log(this.responseText);
-    //     location.reload();
-    //     alert(this.responseText);
-    // }
+    xhr.send(JSON.stringify({}));
 }
