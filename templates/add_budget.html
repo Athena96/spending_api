@@ -16,14 +16,21 @@
         Category: <input type="text" id="categoryTextBoxU" name="item" value="{{budget.category.name}}"><br>
         Amount: <input type="text" id="amountTextBoxU" name="price" value="{{budget.amount}}"><br>
         Amount Frequency: <input type="text" id="amountFrequencyTextBoxU" name="category" value="{{budget.amount_frequency}}"><br>
-        Description: <input type="text" id="descriptionTextBoxU" name="description" value="{{budget.description}}"><br>
+        {% if budget.description != None %}
+            Description:<br>
+            <textarea name="description" id="descriptionTextBoxU" style="width:200px; height:100px;" >{{budget.description}}</textarea><br>
+        {% else %}
+            Description:<br>
+            <textarea name="description" id="descriptionTextBoxU" style="width:200px; height:100px;" ></textarea><br>
+        {% endif %}
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
         <button class="button buttonUpdate" id="{{budget.budget_id}}" onclick="updateBudget(this.id)">Update</button>
     {% else %}
         Category: <input type="text" id="categoryTextBox" name="item" value=""><br>
         Amount: <input type="text" id="amountTextBox" name="price" value=""><br>
         Amount Frequency: <input type="text" id="amountFrequencyTextBox" name="category" value=""><br>
-        Description: <input type="text" id="descriptionTextBox" name="description" value="{{budget.description}}"><br>
+        Description:<br>
+        <textarea name="description" id="descriptionTextBox" style="width:200px; height:100px;" value=""></textarea><br>
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
         <button class="button" onclick="addBudget()">Insert</button>
     {% endif %}

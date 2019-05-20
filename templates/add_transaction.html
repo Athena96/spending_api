@@ -20,9 +20,11 @@
         Date: <input type="text" id="dateTextBoxU" name="date" value="{{transaction.date}}"><br>
 
         {% if transaction.description != None %}
-            Description: <input type="text" id="descriptionTextBoxU" name="description" value="{{transaction.description}}"><br>
+            Description:<br>
+            <textarea name="description" id="descriptionTextBoxU" style="width:200px; height:100px;" >{{transaction.description}}</textarea><br>
         {% else %}
-            Description: <input type="text" id="descriptionTextBoxU" name="description" value=""><br>
+            Description:<br>
+            <textarea name="description" id="descriptionTextBoxU" style="width:200px; height:100px;" ></textarea><br>
         {% endif %}
 
         Passcode: <input type="text" id="passcodeTextBoxU" name="passcode" value=""><br>
@@ -42,7 +44,8 @@
         </select><br>
         Secondary Categories: <input type="text" id="mySelectCategories" name="secondary_categories" value=""><br>
         Date: <input type="text" id="dateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
-        Description: <input type="text" id="descriptionTextBox" name="description" value=""><br>
+        Description:<br>
+        <textarea name="description" id="descriptionTextBox" style="width:200px; height:100px;" ></textarea><br>
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
         <button class="button" onclick="addTransaction()">Insert</button>
 
