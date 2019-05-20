@@ -90,11 +90,14 @@ class BudgetPageInfo:
             self.percent_month = (spent_so_far_month / (budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0) ))
             self.percent_year = (spent_so_far_year / (budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0) ))
 
-        num_rem_mo_in_yr = (12.0 - (datetime.now().month + datetime.now().day/30.0))
+        num_rem_mo_in_yr = (12.0 - datetime.now().month)
+        print("num_rem_mo_in_yr: " , num_rem_mo_in_yr)
 
         if type(budget) is not SpecialBudget:
             if budget.amount_frequency == "month":
                 self.remaining_month = "{}".format(round((budget.amount - spent_so_far_month),2))
+                self.remaining_month_avg = "{}".format(round( (((budget.amount * 12.0) - spent_so_far_year) / num_rem_mo_in_yr) ,2))
+
             else:
                 self.remaining_month = "{}".format(round((budget.amount - spent_so_far_year) / num_rem_mo_in_yr,2))
 

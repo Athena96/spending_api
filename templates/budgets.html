@@ -30,6 +30,7 @@
     <th>Spent Year</th>
     <th>Budgeted</th>
     <th>Remaining Month</th>
+    <th>Remaining Month (avg)</th>
     <th>Remaining Year (total)</th>
     <th>Delete</th>
   </tr>
@@ -52,6 +53,21 @@
                 {% endif %}
             {% endif %}
         {% endif %}
+
+        {% if budget_info.percent_month >=  0.0 and budget_info.percent_month <  0.85 %}
+            <td><font color="green">${{ budget_info.remaining_month_avg }}</font></td>
+        {% else %}
+            {% if budget_info.percent_month >= 0.85 and  budget_info.percent_month < 0.99 %}
+                <td><font color="orange">${{ budget_info.remaining_month_avg }}</font></td>
+            {% else %}
+                {% if budget_info.percent_month >= 0.99 and  budget_info.percent_month <= 1.00 %}
+                    <td><font color="blue">${{ budget_info.remaining_month_avg }}</font></td>
+                {% else %}
+                    <td><font color="red">${{ budget_info.remaining_month_avg }}</font></td>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+
         {% if budget_info.percent_year >=  0.0 and budget_info.percent_year <  0.85 %}
             <td><font color="green">${{ budget_info.remaining_year }}</font></td>
         {% else %}
