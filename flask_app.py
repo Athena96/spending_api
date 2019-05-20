@@ -69,8 +69,7 @@ def transactions_page(year=None, month=None, category="ALL", special_category=No
     spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income)])
     spent_in_year_str = str(round(spent_in_year, 2))
 
-    year_income = sum([transaction.amount for transaction in year_transactions if transaction.category[0].is_income])
-    month_income = sum([transaction.amount for transaction in year_transactions if (transaction.category[0].is_income and (transaction.date[5:7] == month))])
+    (year_income, month_income) = calculate_income_from(year_transactions, month)
 
     spent_in_month_str = "0.00"
     if month is not None:
@@ -118,8 +117,7 @@ def budgets_page(year=None, month=None):
     spent_in_month = sum([transaction.amount for transaction in month_transactions])
     spent_in_month_str = str(round(spent_in_month, 2))
 
-    year_income = sum([transaction.amount for transaction in year_transactions if transaction.category[0].is_income])
-    month_income = sum([transaction.amount for transaction in year_transactions if (transaction.category[0].is_income and (transaction.date[5:7] == month))])
+    (year_income, month_income) = calculate_income_from(year_transactions, month)
 
     budget_data = []
     for budget in budgets:
@@ -293,3 +291,8 @@ def root_page_helper(type):
         final_year_links[year_idx][1].append((month_year_str, link))
 
     return ((obj[0],(sorted(obj[1], reverse=True))) for obj in sorted(final_year_links, reverse=True))
+
+def calculate_income_from(year_transactions, month):
+    year_income = round(sum([transaction.amount for transaction in year_transactions if transaction.category[0].is_income]), 2)
+    month_income = round(sum([transaction.amount for transaction in year_transactions if (transaction.category[0].is_income and (transaction.date[5:7] == month))]), 2)
+    return (year_income, month_income)
