@@ -36,6 +36,7 @@ function updateBudget(budget_id) {
 
     xhr.withCredentials = true;
     xhr.open("PUT", url, true);
+    xhr.setRequestHeader("cache-control", "no-cache");
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader("Authorization", "Basic " + btoa(passcode));
     xhr.send(JSON.stringify({}));
