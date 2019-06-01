@@ -194,12 +194,9 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "get_budgets({})".format(date))
 
-        cmd = """select *
-                from budget
-                where
-                budget.start_date <= '{0}-{1}-{2} {3}:{4}:{5}' and
-                budget.end_date >= '{0}-{1}-{2} {3}:{4}:{5}' """.format(date.year, date.month, date.day, date.hour, date.minute, date.second)
+        cmd = """select * from budget where budget.start_date <= '{0}-{1}-{2} {3}:{4}:{5}' and budget.end_date >= '{0}-{1}-{2} {3}:{4}:{5}' """.format(date.year, '{:02d}'.format(date.month), '{:02d}'.format(date.day), '{:02d}'.format(date.hour), '{:02d}'.format(date.minute), '{:02d}'.format(date.second))
         self.cursor.execute(cmd)
+        print(cmd)
 
         data = []
         for category, amount, amount_frequency, budget_id, description, start_date, end_date in self.cursor:
@@ -223,12 +220,12 @@ class DBCommms:
         self.cursor.execute(cmd)
 
         res = None
-        for category, amount, amount_frequency, budget_id, description in self.cursor:
+        for category, amount, amount_frequency, budget_id, description, start_date, end_date in self.cursor:
             description = None if description == "null" else description
             if "period" in amount_frequency:
-                res = Period(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=budget_id)
+                res = Period(category=category, amount=amount, start_date=start_date, end_date=end_date, description=description, budget_id=budget_id)
             else:
-                res = Budget(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=budget_id)
+                res = Budget(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, budget_id=budget_id)
         return res
 
     def __exit__(self):

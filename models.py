@@ -89,6 +89,8 @@ class BudgetPageInfo:
                 self.remaining_month = "{}".format(round((budget.amount - spent_so_far_month),2))
                 self.remaining_month_avg = "{}".format(round( (((budget.amount * 12.0) - spent_so_far_year) / num_rem_mo_in_yr) ,2))
             else:
+                print("bud: ", budget.amount)
+                print("spent_so_far_year: ", spent_so_far_year)
                 self.remaining_month_avg = "{}".format(round( ((budget.amount - spent_so_far_year) / num_rem_mo_in_yr) ,2))
 
             self.remaining_year = "{}".format(round(((budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0)) - spent_so_far_year),2))

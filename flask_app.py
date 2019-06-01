@@ -1,6 +1,6 @@
+import calendar
 from flask import Flask, jsonify, render_template
 from datetime import datetime
-from datetime import timedelta
 from db_comms import DBCommms
 from models import Category
 from models import Transaction
@@ -30,7 +30,7 @@ def add_transaction_page(transaction_id=None):
     print("add_transaction_page()")
 
     transaction = db_comm.get_transaction(transaction_id)
-    budgets = db_comm.get_budgets()
+    budgets = db_comm.get_budgets(datetime.now())
     return render_template('add_transaction.html', transaction=transaction, budgets=budgets)
 
 @app.route("/site/transactions/year:<string:year>", methods=["GET"])
@@ -50,7 +50,7 @@ def transactions_page(year=None, month=None, category="ALL", start_date=None, en
 
         return render_template('transactions.html',
         month=month, year=year,
-        category=period_category,
+        category=category,
         transactions=period_budget_period_transactions,
         spent_in_month=0.0, spent_in_year=0.0,
         month_income=0.0, year_income=0.0)
@@ -97,7 +97,12 @@ def add_budget_page(budget_id=None):
 def budgets_page(year=None, month=None):
     print("budgets_page()")
 
-    budgets = db_comm.get_budgets(datetime.now())
+    today = datetime.now()
+    if (year == today.year and month == today.month):
+        budgets = db_comm.get_budgets(datetime.now())
+    else:
+        (start, end) = calendar.monthrange(int(year),int(month))
+        budgets = db_comm.get_budgets(datetime(year=int(year), month=int(month), day=end))
 
     year_transactions = db_comm.get_transactions(year=year)
     spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income)])
@@ -195,7 +200,7 @@ def delete_transaction(transaction_id):
 def get_budgets():
     print("get_budgets()")
 
-    return jsonify([budget.to_dict() for budget in db_comm.get_budgets()])
+    return jsonify([budget.to_dict() for budget in db_comm.get_budgets(datetime.now())])
 
 @app.route('/budget/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['POST'])
 def add_budget(category, amount, amount_frequency, description, start_date, end_date):

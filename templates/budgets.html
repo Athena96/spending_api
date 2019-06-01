@@ -107,15 +107,15 @@
         <td><button class="btnSmall select" id="year#{{budget_info.budget.category.name}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_year }}</u></button></td>
         <td>${{ budget_info.budget.amount }}</td>
         {% if budget_info.percent_month >=  0.0 and budget_info.percent_month <  0.85 %}
-            <td><font color="green">${{ budget_info.remaining_month }}</font></td>
+            <td><font color="green">${{ budget_info.remaining_month_avg }}</font></td>
         {% else %}
             {% if budget_info.percent_month >= 0.85 and  budget_info.percent_month < 0.99 %}
-                <td><font color="orange">${{ budget_info.remaining_month }}</font></td>
+                <td><font color="orange">${{ budget_info.remaining_month_avg }}</font></td>
             {% else %}
                 {% if budget_info.percent_month >= 0.99 and  budget_info.percent_month <= 1.00 %}
-                    <td><font color="blue">${{ budget_info.remaining_month }}</font></td>
+                    <td><font color="blue">${{ budget_info.remaining_month_avg }}</font></td>
                 {% else %}
-                    <td><font color="red">${{ budget_info.remaining_month }}</font></td>
+                    <td><font color="red">${{ budget_info.remaining_month_avg }}</font></td>
                 {% endif %}
             {% endif %}
         {% endif %}
