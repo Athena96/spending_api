@@ -16,6 +16,8 @@
         Category: <input type="text" id="categoryTextBoxU" name="item" value="{{budget.category.name}}"><br>
         Amount: <input type="text" id="amountTextBoxU" name="price" value="{{budget.amount}}"><br>
         Amount Frequency: <input type="text" id="amountFrequencyTextBoxU" name="category" value="{{budget.amount_frequency}}"><br>
+        Start Date: <input type="text" id="startDateTextBoxU" name="date" value="{{budget.start_date}}"><br>
+        End Date: <input type="text" id="endDateTextBoxU" name="date" value="{{budget.end_date}}"><br>
         {% if budget.description != None %}
             Description:<br>
             <textarea name="description" id="descriptionTextBoxU" style="width:200px; height:100px;" >{{budget.description}}</textarea><br>
@@ -29,6 +31,8 @@
         Category: <input type="text" id="categoryTextBox" name="item" value=""><br>
         Amount: <input type="text" id="amountTextBox" name="price" value=""><br>
         Amount Frequency: <input type="text" id="amountFrequencyTextBox" name="category" value=""><br>
+        Start Date: <input type="text" id="startDateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
+        End Date: <input type="text" id="endDateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
         Description:<br>
         <textarea name="description" id="descriptionTextBox" style="width:200px; height:100px;" value=""></textarea><br>
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>

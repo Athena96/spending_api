@@ -137,31 +137,27 @@
   {% endfor %}
 </table>
 
-<h2>Special Budgets</h2>
+<h2>Period Budgets</h2>
 <table class="a">
   <tr>
     <th>Category <i>(click to edit)</i></th>
-    <th>Spent Month</th>
-    <th>Spent Year</th>
-    <th>Spent Special Period</th>
+    <th>Spent Period</th>
     <th>Budgeted</th>
-    <th>Remaining Special Period</th>
+    <th>Remaining Period</th>
     <th>Delete</th>
   </tr>
-  {% for budget_info in special_budgets %}
+  {% for budget_info in period_budgets %}
     <tr>
         <td><p><button class="btnSmall select" id="{{budget_info.budget.budget_id}}" onclick="openUpdatePage(this.id)"><b><u>{{ budget_info.budget.category.name }}</u></b></button></p></td>
-        <td><button class="btnSmall select" id="month_year#{{budget_info.budget.category.name}}#{{month}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_month }}</u></button></td>
-        <td><button class="btnSmall select" id="year#{{budget_info.budget.category.name}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_year }}</u></button></td>
-        <td><button class="btnSmall select" id="special#{{budget_info.budget.category.name}}#{{budget_info.budget.amount_frequency}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_period }}</u></button></td>
+        <td><button class="btnSmall select" id="period#{{budget_info.budget.start_date}}#{{budget_info.budget.end_date}}#{{budget_info.budget.category}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_period }}</u></button></td>
         <td>${{ budget_info.budget.amount }}</td>
-        {% if budget_info.percent_special >=  0.0 and budget_info.percent_special <  0.85 %}
+        {% if budget_info.percent_period >=  0.0 and budget_info.percent_period <  0.85 %}
             <td><font color="green">${{ budget_info.remaining_period }}</font></td>
         {% else %}
-            {% if budget_info.percent_special >= 0.85 and  budget_info.percent_special < 0.99 %}
+            {% if budget_info.percent_period >= 0.85 and  budget_info.percent_period < 0.99 %}
                 <td><font color="orange">${{ budget_info.remaining_period }}</font></td>
             {% else %}
-                {% if budget_info.percent_special >= 0.99 and  budget_info.percent_special <= 1.00 %}
+                {% if budget_info.percent_period >= 0.99 and  budget_info.percent_period <= 1.00 %}
                     <td><font color="blue">${{ budget_info.remaining_period }}</font></td>
                 {% else %}
                     <td><font color="red">${{ budget_info.remaining_period }}</font></td>

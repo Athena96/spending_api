@@ -34,10 +34,11 @@ function openPurhcasesPage(info) {
     } else if (title == "year") {
         year = parts[2];
         url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/year:" + year + "/category:" + category;
-    } else if (title == "special") {
-        var special_category = parts[1];
-        var special_frequency = parts[2];
-        url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/special_category:" + special_category + "/special_frequency:" + special_frequency;
+    } else if (title == "period") {
+        var start_date = parts[1];
+        var end_date = parts[2];
+        var category = parts[3];
+        url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/start_date:" + start_date + "/end_date:" + end_date + "/category" + category;
     }
     window.open(url);
 }

@@ -4,7 +4,7 @@ from datetime import datetime
 from dateutil.rrule import rrule, MONTHLY
 from models import Transaction
 from models import Budget
-from models import SpecialBudget
+from models import Period
 
 class DBCommms:
 
@@ -84,7 +84,7 @@ class DBCommms:
 
         return data
 
-    def get_special_transactions(self, start_date, end_date, category=None):
+    def get_period_transactions(self, start_date, end_date, category=None):
         print("     " + self.__class__.__name__)
 
         base_query = "select * from ledger"
@@ -155,7 +155,7 @@ class DBCommms:
 
         sql_description = "NULL" if (budget.description == None) else "'{0}'".format(budget.description)
 
-        cmd = """INSERT INTO budget (category, amount, amount_frequency, description) VALUES ('{0}', {1}, '{2}', {3})""".format(budget.category.name, budget.amount, budget.amount_frequency, sql_description)
+        cmd = """INSERT INTO budget (category, amount, amount_frequency, description, start_date, end_date) VALUES ('{0}', {1}, '{2}', {3}, '{4}', '{5}')""".format(budget.category.name, budget.amount, budget.amount_frequency, sql_description, budget.start_date, budget.end_date)
         print(cmd)
 
         self.cursor.execute(cmd)
@@ -169,8 +169,8 @@ class DBCommms:
 
         sql_description = "NULL" if (budget.description == None) else "'{0}'".format(budget.description)
 
-        cmd = """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}', description = {3} WHERE budget.category_id = {4}""".format(budget.category.name,
-        budget.amount, budget.amount_frequency, sql_description, budget.budget_id)
+        cmd = """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}', description = {3}, start_date = '{4}', end_date = '{5}' WHERE budget.category_id = {6}""".format(budget.category.name,
+        budget.amount, budget.amount_frequency, sql_description, budget.start_date, budget.end_date, budget.budget_id)
         print(cmd)
 
         self.cursor.execute(cmd)
@@ -190,21 +190,24 @@ class DBCommms:
 
         return jsonify({'result': 'successfuly deleted budget category!'})
 
-    def get_budgets(self):
+    def get_budgets(self, date):
         print("     " + self.__class__.__name__)
-        print("     " + "get_budgets()")
+        print("     " + "get_budgets({})".format(date))
 
-        cmd = "SELECT * FROM budget"
+        cmd = """select *
+                from budget
+                where
+                budget.start_date <= '{0}-{1}-{2} {3}:{4}:{5}' and
+                budget.end_date >= '{0}-{1}-{2} {3}:{4}:{5}' """.format(date.year, date.month, date.day, date.hour, date.minute, date.second)
         self.cursor.execute(cmd)
 
         data = []
-        for category, amount, amount_frequency, budget_id, description in self.cursor:
-
+        for category, amount, amount_frequency, budget_id, description, start_date, end_date in self.cursor:
             description = None if description == "null" else description
-            if "special" in amount_frequency:
-                budget = SpecialBudget(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=budget_id)
+            if "period" in amount_frequency:
+                budget = Period(category=category, amount=amount, start_date=start_date, end_date=end_date, description=description, budget_id=budget_id)
             else:
-                budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=budget_id)
+                budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, budget_id=budget_id)
             data.append(budget)
 
         return data
@@ -222,8 +225,8 @@ class DBCommms:
         res = None
         for category, amount, amount_frequency, budget_id, description in self.cursor:
             description = None if description == "null" else description
-            if "special" in amount_frequency:
-                res = SpecialBudget(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=budget_id)
+            if "period" in amount_frequency:
+                res = Period(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=budget_id)
             else:
                 res = Budget(category=category, amount=amount, amount_frequency=amount_frequency, description=description, budget_id=budget_id)
         return res

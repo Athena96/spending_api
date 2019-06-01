@@ -18,10 +18,10 @@ function addTransaction() {
         var sec = formatSingleDigit(currentDate.getSeconds());
         var min = formatSingleDigit(currentDate.getMinutes());
         var hour = formatSingleDigit(currentDate.getHours());
-        var date = formatSingleDigit(currentDate.getDate());
+        var day = formatSingleDigit(currentDate.getDate());
         var month = formatSingleDigit((currentDate.getMonth() + 1));
         var year = currentDate.getFullYear();
-        date = year + "-" + month + "-" + date + " " + hour + ":" + min + ":" + sec;
+        date = year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + sec;
     }
     var description = document.getElementById("descriptionTextBox").value;
     if (description == "" || description == null || description == " ") {
