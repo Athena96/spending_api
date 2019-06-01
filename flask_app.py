@@ -117,8 +117,10 @@ def budgets_page(year=None, month=None):
 
         budget_page_info = None
         if type(budget) is Period:
+            sd = string_to_date(budget.start_date)
+            ed = string_to_date(budget.end_date)
             # get transactions for period budget
-            period_budget_period_transactions = db_comm.get_period_transactions(start_date=budget.start_date, end_date=budget.end_date, category=budget.category)
+            period_budget_period_transactions = db_comm.get_period_transactions(start_date=sd, end_date=ed, category=budget.category)
             spent_so_far_period = sum([transaction.amount for transaction in period_budget_period_transactions])
 
             filtered_year_category_transactions = list(filter(lambda transaction: (transaction.date[0:4] == year), period_budget_period_transactions))
