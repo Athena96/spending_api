@@ -56,7 +56,7 @@ def transactions_page(year=None, month=None, category="ALL", start_date=None, en
         month_income=0.0, year_income=0.0)
 
     year_transactions = db_comm.get_transactions(year=year, category=category)
-    spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income)])
+    spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income) and int(transaction.date[5:7]) <= int(month)])
     spent_in_year_str = str(round(spent_in_year, 2))
 
     (year_income, month_income) = calculate_income_from(year_transactions, month)
@@ -105,7 +105,8 @@ def budgets_page(year=None, month=None):
         budgets = db_comm.get_budgets(datetime(year=int(year), month=int(month), day=end))
 
     year_transactions = db_comm.get_transactions(year=year)
-    spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income)])
+
+    spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income) and int(transaction.date[5:7]) <= int(month)])
     spent_in_year_str = str(round(spent_in_year, 2))
 
     month_transactions = [transaction for transaction in year_transactions if ((not transaction.category[0].is_income) and (transaction.date[5:7] == month))]
@@ -282,7 +283,7 @@ def root_page_helper(type):
     return ((obj[0],(sorted(obj[1], reverse=True))) for obj in sorted(final_year_links, reverse=True))
 
 def calculate_income_from(year_transactions, month):
-    year_income = round(sum([transaction.amount for transaction in year_transactions if transaction.category[0].is_income]), 2)
+    year_income = round(sum([transaction.amount for transaction in year_transactions if transaction.category[0].is_income and int(transaction.date[5:7]) <= int(month)]), 2)
     month_income = round(sum([transaction.amount for transaction in year_transactions if (transaction.category[0].is_income and (transaction.date[5:7] == month))]), 2)
     return (year_income, month_income)
 
