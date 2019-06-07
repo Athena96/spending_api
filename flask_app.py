@@ -56,19 +56,21 @@ def transactions_page(year=None, month=None, category="ALL", start_date=None, en
         month_income=0.0, year_income=0.0)
 
     year_transactions = db_comm.get_transactions(year=year, category=category)
-    spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income) and int(transaction.date[5:7]) <= int(month)])
-    spent_in_year_str = str(round(spent_in_year, 2))
 
-    (year_income, month_income) = calculate_income_from(year_transactions, month)
-
-    spent_in_month_str = "0.00"
     if month is not None:
+        spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income) and int(transaction.date[5:7]) <= int(month)])
+        (year_income, month_income) = calculate_income_from(year_transactions, month)
         month_transactions = [transaction for transaction in year_transactions if (transaction.date[5:7] == month)]
         spent_in_month = sum([transaction.amount for transaction in month_transactions if (not transaction.category[0].is_income)])
         spent_in_month_str = str(round(spent_in_month, 2))
+    else:
+        spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income)])
+        (year_income, month_income) = ("--", "--")
+        spent_in_month_str = "--"
 
     transactions = sorted(year_transactions if month is None else month_transactions, key=lambda x: x.date, reverse=True)
 
+    spent_in_year_str = str(round(spent_in_year, 2))
     return render_template('transactions.html',
     month=month, year=year,
     category=category,
@@ -288,7 +290,7 @@ def calculate_income_from(year_transactions, month):
     return (year_income, month_income)
 
 def string_to_date(date_string):
-    year = int(date_string.split(" ")[0][0:4])
-    month = int(date_string.split(" ")[0][5:7])
-    day = int(date_string.split(" ")[0][8:10])
+    year = int(date_string.split("_")[0][0:4])
+    month = int(date_string.split("_")[0][5:7])
+    day = int(date_string.split("_")[0][8:10])
     return datetime(year=year, month=month, day=day)

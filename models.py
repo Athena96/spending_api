@@ -71,6 +71,12 @@ class Period(Budget):
     def __init__(self, category, amount, start_date, end_date, description=None, budget_id=None):
         Budget.__init__(self, category, amount, "period", start_date, end_date, description=description, budget_id=budget_id)
 
+    def get_date_month_year(self, is_start_date):
+        if is_start_date:
+            return "{}-{}-{}_{}:{}:{}".format(self.start_date[0:4], self.start_date[5:7], self.start_date[8:10], self.start_date[11:13], self.start_date[14:16], self.start_date[17:19])
+        else:
+            return "{}-{}-{}_{}:{}:{}".format(self.end_date[0:4], self.end_date[5:7], self.end_date[8:10], self.end_date[11:13], self.end_date[14:16], self.end_date[17:19])
+
 class BudgetPageInfo:
 
     def __init__(self, budget, spent_so_far_month, spent_so_far_year, spent_so_far_period=None):

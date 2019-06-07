@@ -38,7 +38,7 @@ function openPurhcasesPage(info) {
         var start_date = parts[1];
         var end_date = parts[2];
         var category = parts[3];
-        url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/start_date:" + start_date + "/end_date:" + end_date + "/category" + category;
+        url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/start_date:" + start_date + "/end_date:" + end_date + "/category:" + category;
     }
     window.open(url);
 }

@@ -149,7 +149,7 @@
   {% for budget_info in period_budgets %}
     <tr>
         <td><p><button class="btnSmall select" id="{{budget_info.budget.budget_id}}" onclick="openUpdatePage(this.id)"><b><u>{{ budget_info.budget.category.name }}</u></b></button></p></td>
-        <td><button class="btnSmall select" id="period#{{budget_info.budget.start_date}}#{{budget_info.budget.end_date}}#{{budget_info.budget.category}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_period }}</u></button></td>
+        <td><button class="btnSmall select" id="period#{{budget_info.budget.get_date_month_year(true)}}#{{budget_info.budget.get_date_month_year(false)}}#{{budget_info.budget.category.name}}" onclick="openPurhcasesPage(this.id)"><u>${{ budget_info.spent_so_far_period }}</u></button></td>
         <td>${{ budget_info.budget.amount }}</td>
         {% if budget_info.percent_period >=  0.0 and budget_info.percent_period <  0.85 %}
             <td><font color="green">${{ budget_info.remaining_period }}</font></td>
