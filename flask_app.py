@@ -141,8 +141,9 @@ def budgets_page(year=None, month=None):
 
         elif budget.amount_frequency == "month" or budget.amount_frequency == "year":
             # todo: just else... if its not a Period budget then it would have to be mo/year
+
             filtered_year_category_transactions = list(filter(lambda transaction: (budget.category.name in transaction.get_categories()), year_transactions))
-            spent_so_far_year = sum([transaction.amount for transaction in filtered_year_category_transactions])
+            spent_so_far_year = sum([transaction.amount for transaction in filtered_year_category_transactions if int(transaction.date[5:7]) <= int(month)])
 
             filtered_month_category_transactions = filter(lambda transaction: (transaction.date[5:7] == month), filtered_year_category_transactions)
             spent_so_far_month = sum([transaction.amount for transaction in filtered_month_category_transactions])
