@@ -106,6 +106,7 @@ def budgets_page(year=None, month=None):
         (start, end) = calendar.monthrange(int(year),int(month))
         budgets = db_comm.get_budgets(datetime(year=int(year), month=int(month), day=end))
 
+    # getting transactions when we don't care about their category
     year_transactions = db_comm.get_transactions(year=year)
 
     spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income) and int(transaction.date[5:7]) <= int(month)])
@@ -141,6 +142,12 @@ def budgets_page(year=None, month=None):
 
         elif budget.amount_frequency == "month" or budget.amount_frequency == "year":
             # todo: just else... if its not a Period budget then it would have to be mo/year
+
+            # this is getting transactions when we do care about their category!
+
+            # use an SQL query here instead of matching in python.
+                # querying for all transaction ID's with 'budget' ID from links table, join on Links and Txns
+                # the func would be: get_transactions(category, year, month=None)
 
             filtered_year_category_transactions = list(filter(lambda transaction: (budget.category.name in transaction.get_categories()), year_transactions))
             spent_so_far_year = sum([transaction.amount for transaction in filtered_year_category_transactions if int(transaction.date[5:7]) <= int(month)])
