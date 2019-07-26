@@ -31,12 +31,20 @@ class Transaction:
         self.description = description
         self.transaction_id = transaction_id
 
+    def get_transaction_day(self):
+        dow = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        year = int(self.date.split("_")[0][0:4])
+        month = int(self.date.split("_")[0][5:7])
+        day = int(self.date.split("_")[0][8:10])
+        date = datetime(year, month, day)
+        return "{} {}".format(dow[date.weekday()], self.date[0:10])
+
     def to_dict(self):
         contents = {}
         contents["transaction_id"] = self.transaction_id
         contents["title"] = self.title
         contents["amount"] = self.amount
-        contents["category"] = self.category.name
+        contents["category"] = self.category[0].name
         contents["date"] = self.date
         contents["description"] = self.description
         return contents

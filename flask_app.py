@@ -70,11 +70,27 @@ def transactions_page(year=None, month=None, category="ALL", start_date=None, en
 
     transactions = sorted(year_transactions if month is None else month_transactions, key=lambda x: x.date, reverse=True)
 
+    #
+    txn_date_map = {}
+    for txn in transactions:
+        key = txn.get_transaction_day()
+        if key not in txn_date_map.keys():
+            txn_date_map[key] = []
+        txn_date_map[key].append(txn)
+
+    for k in txn_date_map.keys():
+        print(k)
+        for tx in txn_date_map[k]:
+            print("\t")
+            print(tx.to_dict())
+    #
+
     spent_in_year_str = str(round(spent_in_year, 2))
     return render_template('transactions.html',
     month=month, year=year,
     category=category,
     transactions=transactions,
+    txn_date_map=txn_date_map,
     spent_in_month=spent_in_month_str, spent_in_year=spent_in_year_str,
     month_income=month_income, year_income=year_income)
 
