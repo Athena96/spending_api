@@ -22,38 +22,6 @@
     <br />
 </p>
 
-<!--<table class="a">-->
-
-<!--  <tr>-->
-<!--    <th>Title <i>(click to edit)</i></th>-->
-<!--    <th>Amount</th>-->
-<!--    <th>Category</th>-->
-<!--    <th>Date</th>-->
-<!--    <th>Description</th>-->
-<!--    <th>Delete</th>-->
-<!--  </tr>-->
-
-<!--  {% for transaction in transactions %}-->
-
-<!--    <tr>-->
-<!--        <td><button class="btnSmall select" id="{{transaction.transaction_id}}" onclick="openUpdatePage(this.id)"><u>{{ transaction.title }}</u></button></td>-->
-<!--        <td>${{ transaction.amount }}</td>-->
-<!--        <td>{{ transaction.get_categories() }}</td>-->
-<!--        <td>{{ transaction.date }}</td>-->
-<!--        {% if transaction.description != None %}-->
-<!--            <td>{{ transaction.description }}</td>-->
-<!--        {% else %}-->
-<!--            <td></td>-->
-<!--        {% endif %}-->
-<!--        <td><button class="btnSmall delete" id="{{transaction.transaction_id}}" onclick="deleteTransaction(this.id)"><u>delete</u></button></td>-->
-<!--    </tr>-->
-
-<!--  {% endfor %}-->
-
-<!--</table>-->
-
-<table class="a">
-
   {% for k in txn_date_map.keys() %}
 
     <tr>
@@ -91,13 +59,10 @@
     </tr>
 
     <p>
-    <br />
+        <br />
     </p>
 
-
   {% endfor %}
-
-</table>
 
 <script src="/static/js/transactions.js"></script>
 
