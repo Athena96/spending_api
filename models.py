@@ -81,7 +81,6 @@ class BudgetPageInfo:
 
     def __init__(self, budget, spent_so_far_month, spent_so_far_year, spent_so_far_period=None):
         self.budget = budget
-        num_rem_mo_in_yr = (12.0 - datetime.now().month)
 
         if type(budget) is Period:
             self.spent_so_far_period = spent_so_far_period
@@ -90,14 +89,8 @@ class BudgetPageInfo:
         else:
             self.percent_month = (spent_so_far_month / (budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0) ))
             self.percent_year = (spent_so_far_year / (budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0) ))
-
             if budget.amount_frequency == "month":
                 self.remaining_month = "{}".format(round((budget.amount - spent_so_far_month),2))
-                self.remaining_month_avg = "{}".format(round( (((budget.amount * 12.0) - spent_so_far_year) / num_rem_mo_in_yr) ,2))
-            else:
-                print("bud: ", budget.amount)
-                print("spent_so_far_year: ", spent_so_far_year)
-                self.remaining_month_avg = "{}".format(round( ((budget.amount - spent_so_far_year) / num_rem_mo_in_yr) ,2))
 
             self.remaining_year = "{}".format(round(((budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0)) - spent_so_far_year),2))
 
