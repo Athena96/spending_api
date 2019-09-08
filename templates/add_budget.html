@@ -12,9 +12,27 @@
 
 <form>
     {% if budget != None %}
-        Category: <input type="text" id="categoryTextBoxU" name="item" value="{{budget.category.name}}"><br>
+        Title: <input type="text" id="categoryTextBoxU" name="item" value="{{budget.category.name}}"><br>
         Amount: <input type="text" id="amountTextBoxU" name="price" value="{{budget.amount}}"><br>
-        Amount Frequency: <input type="text" id="amountFrequencyTextBoxU" name="category" value="{{budget.amount_frequency}}"><br>
+        <!--Amount Frequency: <input type="text" id="amountFrequencyTextBoxU" name="category" value="{{budget.amount_frequency}}"><br>-->
+
+        Amount Frequency:<br>
+        {% if budget.amount_frequency == "month" %}
+            <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="month" checked> Month<br>
+            <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="year"> Year<br>
+            <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="period"> Period<br>
+        {% else  %}
+            {% if budget.amount_frequency == "year" %}
+                <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="month"> Month<br>
+                <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="year" checked> Year<br>
+                <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="period"> Period<br>
+            {% else  %}
+                <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="month"> Month<br>
+                <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="year"> Year<br>
+                <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="period" checked> Period<br>
+            {% endif %}
+        {% endif %}
+
         Start Date: <input type="text" id="startDateTextBoxU" name="date" value="{{budget.start_date}}"><br>
         End Date: <input type="text" id="endDateTextBoxU" name="date" value="{{budget.end_date}}"><br>
         {% if budget.description != None %}
@@ -25,12 +43,15 @@
             <textarea name="description" id="descriptionTextBoxU" style="width:200px; height:100px;" ></textarea><br>
         {% endif %}
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
+        <button class="button buttonUpdate" id="{{budget.budget_id}}" onclick="updateBudget(this.id)">Update</button> <br>
         <button class="button buttonDelete" id="{{budget.budget_id}}" onclick="deleteBudget(this.id)">Delete</button>
-        <button class="button buttonUpdate" id="{{budget.budget_id}}" onclick="updateBudget(this.id)">Update</button>
     {% else %}
-        Category: <input type="text" id="categoryTextBox" name="item" value=""><br>
+        Title: <input type="text" id="categoryTextBox" name="item" value=""><br>
         Amount: <input type="text" id="amountTextBox" name="price" value=""><br>
-        Amount Frequency: <input type="text" id="amountFrequencyTextBox" name="category" value=""><br>
+        Amount Frequency:<br>
+            <input type="radio" name="amountFrequencyRadioButtons" id="amountFrequencyRadioButtons" value="month"> Month<br>
+            <input type="radio" name="amountFrequencyRadioButtons" id="amountFrequencyRadioButtons" value="year"> Year<br>
+            <input type="radio" name="amountFrequencyRadioButtons" id="amountFrequencyRadioButtons" value="period"> Period<br>
         Start Date: <input type="text" id="startDateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
         End Date: <input type="text" id="endDateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
         Description:<br>

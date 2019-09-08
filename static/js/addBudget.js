@@ -16,7 +16,13 @@ function deleteBudget(budget_id) {
 function addBudget() {
     var category = document.getElementById("categoryTextBox").value;
     var amount = document.getElementById("amountTextBox").value;
-    var amountFrequency = document.getElementById("amountFrequencyTextBox").value;
+    var amountFrequencies = document.getElementsByName("amountFrequencyRadioButtons");
+    var selectedAmountFrequency;
+    for(var i = 0; i < amountFrequencies.length; i++) {
+        if(amountFrequencies[i].checked)
+            selectedAmountFrequency = amountFrequencies[i].value;
+    }
+    alert(selectedAmountFrequency)
     var startDate = document.getElementById("startDateTextBox").value;
     var endDate = document.getElementById("endDateTextBox").value;
 
@@ -27,7 +33,7 @@ function addBudget() {
     var passcode = document.getElementById("passcodeTextBox").value;
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = "http://inherentvice.pythonanywhere.com/budget/" + category + "/" + amount + "/" + amountFrequency + "/" + description + "/" + startDate + "/" + endDate;
+    var url_tmp = "http://inherentvice.pythonanywhere.com/budget/" + category + "/" + amount + "/" + selectedAmountFrequency + "/" + description + "/" + startDate + "/" + endDate;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.withCredentials = true;
@@ -40,8 +46,12 @@ function addBudget() {
 function updateBudget(budget_id) {
     var category = document.getElementById("categoryTextBoxU").value;
     var amount = document.getElementById("amountTextBoxU").value;
-    var amountFrequency = document.getElementById("amountFrequencyTextBoxU").value;
-    var startDate = document.getElementById("startDateTextBoxU").value;
+    var amountFrequencies = document.getElementsByName("amountFrequencyRadioButtonsU");
+    var selectedAmountFrequency;
+    for(var i = 0; i < amountFrequencies.length; i++) {
+        if(amountFrequencies[i].checked)
+            selectedAmountFrequency = amountFrequencies[i].value;
+    }    var startDate = document.getElementById("startDateTextBoxU").value;
     var endDate = document.getElementById("endDateTextBoxU").value;
 
     var description = document.getElementById("descriptionTextBoxU").value;
