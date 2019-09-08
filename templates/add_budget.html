@@ -11,7 +11,6 @@
     <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
 
 <form>
-
     {% if budget != None %}
         Category: <input type="text" id="categoryTextBoxU" name="item" value="{{budget.category.name}}"><br>
         Amount: <input type="text" id="amountTextBoxU" name="price" value="{{budget.amount}}"><br>
@@ -26,6 +25,7 @@
             <textarea name="description" id="descriptionTextBoxU" style="width:200px; height:100px;" ></textarea><br>
         {% endif %}
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
+        <button class="button buttonDelete" id="{{budget.budget_id}}" onclick="deleteBudget(this.id)">Delete</button>
         <button class="button buttonUpdate" id="{{budget.budget_id}}" onclick="updateBudget(this.id)">Update</button>
     {% else %}
         Category: <input type="text" id="categoryTextBox" name="item" value=""><br>

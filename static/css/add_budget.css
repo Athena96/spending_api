@@ -35,6 +35,7 @@ tr:nth-child(even) {
 }
 
 .buttonUpdate {background-color: #008CBA;} /* Blue */
+.buttonDelete {background-color: #F54B42;} /* Red */
 
 
 .btn {

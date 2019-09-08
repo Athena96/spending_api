@@ -30,7 +30,6 @@
     <th>Spent Year</th>
     <th>Budgeted</th>
     <th>Remaining Month</th>
-    <th>Delete</th>
   </tr>
   {% for budget_info in month_budgets %}
     <tr>
@@ -51,7 +50,6 @@
                 {% endif %}
             {% endif %}
         {% endif %}
-        <td><button class="btnSmall delete" id="{{budget_info.budget.budget_id}}" onclick="deleteBudget(this.id)"><u>delete</u></button></td>
     </tr>
   {% endfor %}
 </table>
@@ -67,7 +65,6 @@
     <th>Spent Year</th>
     <th>Budgeted</th>
     <th>Remaining Year</th>
-    <th>Delete</th>
   </tr>
   {% for budget_info in year_budgets %}
     <tr>
@@ -89,7 +86,6 @@
                 {% endif %}
             {% endif %}
         {% endif %}
-        <td><button class="btnSmall delete" id="{{budget_info.budget.budget_id}}" onclick="deleteBudget(this.id)"><u>delete</u></button></td>
     </tr>
   {% endfor %}
 </table>
@@ -101,7 +97,6 @@
     <th>Spent Period</th>
     <th>Budgeted</th>
     <th>Remaining Period</th>
-    <th>Delete</th>
   </tr>
   {% for budget_info in period_budgets %}
     <tr>
@@ -121,7 +116,6 @@
                 {% endif %}
             {% endif %}
         {% endif %}
-        <td><button class="btnSmall delete" id="{{budget_info.budget.budget_id}}" onclick="deleteBudget(this.id)"><u>delete</u></button></td>
     </tr>
   {% endfor %}
 </table>

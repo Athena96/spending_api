@@ -1,11 +1,19 @@
 
-function addBudget() {
-  // for adding budgets under a parent budget.
-  // e.g.
-  // add grocery: start=jan 1 2019 end = dec 31 2019
-  // update grocery: start=jan 1 2019 end = jun 01 2019
-  // add grocery: start=jun 02 2019 end = dec 31 2019
 
+function deleteBudget(budget_id) {
+    var xhr = new XMLHttpRequest();
+    var url = "http://inherentvice.pythonanywhere.com/budget/" + budget_id;
+    xhr.open("DELETE", url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify({}));
+    xhr.onload = function() {
+        console.log("Deleted Budget Category")
+        location.reload();
+        alert(this.responseText);
+    }
+}
+
+function addBudget() {
     var category = document.getElementById("categoryTextBox").value;
     var amount = document.getElementById("amountTextBox").value;
     var amountFrequency = document.getElementById("amountFrequencyTextBox").value;
