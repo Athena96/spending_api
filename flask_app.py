@@ -12,9 +12,9 @@ from models import BudgetPageInfo
 app = Flask(__name__)
 
 # setup DB
-DATABASE = '/home/inherentVice/spending_log.db'
-db_comm = DBCommms(DATABASE)
-
+DATABASE = '/Users/jf060961/Desktop/spending_log.db'
+# todo move all of these functions to a class? or what is the solution to having all     db_comm = DBCommms(DATABASE) in some constructor
+#   todo so it works locally and on server
 # Website page handlers: Transactions
 
 @app.route("/site/transactions", methods=["GET"])
@@ -28,6 +28,7 @@ def transactions_root_page():
 @app.route("/site/add_transaction/<string:transaction_id>", methods=["GET"])
 def add_transaction_page(transaction_id=None):
     print("add_transaction_page()")
+    db_comm = DBCommms(DATABASE)
 
     transaction = db_comm.get_transaction(transaction_id)
     budgets = db_comm.get_budgets(datetime.now())
@@ -40,6 +41,7 @@ def add_transaction_page(transaction_id=None):
 @app.route("/site/transactions/start_date:<string:start_date>/end_date:<string:end_date>/category:<string:category>", methods=["GET"])
 def transactions_page(year=None, month=None, category="ALL", start_date=None, end_date=None):
     print("transactions_page()")
+    db_comm = DBCommms(DATABASE)
 
     if start_date is not None and end_date is not None:
         sd = string_to_date(start_date)
@@ -99,6 +101,7 @@ def budgets_root_page():
 @app.route("/site/add_budget/<string:budget_id>", methods=["GET"])
 def add_budget_page(budget_id=None):
     print("add_budget_page()")
+    db_comm = DBCommms(DATABASE)
 
     budget = db_comm.get_budget(budget_id)
     return render_template('add_budget.html', budget=budget)
@@ -106,6 +109,7 @@ def add_budget_page(budget_id=None):
 @app.route("/site/budgets/year:<string:year>/month:<string:month>", methods=["GET"])
 def budgets_page(year=None, month=None):
     print("budgets_page()")
+    db_comm = DBCommms(DATABASE)
 
     today = datetime.now()
     if (year == today.year and month == today.month):
@@ -189,12 +193,14 @@ def budgets_page(year=None, month=None):
 @app.route('/transaction/<string:month>/<string:year>/<string:category>', methods=['GET'])
 def get_transactions(month=None, year=None, category="ALL"):
     print("get_all_transaction_for_year()")
+    db_comm = DBCommms(DATABASE)
 
     return jsonify([transaction.to_dict() for transaction in db_comm.get_transactions(month,year,category)])
 
 @app.route('/transaction/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>', methods=['POST'])
 def add_transaction(title, amount, category, date, description):
     print("add_transaction()")
+    db_comm = DBCommms(DATABASE)
 
     description = None if description == "null" else description
     transaction = Transaction(title, amount, category, date, description)
@@ -203,6 +209,7 @@ def add_transaction(title, amount, category, date, description):
 @app.route('/transaction/<string:transaction_id>/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>', methods=['PUT'])
 def update_transaction(transaction_id, title, amount, category, date, description):
     print("update_transaction()")
+    db_comm = DBCommms(DATABASE)
 
     transaction = Transaction(title, amount, category, date, description, transaction_id)
     return db_comm.update_transaction(transaction)
@@ -210,6 +217,7 @@ def update_transaction(transaction_id, title, amount, category, date, descriptio
 @app.route('/transaction/<string:transaction_id>', methods=['DELETE'])
 def delete_transaction(transaction_id):
     print("delete_transaction()")
+    db_comm = DBCommms(DATABASE)
 
     return db_comm.delete_transaction(transaction_id)
 
@@ -218,12 +226,14 @@ def delete_transaction(transaction_id):
 @app.route('/budgets', methods=['GET'])
 def get_budgets():
     print("get_budgets()")
+    db_comm = DBCommms(DATABASE)
 
     return jsonify([budget.to_dict() for budget in db_comm.get_budgets(datetime.now())])
 
 @app.route('/budget/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['POST'])
 def add_budget(category, amount, amount_frequency, description, start_date, end_date):
     print("add_budget()")
+    db_comm = DBCommms(DATABASE)
 
     description = None if description == "null" else description
     budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description)
@@ -232,6 +242,7 @@ def add_budget(category, amount, amount_frequency, description, start_date, end_
 @app.route('/budget/<string:budget_id>/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['PUT'])
 def update_budget(budget_id, category, amount, amount_frequency, description, start_date, end_date):
     print("update_budget()")
+    db_comm = DBCommms(DATABASE)
 
     budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, budget_id=budget_id)
     return db_comm.update_budget(budget)
@@ -239,6 +250,7 @@ def update_budget(budget_id, category, amount, amount_frequency, description, st
 @app.route('/budget/<string:budget_id>', methods=['DELETE'])
 def delete_budget(budget_id):
     print("delete_budget()")
+    db_comm = DBCommms(DATABASE)
 
     return db_comm.delete_budget(budget_id)
 
@@ -276,6 +288,8 @@ def single_digit_num_str(num):
 
 def root_page_helper(type):
     print("Helper: root_page_helper({})".format(type))
+    db_comm = DBCommms(DATABASE)
+
     (min_year, month_year_list) = db_comm.get_min_max_transaction_dates()
 
     final_year_links = []
@@ -301,6 +315,7 @@ def root_page_helper(type):
     return ((obj[0],(sorted(obj[1], reverse=True))) for obj in sorted(final_year_links, reverse=True))
 
 def calculate_income_from(year_transactions, month):
+
     year_income = round(sum([transaction.amount for transaction in year_transactions if transaction.category[0].is_income and int(transaction.date[5:7]) <= int(month)]), 2)
     month_income = round(sum([transaction.amount for transaction in year_transactions if (transaction.category[0].is_income and (transaction.date[5:7] == month))]), 2)
     return (year_income, month_income)
@@ -310,3 +325,6 @@ def string_to_date(date_string):
     month = int(date_string.split("_")[0][5:7])
     day = int(date_string.split("_")[0][8:10])
     return datetime(year=year, month=month, day=day)
+
+if __name__ == '__main__':
+    app.run()

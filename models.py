@@ -15,6 +15,7 @@ class Category:
 class Transaction:
 
     def __init__(self, title, amount, category, date, description=None, transaction_id=None):
+        # this constructor should really just be assignments... this conversion should happen in another file.
         self.title = title
         self.amount = float(amount)
 

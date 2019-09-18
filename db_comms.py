@@ -5,13 +5,15 @@ from dateutil.rrule import rrule, MONTHLY
 from models import Transaction
 from models import Budget
 from models import Period
+from db_singleton import DBSingleton
 
 class DBCommms:
 
     def __init__(self, database_path):
-        self.database_path = database_path
-        self.db_conn = sqlite3.connect(database_path)
-        self.cursor = self.db_conn.cursor()
+        db = DBSingleton(database_path)
+        self.db_conn = None
+        self.cursor = None
+        (self.db_conn, self.cursor) = db.get_instance()
 
     # Transaction Methods
 
