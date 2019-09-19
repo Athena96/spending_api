@@ -7,12 +7,23 @@ from models import Transaction
 from models import Budget
 from models import Period
 from models import BudgetPageInfo
+from flask import current_app
+
 
 # declare our Flask app
 app = Flask(__name__)
+# DATABASE = '/home/inherentVice/spending_log.db'
+
+DATABASE = ""
+with app.app_context():
+    file = current_app.open_resource('path_to_DB.txt')
+    DATABASE = file.read()
+
+
+print("DATABASE", DATABASE)
 
 # setup DB
-DATABASE = '/Users/jf060961/Desktop/spending_log.db'
+
 # todo move all of these functions to a class? or what is the solution to having all     db_comm = DBCommms(DATABASE) in some constructor
 #   todo so it works locally and on server
 # Website page handlers: Transactions
