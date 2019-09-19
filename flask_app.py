@@ -17,7 +17,7 @@ app = Flask(__name__)
 DATABASE = ""
 with app.app_context():
     file = current_app.open_resource('path_to_DB.txt')
-    DATABASE = file.read()
+    DATABASE = file.read().replace('\n','')
 
 
 print("DATABASE", DATABASE)
