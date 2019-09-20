@@ -5,19 +5,25 @@ from dateutil.rrule import rrule, MONTHLY
 from models import Transaction
 from models import Budget
 from models import Period
-from db_singleton import DBSingleton
 
 class DBCommms:
 
     def __init__(self, database_path):
-        db = DBSingleton(database_path)
+        self.database_path = database_path
         self.db_conn = None
         self.cursor = None
-        (self.db_conn, self.cursor) = db.get_instance()
+
+    def get_instance(self):
+        if self.db_conn is None:
+            self.db_conn = sqlite3.connect(self.database_path)
+            self.cursor = self.db_conn.cursor()
+        return (self.db_conn, self.cursor)
 
     # Transaction Methods
 
     def add_transaction(self, transaction):
+        (self.db_conn, self.cursor) = self.get_instance()
+
         print("     " + self.__class__.__name__)
         print("     " + "add_transaction({})".format(transaction))
 
@@ -29,10 +35,13 @@ class DBCommms:
 
         self.cursor.execute(cmd)
         self.db_conn.commit()
+        self.db_conn.close()
 
         return jsonify({'result': 'successfuly added transaction!'})
 
     def update_transaction(self, transaction):
+        (self.db_conn, self.cursor) = self.get_instance()
+
         print("     " + self.__class__.__name__)
         print("     " + "update_transaction({})".format(transaction))
 
@@ -48,6 +57,8 @@ class DBCommms:
         return jsonify({'result': 'successfuly updated transaction!'})
 
     def delete_transaction(self, transaction_id):
+        (self.db_conn, self.cursor) = self.get_instance()
+
         print("     " + self.__class__.__name__)
         print("     " + "delete_transaction({})", transaction_id)
 
@@ -58,6 +69,8 @@ class DBCommms:
         return jsonify({'result': 'successfuly deleted transaction!'})
 
     def get_transactions(self, month=None, year=None, category="ALL"):
+        (self.db_conn, self.cursor) = self.get_instance()
+
         print("     " + self.__class__.__name__)
         print("     " + "get_transaction(month:{},year:{},category:{})".format(month, year, category))
 
@@ -87,6 +100,8 @@ class DBCommms:
         return data
 
     def get_period_transactions(self, start_date, end_date, category=None):
+        (self.db_conn, self.cursor) = self.get_instance()
+
         print("     " + self.__class__.__name__)
 
         base_query = "select * from ledger"
@@ -113,6 +128,8 @@ class DBCommms:
         return data
 
     def get_transaction(self, transaction_id):
+        (self.db_conn, self.cursor) = self.get_instance()
+
         print("     " + self.__class__.__name__)
         print("     " + "get_transaction({})".format(transaction_id))
 
@@ -130,6 +147,8 @@ class DBCommms:
         return res
 
     def get_min_max_transaction_dates(self):
+        (self.db_conn, self.cursor) = self.get_instance()
+
         print("     " + self.__class__.__name__)
         print("     " + "get_min_max_transaction_dates()")
 
@@ -152,6 +171,8 @@ class DBCommms:
     # Budget Methods
 
     def add_budget(self, budget):
+        (self.db_conn, self.cursor) = self.get_instance()
+
         print("     " + self.__class__.__name__)
         print("     " + "add_budget({})", budget)
 
@@ -166,6 +187,8 @@ class DBCommms:
         return jsonify({'result': 'successfuly added budget category!'})
 
     def update_budget(self, budget):
+        (self.db_conn, self.cursor) = self.get_instance()
+
         print("     " + self.__class__.__name__)
         print("     " + "update_budget({})", budget)
 
@@ -181,6 +204,8 @@ class DBCommms:
         return jsonify({'result': 'successfuly updated budget category!'})
 
     def delete_budget(self, budget_id):
+        (self.db_conn, self.cursor) = self.get_instance()
+
         print("     " + self.__class__.__name__)
         print("     " + "delete_budget({})", budget_id)
 
@@ -193,6 +218,8 @@ class DBCommms:
         return jsonify({'result': 'successfuly deleted budget category!'})
 
     def get_budgets(self, date):
+        (self.db_conn, self.cursor) = self.get_instance()
+
         print("     " + self.__class__.__name__)
         print("     " + "get_budgets({})".format(date))
 
@@ -212,6 +239,8 @@ class DBCommms:
         return data
 
     def get_budget(self, budget_id):
+        (self.db_conn, self.cursor) = self.get_instance()
+
         print("     " + self.__class__.__name__)
         print("     " + "get_budget({})".format(budget_id))
 

@@ -27,20 +27,29 @@ function addTransaction() {
     if (description == "" || description == null || description == " ") {
         description = null;
     }
-    var passcode = document.getElementById("passcodeTextBox").value;
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = "http://inherentvice.pythonanywhere.com/transaction/" + title + "/" + amount + "/" + final_cat + "/" + date + "/" + description;
+    var url_tmp = prefix + "/transaction/" + title + "/" + amount + "/" + final_cat + "/" + date + "/" + description;
     var url = url_tmp.replace(" ", "%20");
 
-    xhr.withCredentials = true;
-    xhr.open("POST", url);
-    xhr.setRequestHeader("Authorization", ("Basic " + btoa(passcode)));
+    if (prefix == "http://inherentvice.pythonanywhere.com") {
+        console.log("A");
+        var passcode = document.getElementById("passcodeTextBox").value;
+        xhr.withCredentials = true;
+        xhr.open("POST", url);
+        xhr.setRequestHeader("Authorization", ("Basic " + btoa(passcode)));
+    } else {
+        console.log("B");
+        xhr.open("POST", url);
+    }
+
     xhr.setRequestHeader("cache-control", "no-cache");
     xhr.send(JSON.stringify({}));
+    window.open('transactions');
 }
 
 function updateTransaction(transaction_id) {
+
     var title = document.getElementById("titleTextBoxU").value;
     var amount = document.getElementById("amountTextBoxU").value;
     var category = document.getElementById("mySelectCategoryU").value;
@@ -52,13 +61,16 @@ function updateTransaction(transaction_id) {
     var passcode = document.getElementById("passcodeTextBoxU").value;
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = "http://inherentvice.pythonanywhere.com/transaction/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + description;
+    var url_tmp = prefix + "/transaction/" + transaction_id + "/" + prefix + "/" + amount + "/" + category + "/" + date + "/" + description;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.withCredentials = true;
     xhr.open("PUT", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader("Authorization", "Basic " + btoa(passcode));
+
+    if (prefix == "http://inherentvice.pythonanywhere.com") {
+        xhr.setRequestHeader("Authorization", "Basic " + btoa(passcode));
+    }
     xhr.send(JSON.stringify({}));
 }
 

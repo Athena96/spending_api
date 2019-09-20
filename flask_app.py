@@ -8,16 +8,23 @@ from models import Budget
 from models import Period
 from models import BudgetPageInfo
 from flask import current_app
-
+import dateutil.parser
 
 # declare our Flask app
 app = Flask(__name__)
 
 # setup DB
 DATABASE = ""
+ENVIRONMENT = ""
 with app.app_context():
     file = current_app.open_resource('path_to_DB.txt')
     DATABASE = str(file.read().decode("utf-8")).replace('\n','')
+    if "inherentVice" in DATABASE:
+        ENVIRONMENT = "http://inherentvice.pythonanywhere.com"
+    else:
+        ENVIRONMENT = "http://127.0.0.1:5000"
+    print(ENVIRONMENT)
+
 
 # todo move all of these functions to a class? or what is the solution to having all     db_comm = DBCommms(DATABASE) in some constructor
 #   todo so it works locally and on server
@@ -28,7 +35,8 @@ def transactions_root_page():
     print("transactions_root_page()")
 
     transaction_links = root_page_helper("transactions")
-    return render_template('root_transactions.html', transaction_links=transaction_links)
+
+    return render_template('root_transactions.html', transaction_links=transaction_links, prefix=ENVIRONMENT)
 
 @app.route("/site/add_transaction", methods=["GET"])
 @app.route("/site/add_transaction/<string:transaction_id>", methods=["GET"])
@@ -38,7 +46,8 @@ def add_transaction_page(transaction_id=None):
 
     transaction = db_comm.get_transaction(transaction_id)
     budgets = db_comm.get_budgets(datetime.now())
-    return render_template('add_transaction.html', transaction=transaction, budgets=budgets)
+    print(ENVIRONMENT)
+    return render_template('add_transaction.html', transaction=transaction, budgets=budgets, prefix=ENVIRONMENT)
 
 @app.route("/site/transactions/year:<string:year>", methods=["GET"])
 @app.route("/site/transactions/year:<string:year>/month:<string:month>", methods=["GET"])
@@ -61,7 +70,7 @@ def transactions_page(year=None, month=None, category="ALL", start_date=None, en
         category=category,
         transactions=period_budget_period_transactions,
         spent_in_month=0.0, spent_in_year=0.0,
-        month_income=0.0, year_income=0.0)
+        month_income=0.0, year_income=0.0, prefix=ENVIRONMENT)
 
     year_transactions = db_comm.get_transactions(year=year, category=category)
 
@@ -92,8 +101,7 @@ def transactions_page(year=None, month=None, category="ALL", start_date=None, en
     transactions=transactions,
     txn_date_map=txn_date_map,
     spent_in_month=spent_in_month_str, spent_in_year=spent_in_year_str,
-    month_income=month_income, year_income=year_income)
-
+    month_income=month_income, year_income=year_income, prefix=ENVIRONMENT)
 # Website page handlers: Budgets
 
 @app.route("/site/budgets", methods=["GET"])
@@ -101,7 +109,7 @@ def budgets_root_page():
     print("budgets_root_page()")
 
     budget_links = root_page_helper("budgets")
-    return render_template('root_budgets.html', budget_links=budget_links)
+    return render_template('root_budgets.html', budget_links=budget_links, prefix=ENVIRONMENT)
 
 @app.route("/site/add_budget", methods=["GET"])
 @app.route("/site/add_budget/<string:budget_id>", methods=["GET"])
@@ -110,7 +118,7 @@ def add_budget_page(budget_id=None):
     db_comm = DBCommms(DATABASE)
 
     budget = db_comm.get_budget(budget_id)
-    return render_template('add_budget.html', budget=budget)
+    return render_template('add_budget.html', budget=budget, prefix=ENVIRONMENT)
 
 @app.route("/site/budgets/year:<string:year>/month:<string:month>", methods=["GET"])
 def budgets_page(year=None, month=None):
@@ -191,7 +199,7 @@ def budgets_page(year=None, month=None):
     period_budgets=period_budgets,
     month=month, year=year,
     spent_in_month=spent_in_month_str, spent_in_year=spent_in_year_str,
-    month_income=month_income, year_income=year_income)
+    month_income=month_income, year_income=year_income, prefix=ENVIRONMENT)
 
 # Transaction API endpoints
 
@@ -310,7 +318,7 @@ def root_page_helper(type):
 
         month_str = single_digit_num_str(month)
         month_year_str = "{}-{}".format(month_str, year)
-        link = "location.href='http://inherentvice.pythonanywhere.com/site/{}/year:{}/month:{}'".format(type, year, month_str)
+        link = "location.href='{}/site/{}/year:{}/month:{}'".format(ENVIRONMENT, type, year, month_str)
 
         if year_first:
             final_year_links.append((year, []))

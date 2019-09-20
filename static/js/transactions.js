@@ -2,7 +2,7 @@
 function deleteTransaction(transaction_id) {
 
     var xhr = new XMLHttpRequest();
-    var url = "http://inherentvice.pythonanywhere.com/transaction/" + transaction_id;
+    var url = prefix + "/transaction/" + transaction_id;
     xhr.open("DELETE", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({}));
@@ -13,8 +13,9 @@ function deleteTransaction(transaction_id) {
     }
 }
 
-function openUpdatePage(transaction_id) {
+function openUpdatePage(prefix, transaction_id) {
+
     var xhr = new XMLHttpRequest();
-    var url = "http://inherentvice.pythonanywhere.com/site/add_transaction/" + transaction_id;
+    var url = prefix + "/site/add_transaction/" + transaction_id;
     window.open(url);
 }

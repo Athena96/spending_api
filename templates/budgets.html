@@ -9,10 +9,10 @@
 </head>
 
 <body>
-    <button class="btn transactions" onclick="location.href='http://inherentvice.pythonanywhere.com/site/transactions'">Transaction</button>
-    <button class="btn budgets" onclick="location.href='http://inherentvice.pythonanywhere.com/site/budgets'">Budgets</button>
-    <button class="btn add_transaction" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_transaction'">Add Transaction</button>
-    <button class="btn add_budget" onclick="location.href='http://inherentvice.pythonanywhere.com/site/add_budget'">Add Budget</button>
+    <button class="btn transactions" onclick="location.href='{{prefix}}/site/transactions'">Transaction</button>
+    <button class="btn budgets" onclick="location.href='{{prefix}}/site/budgets'">Budgets</button>
+    <button class="btn add_transaction" onclick="location.href='{{prefix}}/site/add_transaction'">Add Transaction</button>
+    <button class="btn add_budget" onclick="location.href='{{prefix}}/site/add_budget'">Add Budget</button>
 
 <h2>Budgets for {{month}}/{{year}}</h2>
 <h3>Total Spent for {{month}}/{{year}}: ${{spent_in_month}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Income for {{month}}/{{year}}: ${{month_income}}</h3>
