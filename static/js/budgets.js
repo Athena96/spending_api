@@ -2,7 +2,7 @@
 
 function openUpdatePage(budget_id) {
     var xhr = new XMLHttpRequest();
-    var url = "http://inherentvice.pythonanywhere.com/site/add_budget/" + budget_id;
+    var url = prefix + "/site/add_budget/" + budget_id;
     window.open(url);
 }
 
@@ -18,15 +18,15 @@ function openPurhcasesPage(info) {
     if (title == "month_year") {
         month = parts[2];
         year = parts[3];
-        url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/year:" + year + "/month:" + month + "/category:" + category;
+        url = prefix + "/site/transactions" + "/year:" + year + "/month:" + month + "/category:" + category;
     } else if (title == "year") {
         year = parts[2];
-        url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/year:" + year + "/category:" + category;
+        url = prefix + "/site/transactions" + "/year:" + year + "/category:" + category;
     } else if (title == "period") {
         var start_date = parts[1];
         var end_date = parts[2];
         var category = parts[3];
-        url = "http://inherentvice.pythonanywhere.com/site/transactions" + "/start_date:" + start_date + "/end_date:" + end_date + "/category:" + category;
+        url = prefix + "/site/transactions" + "/start_date:" + start_date + "/end_date:" + end_date + "/category:" + category;
     }
     window.open(url);
 }

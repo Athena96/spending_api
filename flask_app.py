@@ -151,7 +151,7 @@ def budgets_page(year=None, month=None):
             continue
 
         budget_page_info = None
-        if type(budget) is Period:
+        if type(budget) is Period or budget.amount_frequency == "period":
             sd = string_to_date(budget.start_date)
             ed = string_to_date(budget.end_date)
             # get transactions for period budget

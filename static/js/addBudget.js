@@ -2,7 +2,7 @@
 
 function deleteBudget(budget_id) {
     var xhr = new XMLHttpRequest();
-    var url = "http://inherentvice.pythonanywhere.com/budget/" + budget_id;
+    var url = prefix + "/budget/" + budget_id;
     xhr.open("DELETE", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({}));
@@ -30,16 +30,23 @@ function addBudget() {
     if (description == "" || description == null || description == " ") {
         description = null;
     }
-    var passcode = document.getElementById("passcodeTextBox").value;
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = "http://inherentvice.pythonanywhere.com/budget/" + category + "/" + amount + "/" + selectedAmountFrequency + "/" + description + "/" + startDate + "/" + endDate;
+    var url_tmp = prefix + "/budget/" + category + "/" + amount + "/" + selectedAmountFrequency + "/" + description + "/" + startDate + "/" + endDate;
     var url = url_tmp.replace(" ", "%20");
 
-    xhr.withCredentials = true;
-    xhr.open("POST", url, true);
+    if (prefix == "http://inherentvice.pythonanywhere.com") {
+        console.log("A");
+        var passcode = document.getElementById("passcodeTextBox").value;
+        xhr.withCredentials = true;
+        xhr.open("POST", url);
+        xhr.setRequestHeader("Authorization", ("Basic " + btoa(passcode)));
+    } else {
+        console.log("B");
+        xhr.open("POST", url);
+    }
+
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader("Authorization", "Basic " + btoa(passcode));
     xhr.send(JSON.stringify({}));
 }
 
@@ -58,16 +65,23 @@ function updateBudget(budget_id) {
     if (description == "" || description == null || description == " ") {
         description = null;
     }
-    var passcode = document.getElementById("passcodeTextBox").value;
 
     var xhr = new XMLHttpRequest();
-    var url_w_spc = "http://inherentvice.pythonanywhere.com/budget/" + budget_id + "/" + category + "/" + amount + "/" + amountFrequency + "/" + description + "/" + startDate + "/" + endDate;
+    var url_w_spc = prefix + "/budget/" + budget_id + "/" + category + "/" + amount + "/" + amountFrequency + "/" + description + "/" + startDate + "/" + endDate;
     var url = url_w_spc.replace(" ", "%20");
 
-    xhr.withCredentials = true;
-    xhr.open("PUT", url, true);
+    if (prefix == "http://inherentvice.pythonanywhere.com") {
+        console.log("A");
+        var passcode = document.getElementById("passcodeTextBox").value;
+        xhr.withCredentials = true;
+        xhr.open("POST", url);
+        xhr.setRequestHeader("Authorization", ("Basic " + btoa(passcode)));
+    } else {
+        console.log("B");
+        xhr.open("POST", url);
+    }
+
     xhr.setRequestHeader("cache-control", "no-cache");
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader("Authorization", "Basic " + btoa(passcode));
     xhr.send(JSON.stringify({}));
 }
