@@ -40,6 +40,13 @@ class Transaction:
         date = datetime(year, month, day)
         return "{} {}".format(dow[date.weekday()], self.date[0:10])
 
+    def get_transaction_day_date(self):
+        year = int(self.date.split("_")[0][0:4])
+        month = int(self.date.split("_")[0][5:7])
+        day = int(self.date.split("_")[0][8:10])
+        date = datetime(year, month, day)
+        return date
+
     def to_dict(self):
         contents = {}
         contents["transaction_id"] = self.transaction_id

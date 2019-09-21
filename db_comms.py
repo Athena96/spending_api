@@ -14,9 +14,8 @@ class DBCommms:
         self.cursor = None
 
     def get_instance(self):
-        if self.db_conn is None:
-            self.db_conn = sqlite3.connect(self.database_path)
-            self.cursor = self.db_conn.cursor()
+        self.db_conn = sqlite3.connect(self.database_path)
+        self.cursor = self.db_conn.cursor()
         return (self.db_conn, self.cursor)
 
     # Transaction Methods
