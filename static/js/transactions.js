@@ -2,7 +2,7 @@
 function deleteTransaction(transaction_id) {
 
     var xhr = new XMLHttpRequest();
-    var url = prefix + "/transaction/" + transaction_id;
+    var url = prefix + "/transactions/" + transaction_id;
     xhr.open("DELETE", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({}));

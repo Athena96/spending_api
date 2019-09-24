@@ -8,7 +8,7 @@ from models import Budget
 from models import Period
 from models import BudgetPageInfo
 from flask import current_app
-from utilities import string_to_date
+from utilities import string_to_date, calculate_income_from
 
 # declare our Flask app
 app = Flask(__name__)
@@ -187,31 +187,31 @@ def budgets_page(year=None, month=None):
 
 # Transaction API endpoints
 
-@app.route('/transaction/<string:year>', methods=['GET'])
-@app.route('/transaction/<string:month>/<string:year>/<string:category>', methods=['GET'])
-def get_transactions(month=None, year=None, category="ALL"):
-    print("get_all_transaction_for_year()")
+@app.route('/transactions/<string:year>', methods=['GET'])
+@app.route('/transactions/<string:year>/<string:month>/<string:category>', methods=['GET'])
+def get_transactions(year=None, month=None, category="ALL"):
+    print("[api] get_transactions()")
 
     return jsonify([transaction.to_dict() for transaction in db_comm.get_transactions(year, month, category)])
 
-@app.route('/transaction/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>', methods=['POST'])
+@app.route('/transactions/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>', methods=['POST'])
 def add_transaction(title, amount, category, date, description):
-    print("add_transaction()")
+    print("[api] add_transaction()")
 
     description = None if description == "null" else description
     transaction = Transaction(title, amount, category, date, description)
     return db_comm.add_transaction(transaction)
 
-@app.route('/transaction/<string:transaction_id>/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>', methods=['PUT'])
+@app.route('/transactions/<string:transaction_id>/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>', methods=['PUT'])
 def update_transaction(transaction_id, title, amount, category, date, description):
-    print("update_transaction()")
+    print("[api] update_transaction()")
 
     transaction = Transaction(title, amount, category, date, description, transaction_id)
     return db_comm.update_transaction(transaction)
 
-@app.route('/transaction/<string:transaction_id>', methods=['DELETE'])
+@app.route('/transactions/<string:transaction_id>', methods=['DELETE'])
 def delete_transaction(transaction_id):
-    print("delete_transaction()")
+    print("[api] delete_transaction()")
 
     return db_comm.delete_transaction(transaction_id)
 
@@ -219,52 +219,32 @@ def delete_transaction(transaction_id):
 
 @app.route('/budgets', methods=['GET'])
 def get_budgets():
-    print("get_budgets()")
+    print("[api] get_budgets()")
 
     return jsonify([budget.to_dict() for budget in db_comm.get_budgets(datetime.now())])
 
-@app.route('/budget/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['POST'])
+@app.route('/budgets/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['POST'])
 def add_budget(category, amount, amount_frequency, description, start_date, end_date):
-    print("add_budget()")
+    print("[api] add_budget()")
 
     description = None if description == "null" else description
     budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description)
     return db_comm.add_budget(budget)
 
-@app.route('/budget/<string:budget_id>/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['PUT'])
+@app.route('/budgets/<string:budget_id>/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['PUT'])
 def update_budget(budget_id, category, amount, amount_frequency, description, start_date, end_date):
-    print("update_budget()")
+    print("[api] update_budget()")
 
     budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, budget_id=budget_id)
     return db_comm.update_budget(budget)
 
-@app.route('/budget/<string:budget_id>', methods=['DELETE'])
+@app.route('/budgets/<string:budget_id>', methods=['DELETE'])
 def delete_budget(budget_id):
-    print("delete_budget()")
+    print("[api] delete_budget()")
 
     return db_comm.delete_budget(budget_id)
 
 # helpers
-def get_curr_start_end(start_date, duration):
-    print("Helper: get_curr_start_end({}, {})".format(start_date, duration))
-
-    today = datetime.now()
-    curr_start = start_date
-    prev_start = None
-
-    while today > curr_start:
-        prev_start = curr_start
-        curr_start = curr_start + duration
-
-    return (prev_start, prev_start + duration)
-
-def get_current_date():
-    print("Helper: get_current_date()")
-
-    year = "{}".format(datetime.now().year)
-    month = "{:02d}".format(datetime.now().month)
-    return (month,year)
-
 def root_page_helper(type):
     print("Helper: root_page_helper({})".format(type))
 
@@ -290,8 +270,3 @@ def root_page_helper(type):
         final_year_links[year_idx][1].append((month_year_str, link))
 
     return ((obj[0],(sorted(obj[1], reverse=True))) for obj in sorted(final_year_links, reverse=True))
-
-def calculate_income_from(year_transactions, month):
-    year_income = round(sum([transaction.amount for transaction in year_transactions if transaction.category[0].is_income and int(transaction.date[5:7]) <= int(month)]), 2)
-    month_income = round(sum([transaction.amount for transaction in year_transactions if (transaction.category[0].is_income and (transaction.date[5:7] == month))]), 2)
-    return (year_income, month_income)

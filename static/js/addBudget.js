@@ -2,7 +2,7 @@
 
 function deleteBudget(budget_id) {
     var xhr = new XMLHttpRequest();
-    var url = prefix + "/budget/" + budget_id;
+    var url = prefix + "/budgets/" + budget_id;
     xhr.open("DELETE", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({}));
@@ -32,7 +32,7 @@ function addBudget() {
     }
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/budget/" + category + "/" + amount + "/" + selectedAmountFrequency + "/" + description + "/" + startDate + "/" + endDate;
+    var url_tmp = prefix + "/budgets/" + category + "/" + amount + "/" + selectedAmountFrequency + "/" + description + "/" + startDate + "/" + endDate;
     var url = url_tmp.replace(" ", "%20");
 
     if (prefix == "http://inherentvice.pythonanywhere.com") {
@@ -67,7 +67,7 @@ function updateBudget(budget_id) {
     }
 
     var xhr = new XMLHttpRequest();
-    var url_w_spc = prefix + "/budget/" + budget_id + "/" + category + "/" + amount + "/" + amountFrequency + "/" + description + "/" + startDate + "/" + endDate;
+    var url_w_spc = prefix + "/budgets/" + budget_id + "/" + category + "/" + amount + "/" + amountFrequency + "/" + description + "/" + startDate + "/" + endDate;
     var url = url_w_spc.replace(" ", "%20");
 
     if (prefix == "http://inherentvice.pythonanywhere.com") {

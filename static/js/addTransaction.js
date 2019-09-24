@@ -29,7 +29,7 @@ function addTransaction() {
     }
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/transaction/" + title + "/" + amount + "/" + final_cat + "/" + date + "/" + description;
+    var url_tmp = prefix + "/transactions/" + title + "/" + amount + "/" + final_cat + "/" + date + "/" + description;
     var url = url_tmp.replace(" ", "%20");
 
     if (prefix == "http://inherentvice.pythonanywhere.com") {
@@ -61,7 +61,7 @@ function updateTransaction(transaction_id) {
     var passcode = document.getElementById("passcodeTextBoxU").value;
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/transaction/" + transaction_id + "/" + prefix + "/" + amount + "/" + category + "/" + date + "/" + description;
+    var url_tmp = prefix + "/transactions/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + description;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.withCredentials = true;
