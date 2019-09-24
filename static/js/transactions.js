@@ -13,7 +13,7 @@ function deleteTransaction(transaction_id) {
     }
 }
 
-function openUpdatePage(prefix, transaction_id) {
+function openUpdatePage(transaction_id) {
 
     var xhr = new XMLHttpRequest();
     var url = prefix + "/site/add_transaction/" + transaction_id;

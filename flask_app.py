@@ -57,7 +57,7 @@ def transactions_page(year=None, month=None, category="ALL", start_date=None, en
         ed = string_to_date(end_date)
 
         # get transactions for period budget
-        period_budget_period_transactions = db_comm.get_period_transactions(start_date=sd, end_date=ed, category=Category(name=category, is_income=False))
+        period_budget_period_transactions = db_comm.get_transactions_between(start_date=sd, end_date=ed, category=Category(name=category, is_income=False))
 
         return render_template('transactions.html',
         month=month, year=year,
@@ -148,7 +148,7 @@ def budgets_page(year=None, month=None):
             sd = string_to_date(budget.start_date)
             ed = string_to_date(budget.end_date)
             # get transactions for period budget
-            period_budget_period_transactions = db_comm.get_period_transactions(start_date=sd, end_date=ed, category=budget.category)
+            period_budget_period_transactions = db_comm.get_transactions_between(start_date=sd, end_date=ed, category=budget.category)
             spent_so_far_period = sum([transaction.amount for transaction in period_budget_period_transactions])
 
             filtered_year_category_transactions = list(filter(lambda transaction: (transaction.date[0:4] == year), period_budget_period_transactions))
@@ -200,14 +200,12 @@ def budgets_page(year=None, month=None):
 @app.route('/transaction/<string:month>/<string:year>/<string:category>', methods=['GET'])
 def get_transactions(month=None, year=None, category="ALL"):
     print("get_all_transaction_for_year()")
-    
 
-    return jsonify([transaction.to_dict() for transaction in db_comm.get_transactions(month,year,category)])
+    return jsonify([transaction.to_dict() for transaction in db_comm.get_transactions(year, month, category)])
 
 @app.route('/transaction/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>', methods=['POST'])
 def add_transaction(title, amount, category, date, description):
     print("add_transaction()")
-    
 
     description = None if description == "null" else description
     transaction = Transaction(title, amount, category, date, description)
@@ -216,7 +214,6 @@ def add_transaction(title, amount, category, date, description):
 @app.route('/transaction/<string:transaction_id>/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>', methods=['PUT'])
 def update_transaction(transaction_id, title, amount, category, date, description):
     print("update_transaction()")
-    
 
     transaction = Transaction(title, amount, category, date, description, transaction_id)
     return db_comm.update_transaction(transaction)
@@ -224,7 +221,6 @@ def update_transaction(transaction_id, title, amount, category, date, descriptio
 @app.route('/transaction/<string:transaction_id>', methods=['DELETE'])
 def delete_transaction(transaction_id):
     print("delete_transaction()")
-    
 
     return db_comm.delete_transaction(transaction_id)
 
@@ -233,14 +229,12 @@ def delete_transaction(transaction_id):
 @app.route('/budgets', methods=['GET'])
 def get_budgets():
     print("get_budgets()")
-    
 
     return jsonify([budget.to_dict() for budget in db_comm.get_budgets(datetime.now())])
 
 @app.route('/budget/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['POST'])
 def add_budget(category, amount, amount_frequency, description, start_date, end_date):
     print("add_budget()")
-    
 
     description = None if description == "null" else description
     budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description)
@@ -249,7 +243,6 @@ def add_budget(category, amount, amount_frequency, description, start_date, end_
 @app.route('/budget/<string:budget_id>/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['PUT'])
 def update_budget(budget_id, category, amount, amount_frequency, description, start_date, end_date):
     print("update_budget()")
-    
 
     budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, budget_id=budget_id)
     return db_comm.update_budget(budget)
@@ -257,7 +250,6 @@ def update_budget(budget_id, category, amount, amount_frequency, description, st
 @app.route('/budget/<string:budget_id>', methods=['DELETE'])
 def delete_budget(budget_id):
     print("delete_budget()")
-    
 
     return db_comm.delete_budget(budget_id)
 
@@ -285,8 +277,6 @@ def get_current_date():
 
 def single_digit_num_str(num):
     print("Helper: single_digit_num_str({})".format(num))
-
-    str_num = ""
     if num < 10:
         str_num = "0{}".format(num)
     else:
