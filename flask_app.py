@@ -1,5 +1,4 @@
 import calendar
-from collections import OrderedDict
 from flask import Flask, jsonify, render_template
 from datetime import datetime
 from db_comms import DBCommms
@@ -9,6 +8,7 @@ from models import Budget
 from models import Period
 from models import BudgetPageInfo
 from flask import current_app
+from utilities import string_to_date
 
 # declare our Flask app
 app = Flask(__name__)
@@ -116,7 +116,6 @@ def add_budget_page(budget_id=None):
 @app.route("/site/budgets/year:<string:year>/month:<string:month>", methods=["GET"])
 def budgets_page(year=None, month=None):
     print("budgets_page()")
-    
 
     today = datetime.now()
     if (year == today.year and month == today.month):
@@ -160,14 +159,6 @@ def budgets_page(year=None, month=None):
             budget_page_info = BudgetPageInfo(budget, spent_so_far_month, spent_so_far_year, spent_so_far_period)
 
         elif budget.amount_frequency == "month" or budget.amount_frequency == "year":
-            # todo: just else... if its not a Period budget then it would have to be mo/year
-
-            # this is getting transactions when we do care about their category!
-
-            # use an SQL query here instead of matching in python.
-                # querying for all transaction ID's with 'budget' ID from links table, join on Links and Txns
-                # the func would be: get_transactions(category, year, month=None)
-
             filtered_year_category_transactions = list(filter(lambda transaction: (budget.category.name in transaction.get_categories()), year_transactions))
             spent_so_far_year = sum([transaction.amount for transaction in filtered_year_category_transactions if int(transaction.date[5:7]) <= int(month)])
 
@@ -271,34 +262,24 @@ def get_current_date():
     print("Helper: get_current_date()")
 
     year = "{}".format(datetime.now().year)
-    curr_month = datetime.now().month
-    month = single_digit_num_str(curr_month)
+    month = "{:02d}".format(datetime.now().month)
     return (month,year)
-
-def single_digit_num_str(num):
-    print("Helper: single_digit_num_str({})".format(num))
-    if num < 10:
-        str_num = "0{}".format(num)
-    else:
-        str_num = "{}".format(num)
-    return str_num
 
 def root_page_helper(type):
     print("Helper: root_page_helper({})".format(type))
 
     (min_year, month_year_list) = db_comm.get_min_max_transaction_dates()
-
     final_year_links = []
     curr_year = min_year
     year_idx = 0
     year_first = True
-    for (month,year) in month_year_list:
+    for (month, year) in month_year_list:
         if curr_year != year:
             curr_year = year
             year_idx += 1
             year_first = True
 
-        month_str = single_digit_num_str(month)
+        month_str = "{:02d}".format(month)
         month_year_str = "{}-{}".format(month_str, year)
         link = "location.href='{}/site/{}/year:{}/month:{}'".format(ENVIRONMENT, type, year, month_str)
 
@@ -314,9 +295,3 @@ def calculate_income_from(year_transactions, month):
     year_income = round(sum([transaction.amount for transaction in year_transactions if transaction.category[0].is_income and int(transaction.date[5:7]) <= int(month)]), 2)
     month_income = round(sum([transaction.amount for transaction in year_transactions if (transaction.category[0].is_income and (transaction.date[5:7] == month))]), 2)
     return (year_income, month_income)
-
-def string_to_date(date_string):
-    year = int(date_string.split("_")[0][0:4])
-    month = int(date_string.split("_")[0][5:7])
-    day = int(date_string.split("_")[0][8:10])
-    return datetime(year=year, month=month, day=day)
