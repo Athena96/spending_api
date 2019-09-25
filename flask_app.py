@@ -8,7 +8,7 @@ from models import Budget
 from models import Period
 from models import BudgetPageInfo
 from flask import current_app
-from utilities import string_to_date, calculate_income_from
+from utilities import string_to_date
 
 #todo db_comm function to return spent_in_month, spent_in_year and month_income and year_income
 
@@ -69,31 +69,13 @@ def transactions_page(year=None, month=None, category="ALL", start_date=None, en
         spent_in_month=0.0, spent_in_year=0.0,
         month_income=0.0, year_income=0.0, prefix=ENVIRONMENT)
 
-    # 1 get all the year transactions
+    # get all the year transactions (and filter month as well)
     year_transactions = db_comm.get_transactions(year=year, category=category)
+    month_transactions = [transaction for transaction in year_transactions if (transaction.date[5:7] == month)]
 
-    # 2 get year and month income values
-    (year_income, month_income) = calculate_income_from(year_transactions, month)
-
-    if month is not None:
-        # 3 filter month transactions
-        month_transactions = [transaction for transaction in year_transactions if (transaction.date[5:7] == month)]
-
-        # 4 calculate spent_in_year
-        spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income) and int(transaction.date[5:7]) <= int(month)])
-        spent_in_year_str = str(round(spent_in_year, 2))
-
-        # 5 calculate spent_in_month
-        spent_in_month = sum([transaction.amount for transaction in month_transactions if (not transaction.category[0].is_income)])
-        spent_in_month_str = str(round(spent_in_month, 2))
-    else:
-        # 4 calculate spent_in_month
-        spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income)])
-        spent_in_year_str = str(round(spent_in_year, 2))
-
-        # 5 calculate spent_in_month
-        spent_in_month_str = "--"
-
+    # 2 get year and month income/spending values
+    (year_income, month_income) = db_comm.get_income(year, month)
+    (spent_in_year_str, spent_in_month_str) = db_comm.get_spending(year, month)
 
     # sort the transactions to display and store them in "transactions"
     transactions = sorted(year_transactions if month is None else month_transactions, key=lambda x: x.date, reverse=True)
@@ -139,22 +121,9 @@ def budgets_page(year=None, month=None):
     (start, end) = calendar.monthrange(int(year), int(month))
     budgets = db_comm.get_budgets(datetime(year=int(year), month=int(month), day=end))
 
-    # 1 get all the year transactions
-    year_transactions = db_comm.get_transactions(year=year)
-
-    # 2 get year and month income values
-    (year_income, month_income) = calculate_income_from(year_transactions, month)
-
-    # 3 filter month transactions
-    month_transactions = [transaction for transaction in year_transactions if ((not transaction.category[0].is_income) and (transaction.date[5:7] == month))]
-
-    # 4 calculate spent_in_year
-    spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income) and int(transaction.date[5:7]) <= int(month)])
-    spent_in_year_str = str(round(spent_in_year, 2))
-
-    # 5 calculate spent_in_month
-    spent_in_month = sum([transaction.amount for transaction in month_transactions])
-    spent_in_month_str = str(round(spent_in_month, 2))
+    # 2 get year and month income/spending values
+    (year_income, month_income) = db_comm.get_income(year, month)
+    (spent_in_year_str, spent_in_month_str) = db_comm.get_spending(year, month)
 
     budget_data = []
     for budget in budgets:

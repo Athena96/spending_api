@@ -197,6 +197,47 @@ class DBCommms:
 
     # Helper
 
+    def get_spending(self, year, month):
+        print("     " + self.__class__.__name__)
+        print("     " + "get_spending()")
+
+        year_transactions = self.get_transactions(year=year)
+
+        if month is not None:
+            # 3 filter month transactions
+            month_transactions = [transaction for transaction in year_transactions if (transaction.date[5:7] == month)]
+
+            # 4 calculate spent_in_year
+            spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income) and int(transaction.date[5:7]) <= int(month)])
+            spent_in_year_str = str(round(spent_in_year, 2))
+
+            # 5 calculate spent_in_month
+            spent_in_month = sum([transaction.amount for transaction in month_transactions if (not transaction.category[0].is_income)])
+            spent_in_month_str = str(round(spent_in_month, 2))
+        else:
+            # 4 calculate spent_in_month
+            spent_in_year = sum([transaction.amount for transaction in year_transactions if (not transaction.category[0].is_income)])
+            spent_in_year_str = str(round(spent_in_year, 2))
+
+            # 5 calculate spent_in_month
+            spent_in_month_str = "--"
+
+        return (spent_in_year_str, spent_in_month_str)
+
+    def get_income(self, year, month):
+        print("     " + self.__class__.__name__)
+        print("     " + "get_income()")
+        if month is None:
+            return ("--", "--")
+
+        year_transactions = self.get_transactions(year=year)
+
+        year_income = round(sum([transaction.amount for transaction in year_transactions if
+                                 transaction.category[0].is_income and int(transaction.date[5:7]) <= int(month)]), 2)
+        month_income = round(sum([transaction.amount for transaction in year_transactions if
+                                  (transaction.category[0].is_income and (transaction.date[5:7] == month))]), 2)
+        return (year_income, month_income)
+
     def extract_transactions(self, cursor):
         print("     " + self.__class__.__name__)
         print("     " + "extract_transactions()")
