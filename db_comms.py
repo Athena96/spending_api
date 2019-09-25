@@ -115,6 +115,7 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "get_transaction(month:{},year:{},category:{})".format(month, year, category))
         (self.db_conn, self.cursor) = self.get_instance()
+        # todo update category so that you pass obj and not string (or change Budget to not store category as Obj)
 
         base_query = "select * from ledger"
         if month is None:
