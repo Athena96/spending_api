@@ -49,6 +49,7 @@ tr:nth-child(even) {
 
 .btn:hover {background: #eee;}
 
+.timeline {color: grey;}
 .transactions {color: green;}
 .budgets {color: dodgerblue;}
 .add_transaction {color: purple;}

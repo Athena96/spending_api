@@ -1,5 +1,15 @@
 from datetime import datetime
 
+class BalanceRow:
+
+    def __init__(self, balance_date, balance, income, expense, income_desc, expenses_desc):
+        self.balance_date = balance_date
+        self.balance = balance
+        self.income = income
+        self.expense = expense
+        self.income_desc = income_desc
+        self.expenses_desc = expenses_desc
+
 class Category:
 
     def __init__(self, name, is_income):

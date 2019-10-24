@@ -7,6 +7,7 @@ from models import Transaction
 from models import Budget
 from models import Period
 from models import BudgetPageInfo
+from TimelineGenerator import TimelineGenerator
 from flask import current_app
 from utilities import string_to_date
 
@@ -25,6 +26,18 @@ with app.app_context():
         ENVIRONMENT = "http://inherentvice.pythonanywhere.com"
     else:
         ENVIRONMENT = "http://127.0.0.1:5000"
+
+# Website page handlers: Timeline
+
+@app.route("/site/timeline", methods=["GET"])
+def timeline_page():
+    print("timeline_page()")
+
+    months_to_generate = 6
+    generator = TimelineGenerator(months_to_generate)
+    table = generator.generate_table()
+
+    return render_template('timeline.html', timeline_table=table, prefix=ENVIRONMENT)
 
 # Website page handlers: Transactions
 
