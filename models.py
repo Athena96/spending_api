@@ -1,4 +1,10 @@
 from datetime import datetime
+from enum import Enum
+from datetime import timedelta
+
+class RecurrenceType(Enum):
+    INCOME = 1
+    EXPENSE = 2
 
 class BalanceRow:
 
@@ -70,16 +76,31 @@ class Transaction:
     def get_categories(self,):
         return list([c.name for c in self.category])
 
-class Budget:
+class Recurrence:
 
-    def __init__(self, category, amount, amount_frequency, start_date, end_date, description=None, budget_id=None):
+    def __init__(self, category, amount, amount_frequency, start_date, end_date, description=None, recurrence_id=None, type=None, repeat_start_date=None, days_till_repeat=None):
         self.amount = float(amount)
         self.category = Category(name=category, is_income=True if self.amount > 0 else False)
         self.amount_frequency = amount_frequency
         self.start_date = start_date
         self.end_date = end_date
         self.description = description
-        self.budget_id = budget_id
+        self.recurrence_id = recurrence_id
+        self.type = RecurrenceType.EXPENSE if type is None else type
+
+        if repeat_start_date is not None:
+            year = int(repeat_start_date.split("_")[0][0:4])
+            month = int(repeat_start_date.split("_")[0][5:7])
+            day = int(repeat_start_date.split("_")[0][8:10])
+            dt = datetime(year, month, day)
+        else:
+            dt = None
+
+        self.repeat_start_date = dt
+        self.days_till_repeat = days_till_repeat
+
+        # start's on DATE, then repeats every x days (could be 14days, every other week) every 30 days 1x a month
+
 
     def to_dict(self):
         contents = {}
@@ -89,13 +110,29 @@ class Budget:
         contents["start_date"] = self.start_date
         contents["end_date"] = self.end_date
         contents["description"] = self.description
-        contents["budget_id"] = self.budget_id
+        contents["type"] = self.type
+        contents["repeat_start_date"] = self.repeat_start_date
+        contents["days_till_repeat"] = self.days_till_repeat
+        contents["recurrence_id"] = self.recurrence_id
         return contents
 
-class Period(Budget):
+    def generate_txn_days_in_range(self, clac_start_date, calc_end_date):
 
-    def __init__(self, category, amount, start_date, end_date, description=None, budget_id=None):
-        Budget.__init__(self, category, amount, "period", start_date, end_date, description=description, budget_id=budget_id)
+        print(self.to_dict())
+        txn_days = []
+        txn_day = self.repeat_start_date
+
+        while txn_day <= calc_end_date:
+            if txn_day >= clac_start_date and txn_day <= calc_end_date:
+                txn_days.append(txn_day)
+            txn_day = txn_day + timedelta(days=self.days_till_repeat)
+
+        return txn_days
+
+class Period(Recurrence):
+
+    def __init__(self, category, amount, start_date, end_date, description=None, recurrence_id=None):
+        Recurrence.__init__(self, category, amount, "period", start_date, end_date, description=description, recurrence_id=recurrence_id)
 
     def get_date_month_year(self, is_start_date):
         if is_start_date:

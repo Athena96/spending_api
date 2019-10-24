@@ -3,8 +3,9 @@ from flask import jsonify
 from datetime import datetime
 from dateutil.rrule import rrule, MONTHLY
 from models import Transaction
-from models import Budget
+from models import Recurrence
 from models import Period
+from models import RecurrenceType
 
 class DBCommms:
 
@@ -252,15 +253,20 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "extract_budgets()")
         data = []
-        for category, amount, amount_frequency, budget_id, description, start_date, end_date in cursor:
+        for category, amount, amount_frequency, budget_id, description, start_date, end_date, type, repeat_start_date, days_till_repeat in cursor:
             description = None if description == "null" else description
             if "period" in amount_frequency:
+                continue
                 budget = Period(category=category, amount=amount, start_date=start_date, end_date=end_date,
-                                description=description, budget_id=budget_id)
+                                description=description, recurrence_id=budget_id)
             else:
-                budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency,
-                                start_date=start_date, end_date=end_date, description=description, budget_id=budget_id)
-            data.append(budget)
+                print("#HERE", description)
+                tp = RecurrenceType.EXPENSE if type == 2 else RecurrenceType.INCOME
+                budget = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency,
+                                    start_date=start_date, end_date=end_date, description=description, recurrence_id=budget_id, type=tp, repeat_start_date=repeat_start_date, days_till_repeat=days_till_repeat)
+
+            if (repeat_start_date != None and repeat_start_date != "NULL" and repeat_start_date != "None"):
+                data.append(budget)
         return data
 
 

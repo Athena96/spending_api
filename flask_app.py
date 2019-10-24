@@ -4,7 +4,7 @@ from datetime import datetime
 from db_comms import DBCommms
 from models import Category
 from models import Transaction
-from models import Budget
+from models import Recurrence
 from models import Period
 from models import BudgetPageInfo
 from TimelineGenerator import TimelineGenerator
@@ -34,7 +34,7 @@ def timeline_page():
     print("timeline_page()")
 
     months_to_generate = 6
-    generator = TimelineGenerator(months_to_generate)
+    generator = TimelineGenerator(months_to_generate, db_comm)
     table = generator.generate_table()
 
     return render_template('timeline.html', timeline_table=table, prefix=ENVIRONMENT)
@@ -224,14 +224,14 @@ def add_budget(category, amount, amount_frequency, description, start_date, end_
     print("[api] add_budget()")
 
     description = None if description == "null" else description
-    budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description)
+    budget = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description)
     return db_comm.add_budget(budget)
 
 @app.route('/budgets/<string:budget_id>/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['PUT'])
 def update_budget(budget_id, category, amount, amount_frequency, description, start_date, end_date):
     print("[api] update_budget()")
 
-    budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, budget_id=budget_id)
+    budget = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, recurrence_id=budget_id)
     return db_comm.update_budget(budget)
 
 @app.route('/budgets/<string:budget_id>', methods=['DELETE'])
