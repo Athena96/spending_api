@@ -10,8 +10,6 @@ from models import BudgetPageInfo
 from flask import current_app
 from utilities import string_to_date
 
-#todo db_comm function to return spent_in_month, spent_in_year and month_income and year_income
-
 # declare our Flask app
 app = Flask(__name__)
 
