@@ -7,7 +7,7 @@ from models import Transaction
 from models import Recurrence
 from models import Period
 from models import BudgetPageInfo
-from TimelineGenerator import TimelineGenerator
+from timeline_generator import TimelineGenerator
 from flask import current_app
 from utilities import string_to_date
 
