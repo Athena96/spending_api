@@ -256,11 +256,9 @@ class DBCommms:
         for category, amount, amount_frequency, recurrence_id, description, start_date, end_date, type, repeat_start_date, days_till_repeat in cursor:
             description = None if description == "null" else description
             if "period" in amount_frequency:
-                continue
                 recurrence = Period(category=category, amount=amount, start_date=start_date, end_date=end_date,
                                 description=description, recurrence_id=recurrence_id)
             else:
-                print("#HERE", description)
                 tp = RecurrenceType.EXPENSE if type == 2 else RecurrenceType.INCOME
                 recurrence = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency,
                                     start_date=start_date, end_date=end_date, description=description, recurrence_id=recurrence_id, type=tp, repeat_start_date=repeat_start_date, days_till_repeat=days_till_repeat)

@@ -80,14 +80,14 @@ class Transaction:
 class Recurrence:
 
     def __init__(self, category, amount, amount_frequency, start_date, end_date, description=None, recurrence_id=None, type=None, repeat_start_date=None, days_till_repeat=None):
+        self.type = RecurrenceType.EXPENSE if type is None else type
         self.amount = float(amount)
-        self.category = Category(name=category, is_income=True if self.amount > 0 else False)
+        self.category = Category(name=category, is_income=True if self.type == RecurrenceType.INCOME else False)
         self.amount_frequency = amount_frequency
         self.start_date = start_date
         self.end_date = end_date
         self.description = description
         self.recurrence_id = recurrence_id
-        self.type = RecurrenceType.EXPENSE if type is None else type
 
         if repeat_start_date is not None:
             dt = string_to_date(repeat_start_date)
@@ -129,8 +129,8 @@ class Recurrence:
 
 class Period(Recurrence):
 
-    def __init__(self, category, amount, start_date, end_date, description=None, recurrence_id=None):
-        Recurrence.__init__(self, category, amount, "period", start_date, end_date, description=description, recurrence_id=recurrence_id)
+    def __init__(self, category, amount, start_date, end_date, description=None, recurrence_id=None, type=None, repeat_start_date=None, days_till_repeat=None):
+        Recurrence.__init__(self, category, amount, "period", start_date, end_date, description=description, recurrence_id=recurrence_id, type=type)
 
     def get_date_month_year(self, is_start_date):
         if is_start_date:

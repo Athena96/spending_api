@@ -129,6 +129,7 @@ def recurrence_page(year=None, month=None):
     # get the recurrences for the requested year/month
     (start, end) = calendar.monthrange(int(year), int(month))
     recurrences = db_comm.get_recurrences(datetime(year=int(year), month=int(month), day=end))
+    print("RECURRENCES: ", [x.category.name for x in recurrences])
 
     # 2 get year and month income/spending values
     (year_income, month_income) = db_comm.get_income(year, month)
