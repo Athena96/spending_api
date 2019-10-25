@@ -33,10 +33,8 @@ with app.app_context():
 def timeline_page():
     print("timeline_page()")
 
-    months_to_generate = 6
-    generator = TimelineGenerator(months_to_generate, db_comm)
+    generator = TimelineGenerator(months_to_generate=6, db_comm=db_comm)
     table = generator.generate_table()
-
     return render_template('timeline.html', timeline_table=table, prefix=ENVIRONMENT)
 
 # Website page handlers: Transactions
