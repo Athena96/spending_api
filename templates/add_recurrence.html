@@ -39,6 +39,10 @@
 
         Start Date: <input type="text" id="startDateTextBoxU" name="date" value="{{recurrence.start_date}}"><br>
         End Date: <input type="text" id="endDateTextBoxU" name="date" value="{{recurrence.end_date}}"><br>
+        Repeat Start Date: <input type="text" id="repeatStartDateTextBoxU" name="date" value="{{recurrence.repeat_start_date}}"><br>
+        Repeat Interval (Days): <input type="text" id="daysTillRepeateTextBoxU" name="repeateDays" value="{{recurrence.days_till_repeat}}"><br>
+        Type (1=INCOME,2=EXPENSE): <input type="text" id="typeTextBoxU" name="type" value="{{recurrence.type}}"><br>
+
         {% if recurrence.description != None %}
             Description:<br>
             <textarea name="description" id="descriptionTextBoxU" style="width:200px; height:100px;" >{{recurrence.description}}</textarea><br>
@@ -58,6 +62,9 @@
             <input type="radio" name="amountFrequencyRadioButtons" id="amountFrequencyRadioButtons" value="period"> Period<br>
         Start Date: <input type="text" id="startDateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
         End Date: <input type="text" id="endDateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
+        Repeat Start Date: <input type="text" id="repeatStartDateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
+        Repeat Interval (Days): <input type="text" id="daysTillRepeateTextBox" name="repeateDays" value=""><br>
+        Type (1=INCOME,2=EXPENSE): <input type="text" id="typeTextBox" name="type" placeholder="2" value=""><br>
         Description:<br>
         <textarea name="description" id="descriptionTextBox" style="width:200px; height:100px;" value=""></textarea><br>
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>

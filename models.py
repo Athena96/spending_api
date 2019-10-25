@@ -31,7 +31,7 @@ class Category:
 
 class Transaction:
 
-    def __init__(self, title, amount, category, date, description=None, transaction_id=None):
+    def __init__(self, title, amount, category, date, description=None, credit_card=None, transaction_id=None):
         # this constructor should really just be assignments... this conversion should happen in another file.
         self.title = title
         self.amount = float(amount)
@@ -47,6 +47,7 @@ class Transaction:
         self.category = categories
         self.date = date
         self.description = description
+        self.credit_card = credit_card
         self.transaction_id = transaction_id
 
     def get_transaction_day(self):
@@ -89,12 +90,7 @@ class Recurrence:
         self.description = description
         self.recurrence_id = recurrence_id
 
-        if repeat_start_date is not None:
-            dt = string_to_date(repeat_start_date)
-        else:
-            dt = None
-
-        self.repeat_start_date = dt
+        self.repeat_start_date = repeat_start_date
         self.days_till_repeat = days_till_repeat
 
         # start's on DATE, then repeats every x days (could be 14days, every other week) every 30 days 1x a month
@@ -115,8 +111,6 @@ class Recurrence:
         return contents
 
     def generate_txn_days_in_range(self, clac_start_date, calc_end_date):
-
-        print(self.to_dict())
         txn_days = []
         txn_day = self.repeat_start_date
 

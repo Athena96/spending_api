@@ -10,6 +10,9 @@ from models import RecurrencePageInfo
 from timeline_generator import TimelineGenerator
 from flask import current_app
 from utilities import string_to_date
+from utilities import is_valid_or_none
+from models import RecurrenceType
+
 
 # declare our Flask app
 app = Flask(__name__)
@@ -218,22 +221,31 @@ def get_recurrences():
 
     return jsonify([recurrence.to_dict() for recurrence in db_comm.get_recurrences(datetime.now())])
 
-@app.route('/recurrences/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['POST'])
-def add_recurrence(category, amount, amount_frequency, description, start_date, end_date):
+@app.route('/recurrence/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>/<string:type>/<string:repeat_start_date>/<string:days_till_repeat>', methods=['POST'])
+def add_recurrence(category, amount, amount_frequency, description, start_date, end_date, type, repeat_start_date, days_till_repeat):
     print("[api] add_recurrence()")
 
     description = None if description == "null" else description
-    recurrence = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description)
+    repeat_start_date = None if is_valid_or_none(repeat_start_date) is None else string_to_date(repeat_start_date)
+    description = None if is_valid_or_none(description) is None else description
+    tp = RecurrenceType.EXPENSE if type == 2 else RecurrenceType.INCOME
+
+    recurrence = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, type=tp, repeat_start_date=repeat_start_date, days_till_repeat=days_till_repeat)
     return db_comm.add_recurrence(recurrence)
 
-@app.route('/recurrences/<string:recurrence_id>/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['PUT'])
-def update_recurrence(recurrence_id, category, amount, amount_frequency, description, start_date, end_date):
+@app.route('/recurrence/<string:recurrence_id>/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>/<string:type>/<string:repeat_start_date>/<string:days_till_repeat>', methods=['PUT'])
+def update_recurrence(recurrence_id, category, amount, amount_frequency, description, start_date, end_date,type, repeat_start_date, days_till_repeat):
     print("[api] update_recurrence()")
 
-    recurrence = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, recurrence_id=recurrence_id)
+    description = None if description == "null" else description
+    repeat_start_date = None if is_valid_or_none(repeat_start_date) is None else string_to_date(repeat_start_date)
+    description = None if is_valid_or_none(description) is None else description
+    tp = RecurrenceType.EXPENSE if type == 2 else RecurrenceType.INCOME
+
+    recurrence = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, recurrence_id=recurrence_id, type=tp, repeat_start_date=repeat_start_date, days_till_repeat=days_till_repeat)
     return db_comm.update_recurrence(recurrence)
 
-@app.route('/recurrences/<string:recurrence_id>', methods=['DELETE'])
+@app.route('/recurrence/<string:recurrence_id>', methods=['DELETE'])
 def delete_recurrence(recurrence_id):
     print("[api] delete_recurrence()")
 

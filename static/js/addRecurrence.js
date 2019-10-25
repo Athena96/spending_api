@@ -2,7 +2,7 @@
 
 function deleteRecurrence(recurrence_id) {
     var xhr = new XMLHttpRequest();
-    var url = prefix + "/recurrences/" + recurrence_id;
+    var url = prefix + "/recurrence/" + recurrence_id;
     xhr.open("DELETE", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({}));
@@ -26,13 +26,17 @@ function addRecurrence() {
     var startDate = document.getElementById("startDateTextBox").value;
     var endDate = document.getElementById("endDateTextBox").value;
 
+    var repeatStartDate = document.getElementById("repeatStartDateTextBox").value;
+    var repeatInterval = document.getElementById("daysTillRepeateTextBox").value;
+    var type = document.getElementById("typeTextBox").value;
+
     var description = document.getElementById("descriptionTextBox").value;
     if (description == "" || description == null || description == " ") {
         description = null;
     }
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/recurrences/" + category + "/" + amount + "/" + selectedAmountFrequency + "/" + description + "/" + startDate + "/" + endDate;
+    var url_tmp = prefix + "/recurrence/" + category + "/" + amount + "/" + selectedAmountFrequency + "/" + description + "/" + startDate + "/" + endDate + "/" + type + "/" + repeatStartDate + "/" + repeatInterval;
     var url = url_tmp.replace(" ", "%20");
 
     if (prefix == "http://inherentvice.pythonanywhere.com") {
@@ -61,13 +65,18 @@ function updateRecurrence(recurrence_id) {
     }    var startDate = document.getElementById("startDateTextBoxU").value;
     var endDate = document.getElementById("endDateTextBoxU").value;
 
+    var repeatStartDate = document.getElementById("repeatStartDateTextBoxU").value;
+    var repeatInterval = document.getElementById("daysTillRepeateTextBoxU").value;
+    var type = document.getElementById("typeTextBoxU").value;
+
+
     var description = document.getElementById("descriptionTextBoxU").value;
     if (description == "" || description == null || description == " ") {
         description = null;
     }
 
     var xhr = new XMLHttpRequest();
-    var url_w_spc = prefix + "/recurrences/" + recurrence_id + "/" + category + "/" + amount + "/" + amountFrequency + "/" + description + "/" + startDate + "/" + endDate;
+    var url_w_spc = prefix + "/recurrence/" + recurrence_id + "/" + category + "/" + amount + "/" + amountFrequency + "/" + description + "/" + startDate + "/" + endDate + "/" + type + "/" + repeatStartDate + "/" + repeatInterval;
     var url = url_w_spc.replace(" ", "%20");
 
     if (prefix == "http://inherentvice.pythonanywhere.com") {

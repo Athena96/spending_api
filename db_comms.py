@@ -6,6 +6,8 @@ from models import Transaction
 from models import Recurrence
 from models import Period
 from models import RecurrenceType
+from utilities import string_to_date
+from utilities import is_valid_or_none
 
 class DBCommms:
 
@@ -254,16 +256,20 @@ class DBCommms:
         print("     " + "extract_recurrence()")
         data = []
         for category, amount, amount_frequency, recurrence_id, description, start_date, end_date, type, repeat_start_date, days_till_repeat in cursor:
-            description = None if description == "null" else description
+
+            repeat_start_date = None if is_valid_or_none(repeat_start_date) is None else string_to_date(repeat_start_date)
+            description = None if is_valid_or_none(description) is None else description
+            tp = RecurrenceType.EXPENSE if type == 2 else RecurrenceType.INCOME
+
             if "period" in amount_frequency:
                 recurrence = Period(category=category, amount=amount, start_date=start_date, end_date=end_date,
-                                description=description, recurrence_id=recurrence_id)
+                                description=description, recurrence_id=recurrence_id, type=tp)
             else:
-                tp = RecurrenceType.EXPENSE if type == 2 else RecurrenceType.INCOME
                 recurrence = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency,
-                                    start_date=start_date, end_date=end_date, description=description, recurrence_id=recurrence_id, type=tp, repeat_start_date=repeat_start_date, days_till_repeat=days_till_repeat)
+                                    start_date=start_date, end_date=end_date, description=description, recurrence_id=recurrence_id,
+                                        type=tp, repeat_start_date=repeat_start_date, days_till_repeat=days_till_repeat)
 
-            if (repeat_start_date != None and repeat_start_date != "NULL" and repeat_start_date != "None"):
+            if is_valid_or_none(repeat_start_date) is not None:
                 data.append(recurrence)
         return data
 
