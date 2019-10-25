@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from datetime import timedelta
+from utilities import string_to_date
 
 class RecurrenceType(Enum):
     INCOME = 1
@@ -89,10 +90,7 @@ class Recurrence:
         self.type = RecurrenceType.EXPENSE if type is None else type
 
         if repeat_start_date is not None:
-            year = int(repeat_start_date.split("_")[0][0:4])
-            month = int(repeat_start_date.split("_")[0][5:7])
-            day = int(repeat_start_date.split("_")[0][8:10])
-            dt = datetime(year, month, day)
+            dt = string_to_date(repeat_start_date)
         else:
             dt = None
 
@@ -140,22 +138,22 @@ class Period(Recurrence):
         else:
             return "{}-{}-{}_{}:{}:{}".format(self.end_date[0:4], self.end_date[5:7], self.end_date[8:10], self.end_date[11:13], self.end_date[14:16], self.end_date[17:19])
 
-class BudgetPageInfo:
+class RecurrencePageInfo:
 
-    def __init__(self, budget, spent_so_far_month, spent_so_far_year, spent_so_far_period=None):
-        self.budget = budget
+    def __init__(self, recurrence, spent_so_far_month, spent_so_far_year, spent_so_far_period=None):
+        self.recurrence = recurrence
 
-        if type(budget) is Period:
+        if type(recurrence) is Period:
             self.spent_so_far_period = spent_so_far_period
-            self.percent_period = (spent_so_far_period / budget.amount)
-            self.remaining_period = "{}".format(round((budget.amount - spent_so_far_period),2))
+            self.percent_period = (spent_so_far_period / recurrence.amount)
+            self.remaining_period = "{}".format(round((recurrence.amount - spent_so_far_period), 2))
         else:
-            self.percent_month = (spent_so_far_month / (budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0) ))
-            self.percent_year = (spent_so_far_year / (budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0) ))
-            if budget.amount_frequency == "month":
-                self.remaining_month = "{}".format(round((budget.amount - spent_so_far_month),2))
+            self.percent_month = (spent_so_far_month / (recurrence.amount if recurrence.amount_frequency == "month" else (recurrence.amount / 12.0)))
+            self.percent_year = (spent_so_far_year / (recurrence.amount if recurrence.amount_frequency == "year" else (recurrence.amount * 12.0)))
+            if recurrence.amount_frequency == "month":
+                self.remaining_month = "{}".format(round((recurrence.amount - spent_so_far_month), 2))
 
-            self.remaining_year = "{}".format(round(((budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0)) - spent_so_far_year),2))
+            self.remaining_year = "{}".format(round(((recurrence.amount if recurrence.amount_frequency == "year" else (recurrence.amount * 12.0)) - spent_so_far_year), 2))
 
         self.spent_so_far_month = "{}".format(round(spent_so_far_month, 2))
         self.spent_so_far_year = "{}".format(round(spent_so_far_year, 2))

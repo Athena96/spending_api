@@ -7,7 +7,7 @@ from models import RecurrenceType
 
 class TimelineGenerator:
 
-    def __init__(self, months_to_generate, db_comms):
+    def __init__(self, months_to_generate, db_comm):
         days_in_month = 30
         n = datetime.now()
         yr = n.year
@@ -19,7 +19,7 @@ class TimelineGenerator:
         self.end_date = self.start_date + self.duration
 
         self.starting_balance = 2400.0
-        self.db_comms = db_comms
+        self.db_comms = db_comm
 
     def get_recurrence_for_day(self, date, recurrence_type):
         # todo
@@ -47,7 +47,7 @@ class TimelineGenerator:
             return (random()*1000, "ok")
 
         todays_recurrences = []
-        recurrences = self.db_comms.get_budgets(date)
+        recurrences = self.db_comms.get_recurrences(date)
         todays_uncat_recurr = [] # todo
 
         for recurrence in recurrences:

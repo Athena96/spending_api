@@ -1,8 +1,8 @@
 
 
-function openUpdatePage(budget_id) {
+function openUpdatePage(recurrence_id) {
     var xhr = new XMLHttpRequest();
-    var url = prefix + "/site/add_budget/" + budget_id;
+    var url = prefix + "/site/add_recurrence/" + recurrence_id;
     window.open(url);
 }
 

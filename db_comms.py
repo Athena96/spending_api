@@ -37,20 +37,20 @@ class DBCommms:
 
         return jsonify({'result': 'successfuly added transaction!'})
 
-    def add_budget(self, budget):
+    def add_recurrence(self, recurrence):
         print("     " + self.__class__.__name__)
-        print("     " + "add_budget({})", budget)
+        print("     " + "add_recurrence({})", recurrence)
         (self.db_conn, self.cursor) = self.get_instance()
 
-        sql_description = "NULL" if (budget.description == None) else "'{0}'".format(budget.description)
+        sql_description = "NULL" if (recurrence.description == None) else "'{0}'".format(recurrence.description)
 
-        cmd = """INSERT INTO budget (category, amount, amount_frequency, description, start_date, end_date) VALUES ('{0}', {1}, '{2}', {3}, '{4}', '{5}')""".format(budget.category.name, budget.amount, budget.amount_frequency, sql_description, budget.start_date, budget.end_date)
+        cmd = """INSERT INTO budget (category, amount, amount_frequency, description, start_date, end_date) VALUES ('{0}', {1}, '{2}', {3}, '{4}', '{5}')""".format(recurrence.category.name, recurrence.amount, recurrence.amount_frequency, sql_description, recurrence.start_date, recurrence.end_date)
         self.cursor.execute(cmd)
         self.db_conn.commit()
         self.db_conn.close()
         print(cmd)
 
-        return jsonify({'result': 'successfuly added budget category!'})
+        return jsonify({'result': 'successfuly added recurrence category!'})
 
     # Update Methods
 
@@ -69,20 +69,20 @@ class DBCommms:
 
         return jsonify({'result': 'successfuly updated transaction!'})
 
-    def update_budget(self, budget):
+    def update_recurrence(self, recurrence):
         print("     " + self.__class__.__name__)
-        print("     " + "update_budget({})", budget)
+        print("     " + "update_recurrence({})", recurrence)
         (self.db_conn, self.cursor) = self.get_instance()
 
-        sql_description = "NULL" if (budget.description == None) else "'{0}'".format(budget.description)
+        sql_description = "NULL" if (recurrence.description == None) else "'{0}'".format(recurrence.description)
 
-        cmd = """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}', description = {3}, start_date = '{4}', end_date = '{5}' WHERE budget.category_id = {6}""".format(budget.category.name,
-        budget.amount, budget.amount_frequency, sql_description, budget.start_date, budget.end_date, budget.budget_id)
+        cmd = """UPDATE budget SET category = '{0}', amount = {1}, amount_frequency = '{2}', description = {3}, start_date = '{4}', end_date = '{5}' WHERE budget.category_id = {6}""".format(recurrence.category.name,
+                                                                                                                                                                                              recurrence.amount, recurrence.amount_frequency, sql_description, recurrence.start_date, recurrence.end_date, recurrence.recurrence_id)
         self.cursor.execute(cmd)
         self.db_conn.commit()
         print(cmd)
 
-        return jsonify({'result': 'successfuly updated budget category!'})
+        return jsonify({'result': 'successfuly updated recurrence category!'})
 
     # Delete Methods
 
@@ -98,17 +98,17 @@ class DBCommms:
 
         return jsonify({'result': 'successfuly deleted transaction!'})
 
-    def delete_budget(self, budget_id):
+    def delete_recurrence(self, recurrence_id):
         print("     " + self.__class__.__name__)
-        print("     " + "delete_budget({})", budget_id)
+        print("     " + "delete_recurrence({})", recurrence_id)
         (self.db_conn, self.cursor) = self.get_instance()
 
-        cmd = "DELETE FROM budget WHERE budget.category_id = {0};".format(int(budget_id))
+        cmd = "DELETE FROM budget WHERE budget.category_id = {0};".format(int(recurrence_id))
         self.cursor.execute(cmd)
         self.db_conn.commit()
         print(cmd)
 
-        return jsonify({'result': 'successfuly deleted budget category!'})
+        return jsonify({'result': 'successfuly deleted recurrence category!'})
 
     # Query Methods
 
@@ -116,7 +116,7 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "get_transaction(month:{},year:{},category:{})".format(month, year, category))
         (self.db_conn, self.cursor) = self.get_instance()
-        # todo update category so that you pass obj and not string (or change Budget to not store category as Obj)
+        # todo update category so that you pass obj and not string (or change recurrence to not store category as Obj)
 
         base_query = "select * from ledger"
         if month is None:
@@ -170,30 +170,30 @@ class DBCommms:
 
         return self.extract_transactions(self.cursor)
 
-    def get_budgets(self, date):
+    def get_recurrences(self, date):
         print("     " + self.__class__.__name__)
-        print("     " + "get_budgets({})".format(date))
+        print("     " + "get_recurrences({})".format(date))
         (self.db_conn, self.cursor) = self.get_instance()
 
         cmd = """select * from budget where budget.start_date <= '{0}-{1}-{2} {3}:{4}:{5}' and budget.end_date >= '{0}-{1}-{2} {3}:{4}:{5}' """.format(date.year, '{:02d}'.format(date.month), '{:02d}'.format(date.day), '{:02d}'.format(date.hour), '{:02d}'.format(date.minute), '{:02d}'.format(date.second))
         self.cursor.execute(cmd)
         print(cmd)
 
-        return self.extract_budgets(self.cursor)
+        return self.extract_recurrence(self.cursor)
 
-    def get_budget(self, budget_id):
+    def get_recurrence(self, recurrence_id):
         print("     " + self.__class__.__name__)
-        print("     " + "get_budget({})".format(budget_id))
+        print("     " + "get_recurrence({})".format(recurrence_id))
         (self.db_conn, self.cursor) = self.get_instance()
 
-        if budget_id is None:
+        if recurrence_id is None:
             return None
 
-        cmd = "SELECT * FROM budget where budget.category_id = {}".format(budget_id)
+        cmd = "SELECT * FROM budget where budget.category_id = {}".format(recurrence_id)
         self.cursor.execute(cmd)
         print(cmd)
 
-        result = self.extract_budgets(self.cursor)
+        result = self.extract_recurrence(self.cursor)
         return None if len(result) == 0 or len(result) > 1 else result[0]
 
     # Helper
@@ -249,24 +249,24 @@ class DBCommms:
             data.append(transaction)
         return data
 
-    def extract_budgets(self, cursor):
+    def extract_recurrence(self, cursor):
         print("     " + self.__class__.__name__)
-        print("     " + "extract_budgets()")
+        print("     " + "extract_recurrence()")
         data = []
-        for category, amount, amount_frequency, budget_id, description, start_date, end_date, type, repeat_start_date, days_till_repeat in cursor:
+        for category, amount, amount_frequency, recurrence_id, description, start_date, end_date, type, repeat_start_date, days_till_repeat in cursor:
             description = None if description == "null" else description
             if "period" in amount_frequency:
                 continue
-                budget = Period(category=category, amount=amount, start_date=start_date, end_date=end_date,
-                                description=description, recurrence_id=budget_id)
+                recurrence = Period(category=category, amount=amount, start_date=start_date, end_date=end_date,
+                                description=description, recurrence_id=recurrence_id)
             else:
                 print("#HERE", description)
                 tp = RecurrenceType.EXPENSE if type == 2 else RecurrenceType.INCOME
-                budget = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency,
-                                    start_date=start_date, end_date=end_date, description=description, recurrence_id=budget_id, type=tp, repeat_start_date=repeat_start_date, days_till_repeat=days_till_repeat)
+                recurrence = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency,
+                                    start_date=start_date, end_date=end_date, description=description, recurrence_id=recurrence_id, type=tp, repeat_start_date=repeat_start_date, days_till_repeat=days_till_repeat)
 
             if (repeat_start_date != None and repeat_start_date != "NULL" and repeat_start_date != "None"):
-                data.append(budget)
+                data.append(recurrence)
         return data
 
 

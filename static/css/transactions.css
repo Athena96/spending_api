@@ -53,11 +53,11 @@ table.a {
 
 .timeline {color: grey;}
 .transactions {color: green;}
-.budgets {color: dodgerblue;}
+.recurrences {color: dodgerblue;}
 .chart {color: gold;}
 
 .add_transaction {color: purple;}
-.add_budget {color: orange;}
+.add_recurrence {color: orange;}
 .delete {color: red;}
 .select {color: black;}
 

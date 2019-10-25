@@ -1,19 +1,19 @@
 
 
-function deleteBudget(budget_id) {
+function deleteRecurrence(recurrence_id) {
     var xhr = new XMLHttpRequest();
-    var url = prefix + "/budgets/" + budget_id;
+    var url = prefix + "/recurrences/" + recurrence_id;
     xhr.open("DELETE", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({}));
     xhr.onload = function() {
-        console.log("Deleted Budget Category")
+        console.log("Deleted Recurrence Category")
         location.reload();
         alert(this.responseText);
     }
 }
 
-function addBudget() {
+function addRecurrence() {
     var category = document.getElementById("categoryTextBox").value;
     var amount = document.getElementById("amountTextBox").value;
     var amountFrequencies = document.getElementsByName("amountFrequencyRadioButtons");
@@ -32,7 +32,7 @@ function addBudget() {
     }
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/budgets/" + category + "/" + amount + "/" + selectedAmountFrequency + "/" + description + "/" + startDate + "/" + endDate;
+    var url_tmp = prefix + "/recurrences/" + category + "/" + amount + "/" + selectedAmountFrequency + "/" + description + "/" + startDate + "/" + endDate;
     var url = url_tmp.replace(" ", "%20");
 
     if (prefix == "http://inherentvice.pythonanywhere.com") {
@@ -50,7 +50,7 @@ function addBudget() {
     xhr.send(JSON.stringify({}));
 }
 
-function updateBudget(budget_id) {
+function updateRecurrence(recurrence_id) {
     var category = document.getElementById("categoryTextBoxU").value;
     var amount = document.getElementById("amountTextBoxU").value;
     var amountFrequencies = document.getElementsByName("amountFrequencyRadioButtonsU");
@@ -67,7 +67,7 @@ function updateBudget(budget_id) {
     }
 
     var xhr = new XMLHttpRequest();
-    var url_w_spc = prefix + "/budgets/" + budget_id + "/" + category + "/" + amount + "/" + amountFrequency + "/" + description + "/" + startDate + "/" + endDate;
+    var url_w_spc = prefix + "/recurrences/" + recurrence_id + "/" + category + "/" + amount + "/" + amountFrequency + "/" + description + "/" + startDate + "/" + endDate;
     var url = url_w_spc.replace(" ", "%20");
 
     if (prefix == "http://inherentvice.pythonanywhere.com") {
