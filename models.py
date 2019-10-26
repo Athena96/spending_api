@@ -111,10 +111,10 @@ class Recurrence:
         return contents
 
     def generate_txn_days_in_range(self, clac_start_date, calc_end_date):
-        txn_days = []
         txn_day = self.repeat_start_date
+        txn_days = [txn_day]
 
-        while txn_day <= calc_end_date:
+        while txn_day < calc_end_date and self.days_till_repeat != 0:
             if txn_day >= clac_start_date and txn_day <= calc_end_date:
                 txn_days.append(txn_day)
             txn_day = txn_day + timedelta(days=self.days_till_repeat)

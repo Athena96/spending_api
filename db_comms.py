@@ -114,6 +114,17 @@ class DBCommms:
 
     # Query Methods
 
+    def get_cc_transactions_for_statement(self, recurrence):
+        print("     " + self.__class__.__name__)
+        print("     " + "get_cc_transactions_for_statement(recurrence:{})".format(recurrence.to_dict()))
+        (self.db_conn, self.cursor) = self.get_instance()
+
+        cmd = "select * from ledger where ledger.credit_card like '%{}%'".format(recurrence.category.name)
+        self.cursor.execute(cmd)
+        print(cmd)
+
+        return self.extract_transactions(self.cursor)
+
     def get_transactions(self, year=None, month=None, category="ALL"):
         print("     " + self.__class__.__name__)
         print("     " + "get_transaction(month:{},year:{},category:{})".format(month, year, category))
@@ -245,9 +256,9 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "extract_transactions()")
         data = []
-        for transaction_id, title, amount, category, date, description in cursor:
+        for transaction_id, title, amount, category, date, description, credit_card in cursor:
             description = None if description == "null" else description
-            transaction = Transaction(title, amount, category, date, description, transaction_id)
+            transaction = Transaction(title, amount, category, date, description, credit_card, transaction_id)
             data.append(transaction)
         return data
 
