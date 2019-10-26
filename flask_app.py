@@ -11,8 +11,8 @@ from timeline_generator import TimelineGenerator
 from flask import current_app
 from utilities import string_to_date
 from utilities import is_valid_or_none
+from utilities import get_variable_recurrence_transactions
 from models import RecurrenceType
-
 
 # declare our Flask app
 app = Flask(__name__)
@@ -165,6 +165,16 @@ def recurrence_page(year=None, month=None):
             filtered_month_category_transactions = db_comm.get_transactions(year=year, month=month, category=recurrence.category.name)
             spent_so_far_month = sum([transaction.amount for transaction in filtered_month_category_transactions])
 
+        elif recurrence.amount_frequency == "variable":
+
+            # get transactions for period recurrence
+            period_recurrence_period_transactions = get_variable_recurrence_transactions(db_comm, recurrence)
+            spent_so_far_period = sum([transaction.amount for transaction in period_recurrence_period_transactions])
+            recurrence.amount = spent_so_far_period
+            spent_so_far_year = 0.0
+            spent_so_far_month = 0.0
+
+
         recurrence_data.append(RecurrencePageInfo(recurrence, spent_so_far_month, spent_so_far_year, spent_so_far_period))
 
     month_recurrences = filter(lambda x: x.recurrence.amount_frequency == "month", recurrence_data)
@@ -173,12 +183,16 @@ def recurrence_page(year=None, month=None):
     year_recurrences = filter(lambda x: x.recurrence.amount_frequency == "year", recurrence_data)
     year_recurrences = sorted(year_recurrences, key=lambda x: x.recurrence.amount, reverse=True)
 
+    variable_recurrences = filter(lambda x: x.recurrence.amount_frequency == "variable", recurrence_data)
+    variable_recurrences = sorted(variable_recurrences, key=lambda x: x.recurrence.amount, reverse=True)
+
     period_recurrences = filter(lambda x: (type(x.recurrence) is Period), recurrence_data)
     period_recurrences = sorted(period_recurrences, key=lambda x: x.recurrence.amount, reverse=True)
 
     return render_template('recurrences.html',
     month_recurrences=month_recurrences, year_recurrences=year_recurrences,
     period_recurrences=period_recurrences,
+    variable_recurrences=variable_recurrences,
     month=month, year=year,
     spent_in_month=spent_in_month_str, spent_in_year=spent_in_year_str,
     month_income=month_income, year_income=year_income, prefix=ENVIRONMENT)

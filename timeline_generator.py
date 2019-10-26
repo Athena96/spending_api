@@ -4,6 +4,7 @@ from models import BalanceRow
 from random import random
 from db_comms import DBCommms
 from models import RecurrenceType
+from utilities import get_variable_recurrence_transactions
 
 class TimelineGenerator:
 
@@ -26,17 +27,9 @@ class TimelineGenerator:
         for recurrence in recurrences:
             if recurrence_type == recurrence.type and date in recurrence.generate_txn_days_in_range(self.start_date, self.end_date):
                 if recurrence.days_till_repeat == 0:
-                    txns = self.db_comms.get_cc_transactions_for_statement(recurrence)
-                    total_spent = sum([x.amount for x in txns])
-                    recurrence.amount = total_spent
+                    recurrence.amount = sum([x.amount for x in get_variable_recurrence_transactions(self.db_comms, recurrence)])
 
                 todays_recurrences.append(recurrence)
-
-
-        # if the recurrence is a variable type... then look for all the txns from <= date that
-        # are linked with this recurrence... then sum those txns and set that sum to be the recurrecnes amt field.
-
-
 
         total_amnt = sum([x.amount for x in todays_recurrences])
         total_descriptions = ",\n".join([x.description for x in todays_recurrences])

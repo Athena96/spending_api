@@ -273,9 +273,11 @@ class DBCommms:
             tp = RecurrenceType.EXPENSE if type == 2 else RecurrenceType.INCOME
 
             if "period" in amount_frequency:
+                print("CREATING PERIOD ", category)
                 recurrence = Period(category=category, amount=amount, start_date=start_date, end_date=end_date,
                                 description=description, recurrence_id=recurrence_id, type=tp)
             else:
+
                 recurrence = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency,
                                     start_date=start_date, end_date=end_date, description=description, recurrence_id=recurrence_id,
                                         type=tp, repeat_start_date=repeat_start_date, days_till_repeat=days_till_repeat)

@@ -11,3 +11,7 @@ def is_valid_or_none(string):
     if string is not None and string != "NULL" and string != "None" and string != "null" and string != "nil" and string != "":
         val = string
     return val
+
+def get_variable_recurrence_transactions(db_comm, recurrence):
+    txns = db_comm.get_cc_transactions_for_statement(recurrence)
+    return txns

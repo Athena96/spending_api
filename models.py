@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from datetime import timedelta
-from utilities import string_to_date
+from utilities import get_variable_recurrence_transactions
 
 class RecurrenceType(Enum):
     INCOME = 1
@@ -137,10 +137,12 @@ class RecurrencePageInfo:
     def __init__(self, recurrence, spent_so_far_month, spent_so_far_year, spent_so_far_period=None):
         self.recurrence = recurrence
 
-        if type(recurrence) is Period:
-            self.spent_so_far_period = spent_so_far_period
-            self.percent_period = (spent_so_far_period / recurrence.amount)
-            self.remaining_period = "{}".format(round((recurrence.amount - spent_so_far_period), 2))
+        if type(recurrence) is Period or recurrence.amount_frequency == "variable":
+            tot = 500.0 if "prime" in recurrence.category.name else 60.0
+            self.spent_so_far_period = tot
+
+            self.percent_period = (spent_so_far_period / tot)
+            self.remaining_period = "{}".format(round((tot - spent_so_far_period), 2))
         else:
             self.percent_month = (spent_so_far_month / (recurrence.amount if recurrence.amount_frequency == "month" else (recurrence.amount / 12.0)))
             self.percent_year = (spent_so_far_year / (recurrence.amount if recurrence.amount_frequency == "year" else (recurrence.amount * 12.0)))
