@@ -37,6 +37,7 @@
                 <th>Amount</th>
                 <th>Category</th>
                 <th>Date</th>
+                <th>Credit Card</th>
                 <th>Description</th>
                 <th>Delete</th>
             </tr>
@@ -48,6 +49,7 @@
                     <td>${{ transaction.amount }}</td>
                     <td>{{ transaction.get_categories() }}</td>
                     <td>{{ transaction.date }}</td>
+                    <td>{{ transaction.credit_card }}</td>
                     {% if transaction.description != None %}
                         <td>{{ transaction.description }}</td>
                     {% else %}
