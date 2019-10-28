@@ -5,6 +5,7 @@ from random import random
 from db_comms import DBCommms
 from models import RecurrenceType
 from utilities import get_variable_recurrence_transactions
+from utilities import is_valid_or_none
 
 class TimelineGenerator:
 
@@ -19,20 +20,16 @@ class TimelineGenerator:
         self.db_comms = db_comm
 
     def get_recurrences_for_day(self, date, recurrence_type):
-
         todays_recurrences = []
-        recurrences = self.db_comms.get_recurrences(date)
+        recurrences = list(filter(lambda x: is_valid_or_none(x.repeat_start_date) is not None, self.db_comms.get_recurrences(date)))
         todays_uncat_recurr = [] # todo
 
         for recurrence in recurrences:
             if recurrence_type == recurrence.type and date in recurrence.generate_txn_days_in_range(self.start_date, self.end_date):
-                if recurrence.days_till_repeat == 0:
-                    recurrence.amount = sum([x.amount for x in get_variable_recurrence_transactions(self.db_comms, recurrence)])
-
                 todays_recurrences.append(recurrence)
 
         total_amnt = sum([x.amount for x in todays_recurrences])
-        total_descriptions = ",\n".join([x.description for x in todays_recurrences])
+        total_descriptions = ",\r\n".join([x.description for x in todays_recurrences])
         return (total_amnt, total_descriptions)
 
     def generate_table(self):
