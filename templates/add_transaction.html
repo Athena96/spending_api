@@ -20,6 +20,7 @@
 
         Title: <input type="text" id="titleTextBoxU" name="title" value="{{transaction.title}}"><br>
         Amount: <input type="text" id="amountTextBoxU" name="amount" value="{{transaction.amount}}"><br>
+        Credit Card (statement and type): <input type="text" id="creditCardTypeU" name="amount" value="{{transaction.credit_card}}"><br>
         Categories: <input type="text" id="mySelectCategoryU" name="category" value="{{",".join(transaction.get_categories())}}"><br>
         Date: <input type="text" id="dateTextBoxU" name="date" value="{{transaction.date}}"><br>
 
@@ -40,6 +41,7 @@
     {% else %}
         Title: <input type="text" id="titleTextBox" name="title" value=""><br>
         Amount: <input type="text" id="amountTextBox" name="amount" value=""><br>
+        Credit Card (statement and type): <input type="text" id="creditCardType" name="amount" placeholder="2019" value=""><br>
         Category:
         <select id="mySelectCategory">
             {% for recurrence in recurrences %}

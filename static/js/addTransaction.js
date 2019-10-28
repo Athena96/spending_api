@@ -9,6 +9,8 @@ function addTransaction() {
         final_cat = final_cat + "," + categories;
     }
     var amount = document.getElementById("amountTextBox").value;
+    var creditCard = document.getElementById("creditCardType").value;
+
     if (!category.includes("income")) {
         amount = amount * -1.0;
     }
@@ -29,7 +31,7 @@ function addTransaction() {
     }
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/transactions/" + title + "/" + amount + "/" + final_cat + "/" + date + "/" + description;
+    var url_tmp = prefix + "/transactions/" + title + "/" + amount + "/" + final_cat + "/" + date + "/" + description + "/" + creditCard;
     var url = url_tmp.replace(" ", "%20");
 
     if (prefix == "http://inherentvice.pythonanywhere.com") {
@@ -52,6 +54,8 @@ function updateTransaction(transaction_id) {
 
     var title = document.getElementById("titleTextBoxU").value;
     var amount = document.getElementById("amountTextBoxU").value;
+    var creditCard = document.getElementById("creditCardTypeU").value;
+
     var category = document.getElementById("mySelectCategoryU").value;
     var date = document.getElementById("dateTextBoxU").value;
     var description = document.getElementById("descriptionTextBoxU").value;
@@ -61,7 +65,7 @@ function updateTransaction(transaction_id) {
     var passcode = document.getElementById("passcodeTextBoxU").value;
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/transactions/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + description;
+    var url_tmp = prefix + "/transactions/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + description + "/" + creditCard;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.withCredentials = true;
