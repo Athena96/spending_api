@@ -41,7 +41,7 @@ class Transaction:
         for c in category.split(","):
             if first:
                 first = False
-                categories.append(Category(name=c, is_income=True if self.amount > 0 else False))
+                categories.append(Category(name=c, is_income=True if ("income" in c) else False))
             else:
                 categories.append(Category(name=c, is_income=False))
         self.category = categories

@@ -1,7 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
 from models import BalanceRow
-from random import random
 from db_comms import DBCommms
 from models import RecurrenceType
 from utilities import get_variable_recurrence_transactions
@@ -26,6 +25,9 @@ class TimelineGenerator:
 
         for recurrence in recurrences:
             if recurrence_type == recurrence.type and date in recurrence.generate_txn_days_in_range(self.start_date, self.end_date):
+                if recurrence.days_till_repeat == 0 and "variable" in recurrence.amount_frequency and recurrence.amount == 0.0:
+                    var_txns = get_variable_recurrence_transactions(self.db_comms, recurrence)
+                    recurrence.amount = sum([x.amount for x in var_txns])
                 todays_recurrences.append(recurrence)
 
         total_amnt = sum([x.amount for x in todays_recurrences])
@@ -39,6 +41,7 @@ class TimelineGenerator:
             (incomes, income_desc) = self.get_recurrences_for_day(date, RecurrenceType.INCOME)
             (expenses, expenses_desc) = self.get_recurrences_for_day(date, RecurrenceType.EXPENSE)
             balance = self.starting_balance if previous_bal is None else (previous_bal + incomes - expenses)
+            balance = round(balance, 2)
             previous_bal = balance
             rows.append(BalanceRow(balance_date=date, balance=balance, income=incomes, income_desc=income_desc, expense=expenses, expenses_desc=expenses_desc))
         return rows
