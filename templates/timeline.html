@@ -28,17 +28,17 @@
                 <th>Income</th>
                 <th>Income Description</th>
                 <th>Expense</th>
-                <th>Income Description</th>
+                <th>Expense Description</th>
             </tr>
 
             {% for day in timeline_table %}
 
             <tr>
                 <td>{{ day.balance_date }}</td>
-                <td>{{ day.balance }}</td>
-                <td>{{ day.income }}</td>
-                <td>{{ day.expense }}</td>
+                <td>${{ day.balance }}</td>
+                <td>${{ day.income }}</td>
                 <td>{{ day.income_desc }}</td>
+                <td>${{ day.expense }}</td>
                 <td>{{ day.expenses_desc }}</td>
             </tr>
 

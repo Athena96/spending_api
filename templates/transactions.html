@@ -49,7 +49,11 @@
                     <td>${{ transaction.amount }}</td>
                     <td>{{ transaction.get_categories() }}</td>
                     <td>{{ transaction.date }}</td>
-                    <td>{{ transaction.credit_card }}</td>
+                    {% if transaction.credit_card != None %}
+                        <td>{{ transaction.credit_card }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
                     {% if transaction.description != None %}
                         <td>{{ transaction.description }}</td>
                     {% else %}

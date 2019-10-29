@@ -40,5 +40,5 @@ class TimelineGenerator:
             (expenses, expenses_desc) = self.get_recurrences_for_day(date, RecurrenceType.EXPENSE)
             balance = self.starting_balance if previous_bal is None else (previous_bal + incomes - expenses)
             previous_bal = balance
-            rows.append(BalanceRow(date, balance, incomes, income_desc, expenses, expenses_desc))
+            rows.append(BalanceRow(balance_date=date, balance=balance, income=incomes, income_desc=income_desc, expense=expenses, expenses_desc=expenses_desc))
         return rows
