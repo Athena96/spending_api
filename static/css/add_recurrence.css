@@ -49,8 +49,9 @@ tr:nth-child(even) {
 
 .btn:hover {background: #eee;}
 
+.timeline {color: grey;}
 .transactions {color: green;}
-.budgets {color: dodgerblue;}
+.recurrences {color: dodgerblue;}
 .add_transaction {color: purple;}
-.add_budget {color: orange;}
+.add_recurrence {color: orange;}
 .chart {color: gold;}

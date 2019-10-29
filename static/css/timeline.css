@@ -3,21 +3,23 @@ table {
   border-collapse: collapse;
 }
 
-td, th {
-  border: 1px solid #dddddd;
-  text-align: center;
-
+h2 {
+    font-family:helvetica;
+}
+h3 {
+    font-family:helvetica;
 }
 
 p {
     font-family:helvetica;
 }
 
-h2 {
-    font-family:helvetica;
-}
-h3 {
-    font-family:helvetica;
+
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
 }
 
 tr:nth-child(even) {
@@ -26,7 +28,7 @@ tr:nth-child(even) {
 
 table.a {
   table-layout: auto;
-  width: 950px;
+  width: 800px;
 }
 
 .btn {
@@ -49,9 +51,13 @@ table.a {
 
 .btn:hover {background: #eee;}
 
+.timeline {color: grey;}
 .transactions {color: green;}
-.budgets {color: dodgerblue;}
-.add_transaction {color: purple;}
-.add_budget {color: orange;}
+.recurrences {color: dodgerblue;}
 .chart {color: gold;}
+
+.add_transaction {color: purple;}
+.add_recurrence {color: orange;}
 .delete {color: red;}
+.select {color: black;}
+

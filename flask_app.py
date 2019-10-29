@@ -4,11 +4,15 @@ from datetime import datetime
 from db_comms import DBCommms
 from models import Category
 from models import Transaction
-from models import Budget
+from models import Recurrence
 from models import Period
-from models import BudgetPageInfo
+from models import RecurrencePageInfo
+from timeline_generator import TimelineGenerator
 from flask import current_app
 from utilities import string_to_date
+from utilities import is_valid_or_none
+from utilities import get_variable_recurrence_transactions
+from models import RecurrenceType
 
 # declare our Flask app
 app = Flask(__name__)
@@ -26,6 +30,16 @@ with app.app_context():
     else:
         ENVIRONMENT = "http://127.0.0.1:5000"
 
+# Website page handlers: Timeline
+
+@app.route("/site/timeline", methods=["GET"])
+def timeline_page():
+    print("timeline_page()")
+
+    generator = TimelineGenerator(months_to_generate=6, db_comm=db_comm)
+    table = generator.generate_table()
+    return render_template('timeline.html', timeline_table=table, prefix=ENVIRONMENT)
+
 # Website page handlers: Transactions
 
 @app.route("/site/transactions", methods=["GET"])
@@ -41,8 +55,8 @@ def add_transaction_page(transaction_id=None):
     print("add_transaction_page()")
     
     transaction = db_comm.get_transaction(transaction_id)
-    budgets = db_comm.get_budgets(datetime.now())
-    return render_template('add_transaction.html', transaction=transaction, budgets=budgets, prefix=ENVIRONMENT)
+    recurrences = db_comm.get_recurrences(datetime.now())
+    return render_template('add_transaction.html', transaction=transaction, recurrences=recurrences, prefix=ENVIRONMENT)
 
 @app.route("/site/transactions/year:<string:year>", methods=["GET"])
 @app.route("/site/transactions/year:<string:year>/month:<string:month>", methods=["GET"])
@@ -57,13 +71,13 @@ def transactions_page(year=None, month=None, category="ALL", start_date=None, en
         sd = string_to_date(start_date)
         ed = string_to_date(end_date)
 
-        # get transactions for period budget
-        period_budget_period_transactions = db_comm.get_transactions_between(start_date=sd, end_date=ed, category=Category(name=category, is_income=False))
+        # get transactions for period recurrence
+        period_recurrence_period_transactions = db_comm.get_transactions_between(start_date=sd, end_date=ed, category=Category(name=category, is_income=False))
 
         return render_template('transactions.html',
         month=month, year=year,
         category=category,
-        transactions=period_budget_period_transactions,
+        transactions=period_recurrence_period_transactions,
         spent_in_month=0.0, spent_in_year=0.0,
         month_income=0.0, year_income=0.0, prefix=ENVIRONMENT)
 
@@ -95,75 +109,90 @@ def transactions_page(year=None, month=None, category="ALL", start_date=None, en
     spent_in_month=spent_in_month_str, spent_in_year=spent_in_year_str,
     month_income=month_income, year_income=year_income, prefix=ENVIRONMENT)
 
-# Website page handlers: Budgets
+# Website page handlers: Recurrence
 
-@app.route("/site/budgets", methods=["GET"])
-def budgets_root_page():
-    print("budgets_root_page()")
+@app.route("/site/recurrences", methods=["GET"])
+def recurrences_root_page():
+    print("recurrences_root_page()")
 
-    budget_links = get_date_page_links("budgets")
-    return render_template('root_budgets.html', budget_links=budget_links, prefix=ENVIRONMENT)
+    recurrence_links = get_date_page_links("recurrences")
+    return render_template('root_recurrences.html', recurrence_links=recurrence_links, prefix=ENVIRONMENT)
 
-@app.route("/site/add_budget", methods=["GET"])
-@app.route("/site/add_budget/<string:budget_id>", methods=["GET"])
-def add_budget_page(budget_id=None):
-    print("add_budget_page()")
-    budget = db_comm.get_budget(budget_id)
-    return render_template('add_budget.html', budget=budget, prefix=ENVIRONMENT)
+@app.route("/site/add_recurrence", methods=["GET"])
+@app.route("/site/add_recurrence/<string:recurrence_id>", methods=["GET"])
+def add_recurrence_page(recurrence_id=None):
+    print("add_recurrence_page()")
+    recurrence = db_comm.get_recurrence(recurrence_id)
+    return render_template('add_recurrence.html', recurrence=recurrence, prefix=ENVIRONMENT)
 
-@app.route("/site/budgets/year:<string:year>/month:<string:month>", methods=["GET"])
-def budgets_page(year=None, month=None):
-    print("budgets_page()")
+@app.route("/site/recurrences/year:<string:year>/month:<string:month>", methods=["GET"])
+def recurrence_page(year=None, month=None):
+    print("recurrences_page()")
 
-    # get the budgets for the requested year/month
+    # get the recurrences for the requested year/month
     (start, end) = calendar.monthrange(int(year), int(month))
-    budgets = db_comm.get_budgets(datetime(year=int(year), month=int(month), day=end))
+    recurrences = db_comm.get_recurrences(datetime(year=int(year), month=int(month), day=end))
+    print("RECURRENCES: ", [x.category.name for x in recurrences])
 
     # 2 get year and month income/spending values
     (year_income, month_income) = db_comm.get_income(year, month)
     (spent_in_year_str, spent_in_month_str) = db_comm.get_spending(year, month)
 
-    budget_data = []
-    for budget in budgets:
+    recurrence_data = []
+    for recurrence in recurrences:
 
-        if budget.category.is_income:
+        if recurrence.category.is_income:
             continue
 
-        if type(budget) is Period or budget.amount_frequency == "period":
-            sd = string_to_date(budget.start_date)
-            ed = string_to_date(budget.end_date)
-            # get transactions for period budget
-            period_budget_period_transactions = db_comm.get_transactions_between(start_date=sd, end_date=ed, category=budget.category)
-            spent_so_far_period = sum([transaction.amount for transaction in period_budget_period_transactions])
+        if type(recurrence) is Period or recurrence.amount_frequency == "period":
+            sd = string_to_date(recurrence.start_date)
+            ed = string_to_date(recurrence.end_date)
+            # get transactions for period recurrence
+            period_recurrence_period_transactions = db_comm.get_transactions_between(start_date=sd, end_date=ed, category=recurrence.category)
+            spent_so_far_period = sum([transaction.amount for transaction in period_recurrence_period_transactions])
 
-            filtered_year_category_transactions = list(filter(lambda transaction: (transaction.date[0:4] == year), period_budget_period_transactions))
+            filtered_year_category_transactions = list(filter(lambda transaction: (transaction.date[0:4] == year), period_recurrence_period_transactions))
             spent_so_far_year = sum([transaction.amount for transaction in filtered_year_category_transactions])
 
             filtered_month_category_transactions = filter(lambda transaction: (transaction.date[5:7] == month), filtered_year_category_transactions)
             spent_so_far_month = sum([transaction.amount for transaction in filtered_month_category_transactions])
 
-        elif budget.amount_frequency == "month" or budget.amount_frequency == "year":
+        elif recurrence.amount_frequency == "month" or recurrence.amount_frequency == "year":
             spent_so_far_period = None
-            filtered_year_category_transactions = db_comm.get_transactions(year=year, category=budget.category.name)
+            filtered_year_category_transactions = db_comm.get_transactions(year=year, category=recurrence.category.name)
             spent_so_far_year = sum([transaction.amount for transaction in filtered_year_category_transactions if int(transaction.date[5:7]) <= int(month)])
 
-            filtered_month_category_transactions = db_comm.get_transactions(year=year, month=month, category=budget.category.name)
+            filtered_month_category_transactions = db_comm.get_transactions(year=year, month=month, category=recurrence.category.name)
             spent_so_far_month = sum([transaction.amount for transaction in filtered_month_category_transactions])
 
-        budget_data.append( BudgetPageInfo(budget, spent_so_far_month, spent_so_far_year, spent_so_far_period) )
+        elif recurrence.amount_frequency == "variable":
 
-    month_budgets = filter(lambda x: x.budget.amount_frequency == "month", budget_data)
-    month_budgets = sorted(month_budgets, key=lambda x: x.budget.amount, reverse=True)
+            # get transactions for period recurrence
+            period_recurrence_period_transactions = get_variable_recurrence_transactions(db_comm, recurrence)
+            spent_so_far_period = sum([transaction.amount for transaction in period_recurrence_period_transactions])
+            recurrence.amount = spent_so_far_period
+            spent_so_far_year = 0.0
+            spent_so_far_month = 0.0
 
-    year_budgets = filter(lambda x: x.budget.amount_frequency == "year", budget_data)
-    year_budgets = sorted(year_budgets, key=lambda x: x.budget.amount, reverse=True)
 
-    period_budgets = filter(lambda x: (type(x.budget) is Period), budget_data)
-    period_budgets = sorted(period_budgets, key=lambda x: x.budget.amount, reverse=True)
+        recurrence_data.append(RecurrencePageInfo(recurrence, spent_so_far_month, spent_so_far_year, spent_so_far_period))
 
-    return render_template('budgets.html',
-    month_budgets=month_budgets, year_budgets=year_budgets,
-    period_budgets=period_budgets,
+    month_recurrences = filter(lambda x: x.recurrence.amount_frequency == "month", recurrence_data)
+    month_recurrences = sorted(month_recurrences, key=lambda x: x.recurrence.amount, reverse=True)
+
+    year_recurrences = filter(lambda x: x.recurrence.amount_frequency == "year", recurrence_data)
+    year_recurrences = sorted(year_recurrences, key=lambda x: x.recurrence.amount, reverse=True)
+
+    variable_recurrences = filter(lambda x: x.recurrence.amount_frequency == "variable", recurrence_data)
+    variable_recurrences = sorted(variable_recurrences, key=lambda x: x.recurrence.amount, reverse=True)
+
+    period_recurrences = filter(lambda x: (type(x.recurrence) is Period), recurrence_data)
+    period_recurrences = sorted(period_recurrences, key=lambda x: x.recurrence.amount, reverse=True)
+
+    return render_template('recurrences.html',
+    month_recurrences=month_recurrences, year_recurrences=year_recurrences,
+    period_recurrences=period_recurrences,
+    variable_recurrences=variable_recurrences,
     month=month, year=year,
     spent_in_month=spent_in_month_str, spent_in_year=spent_in_year_str,
     month_income=month_income, year_income=year_income, prefix=ENVIRONMENT)
@@ -177,19 +206,21 @@ def get_transactions(year=None, month=None, category="ALL"):
 
     return jsonify([transaction.to_dict() for transaction in db_comm.get_transactions(year, month, category)])
 
-@app.route('/transactions/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>', methods=['POST'])
-def add_transaction(title, amount, category, date, description):
+@app.route('/transactions/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>/<string:credit_card>', methods=['POST'])
+def add_transaction(title, amount, category, date, description, credit_card):
     print("[api] add_transaction()")
-
+    # todo 1) send null txID here, 2) abstract out the duplicate code here and in update_transaction
     description = None if description == "null" else description
-    transaction = Transaction(title, amount, category, date, description)
+    credit_card = None if is_valid_or_none(credit_card) is None else credit_card
+    transaction = Transaction(title=title, amount=amount, category=category, date=date, description=description, credit_card=credit_card)
     return db_comm.add_transaction(transaction)
 
-@app.route('/transactions/<string:transaction_id>/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>', methods=['PUT'])
-def update_transaction(transaction_id, title, amount, category, date, description):
+@app.route('/transactions/<string:transaction_id>/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>/<string:credit_card>', methods=['PUT'])
+def update_transaction(transaction_id, title, amount, category, date, description, credit_card):
     print("[api] update_transaction()")
-
-    transaction = Transaction(title, amount, category, date, description, transaction_id)
+    description = None if description == "null" else description
+    credit_card = None if is_valid_or_none(credit_card) is None else credit_card
+    transaction = Transaction(title=title, amount=amount, category=category, date=date, description=description, transaction_id=transaction_id, credit_card=credit_card)
     return db_comm.update_transaction(transaction)
 
 @app.route('/transactions/<string:transaction_id>', methods=['DELETE'])
@@ -198,34 +229,43 @@ def delete_transaction(transaction_id):
 
     return db_comm.delete_transaction(transaction_id)
 
-# Budget API endpoints
+# Recurrence API endpoints
 
-@app.route('/budgets', methods=['GET'])
-def get_budgets():
-    print("[api] get_budgets()")
+@app.route('/recurrences', methods=['GET'])
+def get_recurrences():
+    print("[api] get_recurrences()")
 
-    return jsonify([budget.to_dict() for budget in db_comm.get_budgets(datetime.now())])
+    return jsonify([recurrence.to_dict() for recurrence in db_comm.get_recurrences(datetime.now())])
 
-@app.route('/budgets/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['POST'])
-def add_budget(category, amount, amount_frequency, description, start_date, end_date):
-    print("[api] add_budget()")
+@app.route('/recurrence/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>/<string:type>/<string:repeat_start_date>/<string:days_till_repeat>', methods=['POST'])
+def add_recurrence(category, amount, amount_frequency, description, start_date, end_date, type, repeat_start_date, days_till_repeat):
+    print("[api] add_recurrence()")
 
     description = None if description == "null" else description
-    budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description)
-    return db_comm.add_budget(budget)
+    repeat_start_date = None if is_valid_or_none(repeat_start_date) is None else string_to_date(repeat_start_date)
+    description = None if is_valid_or_none(description) is None else description
+    tp = RecurrenceType.EXPENSE if type == 2 else RecurrenceType.INCOME
 
-@app.route('/budgets/<string:budget_id>/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>', methods=['PUT'])
-def update_budget(budget_id, category, amount, amount_frequency, description, start_date, end_date):
-    print("[api] update_budget()")
+    recurrence = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, type=tp, repeat_start_date=repeat_start_date, days_till_repeat=days_till_repeat)
+    return db_comm.add_recurrence(recurrence)
 
-    budget = Budget(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, budget_id=budget_id)
-    return db_comm.update_budget(budget)
+@app.route('/recurrence/<string:recurrence_id>/<string:category>/<string:amount>/<string:amount_frequency>/<string:description>/<string:start_date>/<string:end_date>/<string:type>/<string:repeat_start_date>/<string:days_till_repeat>', methods=['PUT'])
+def update_recurrence(recurrence_id, category, amount, amount_frequency, description, start_date, end_date,type, repeat_start_date, days_till_repeat):
+    print("[api] update_recurrence()")
 
-@app.route('/budgets/<string:budget_id>', methods=['DELETE'])
-def delete_budget(budget_id):
-    print("[api] delete_budget()")
+    description = None if description == "null" else description
+    repeat_start_date = None if is_valid_or_none(repeat_start_date) is None else string_to_date(repeat_start_date)
+    description = None if is_valid_or_none(description) is None else description
+    tp = RecurrenceType.EXPENSE if type == 2 else RecurrenceType.INCOME
 
-    return db_comm.delete_budget(budget_id)
+    recurrence = Recurrence(category=category, amount=amount, amount_frequency=amount_frequency, start_date=start_date, end_date=end_date, description=description, recurrence_id=recurrence_id, type=tp, repeat_start_date=repeat_start_date, days_till_repeat=days_till_repeat)
+    return db_comm.update_recurrence(recurrence)
+
+@app.route('/recurrence/<string:recurrence_id>', methods=['DELETE'])
+def delete_recurrence(recurrence_id):
+    print("[api] delete_recurrence()")
+
+    return db_comm.delete_recurrence(recurrence_id)
 
 # helpers
 def get_date_page_links(type):

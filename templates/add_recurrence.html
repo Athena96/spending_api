@@ -1,31 +1,32 @@
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <head>
-    <link rel="stylesheet" type="text/css" href="/static/css/add_budget.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/add_recurrence.css">
     <script type="text/javascript">
             var prefix = "{{ prefix }}"
     </script>
 </head>
 
 <body>
+    <button class="btn timeline" onclick="location.href='{{prefix}}/site/timeline'">Timeline</button>
     <button class="btn transactions" onclick="location.href='{{prefix}}/site/transactions'">Transactions</button>
-    <button class="btn budgets" onclick="location.href='{{prefix}}/site/budgets'">Budgets</button>
+    <button class="btn recurrences" onclick="location.href='{{prefix}}/site/recurrences'">Recurrences</button>
     <button class="btn add_transaction" onclick="location.href='{{prefix}}/site/add_transaction'">Add Transaction</button>
-    <button class="btn add_budget" onclick="location.href='{{prefix}}/site/add_budget'">Add Budget</button>
+    <button class="btn add_recurrence" onclick="location.href='{{prefix}}/site/add_recurrence'">Add Recurrence</button>
 
 <form>
-    {% if budget != None %}
-        Title: <input type="text" id="categoryTextBoxU" name="item" value="{{budget.category.name}}"><br>
-        Amount: <input type="text" id="amountTextBoxU" name="price" value="{{budget.amount}}"><br>
-        <!--Amount Frequency: <input type="text" id="amountFrequencyTextBoxU" name="category" value="{{budget.amount_frequency}}"><br>-->
+    {% if recurrence != None %}
+        Title: <input type="text" id="categoryTextBoxU" name="item" value="{{recurrence.category.name}}"><br>
+        Amount: <input type="text" id="amountTextBoxU" name="price" value="{{recurrence.amount}}"><br>
+        <!--Amount Frequency: <input type="text" id="amountFrequencyTextBoxU" name="category" value="{{recurrence.amount_frequency}}"><br>-->
 
         Amount Frequency:<br>
-        {% if budget.amount_frequency == "month" %}
+        {% if recurrence.amount_frequency == "month" %}
             <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="month" checked> Month<br>
             <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="year"> Year<br>
             <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="period"> Period<br>
         {% else  %}
-            {% if budget.amount_frequency == "year" %}
+            {% if recurrence.amount_frequency == "year" %}
                 <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="month"> Month<br>
                 <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="year" checked> Year<br>
                 <input type="radio" name="amountFrequencyRadioButtonsU" id="amountFrequencyRadioButtonsU" value="period"> Period<br>
@@ -36,18 +37,22 @@
             {% endif %}
         {% endif %}
 
-        Start Date: <input type="text" id="startDateTextBoxU" name="date" value="{{budget.start_date}}"><br>
-        End Date: <input type="text" id="endDateTextBoxU" name="date" value="{{budget.end_date}}"><br>
-        {% if budget.description != None %}
+        Start Date: <input type="text" id="startDateTextBoxU" name="date" value="{{recurrence.start_date}}"><br>
+        End Date: <input type="text" id="endDateTextBoxU" name="date" value="{{recurrence.end_date}}"><br>
+        Repeat Start Date: <input type="text" id="repeatStartDateTextBoxU" name="date" value="{{recurrence.repeat_start_date}}"><br>
+        Repeat Interval (Days): <input type="text" id="daysTillRepeateTextBoxU" name="repeateDays" value="{{recurrence.days_till_repeat}}"><br>
+        Type (1=INCOME,2=EXPENSE): <input type="text" id="typeTextBoxU" name="type" value="{{recurrence.type}}"><br>
+
+        {% if recurrence.description != None %}
             Description:<br>
-            <textarea name="description" id="descriptionTextBoxU" style="width:200px; height:100px;" >{{budget.description}}</textarea><br>
+            <textarea name="description" id="descriptionTextBoxU" style="width:200px; height:100px;" >{{recurrence.description}}</textarea><br>
         {% else %}
             Description:<br>
             <textarea name="description" id="descriptionTextBoxU" style="width:200px; height:100px;" ></textarea><br>
         {% endif %}
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
-        <button class="button buttonUpdate" id="{{budget.budget_id}}" onclick="updateBudget(this.id)">Update</button> <br>
-        <button class="button buttonDelete" id="{{budget.budget_id}}" onclick="deleteBudget(this.id)">Delete</button>
+        <button class="button buttonUpdate" id="{{recurrence.recurrence_id}}" onclick="updateRecurrence(this.id)">Update</button> <br>
+        <button class="button buttonDelete" id="{{recurrence.recurrence_id}}" onclick="deleteRecurrence(this.id)">Delete</button>
     {% else %}
         Title: <input type="text" id="categoryTextBox" name="item" value=""><br>
         Amount: <input type="text" id="amountTextBox" name="price" value=""><br>
@@ -57,16 +62,19 @@
             <input type="radio" name="amountFrequencyRadioButtons" id="amountFrequencyRadioButtons" value="period"> Period<br>
         Start Date: <input type="text" id="startDateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
         End Date: <input type="text" id="endDateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
+        Repeat Start Date: <input type="text" id="repeatStartDateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
+        Repeat Interval (Days): <input type="text" id="daysTillRepeateTextBox" name="repeateDays" value=""><br>
+        Type (1=INCOME,2=EXPENSE): <input type="text" id="typeTextBox" name="type" placeholder="2" value=""><br>
         Description:<br>
         <textarea name="description" id="descriptionTextBox" style="width:200px; height:100px;" value=""></textarea><br>
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
-        <button class="button" onclick="addBudget()">Insert</button>
+        <button class="button" onclick="addRecurrence()">Insert</button>
     {% endif %}
 
 </form>
 
-<p>Click the "Submit" button to save the budget.</p>
+<p>Click the "Submit" button to save the recurrence.</p>
 
-<script src="/static/js/addBudget.js"></script>
+<script src="/static/js/addRecurrence.js"></script>
 
 </body>

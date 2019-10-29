@@ -9,16 +9,18 @@
 </head>
 
 <body>
+    <button class="btn timeline" onclick="location.href='{{prefix}}/site/timeline'">Timeline</button>
     <button class="btn transactions" onclick="location.href='{{prefix}}/site/transactions'">Transaction</button>
-    <button class="btn budgets" onclick="location.href='{{prefix}}/site/budgets'">Budgets</button>
+    <button class="btn recurrences" onclick="location.href='{{prefix}}/site/recurrences'">Recurrences</button>
     <button class="btn add_transaction" onclick="location.href='{{prefix}}/site/add_transaction'">Add Transaction</button>
-    <button class="btn add_budget" onclick="location.href='{{prefix}}/site/add_budget'">Add Budget</button>
+    <button class="btn add_recurrence" onclick="location.href='{{prefix}}/site/add_recurrence'">Add Recurrence</button>
 
 <form>
     {% if transaction != None %}
 
         Title: <input type="text" id="titleTextBoxU" name="title" value="{{transaction.title}}"><br>
         Amount: <input type="text" id="amountTextBoxU" name="amount" value="{{transaction.amount}}"><br>
+        Credit Card (statement and type): <input type="text" id="creditCardTypeU" name="amount" value="{{transaction.credit_card}}"><br>
         Categories: <input type="text" id="mySelectCategoryU" name="category" value="{{",".join(transaction.get_categories())}}"><br>
         Date: <input type="text" id="dateTextBoxU" name="date" value="{{transaction.date}}"><br>
 
@@ -39,10 +41,11 @@
     {% else %}
         Title: <input type="text" id="titleTextBox" name="title" value=""><br>
         Amount: <input type="text" id="amountTextBox" name="amount" value=""><br>
+        Credit Card (statement and type): <input type="text" id="creditCardType" name="amount" placeholder="2019" value=""><br>
         Category:
         <select id="mySelectCategory">
-            {% for budget in budgets %}
-                <option value="{{budget.category.name}}">{{budget.category.name}}</option>
+            {% for recurrence in recurrences %}
+                <option value="{{recurrence.category.name}}">{{recurrence.category.name}}</option>
             {% endfor %}
         </select><br>
         Secondary Categories: <input type="text" id="mySelectCategories" name="secondary_categories" value=""><br>

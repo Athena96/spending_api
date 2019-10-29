@@ -1,4 +1,21 @@
 from datetime import datetime
+from enum import Enum
+from datetime import timedelta
+from utilities import get_variable_recurrence_transactions
+
+class RecurrenceType(Enum):
+    INCOME = 1
+    EXPENSE = 2
+
+class BalanceRow:
+
+    def __init__(self, balance_date, balance, income, expense, income_desc, expenses_desc):
+        self.balance_date = balance_date
+        self.balance = balance
+        self.income = income
+        self.expense = expense
+        self.income_desc = income_desc
+        self.expenses_desc = expenses_desc
 
 class Category:
 
@@ -14,7 +31,7 @@ class Category:
 
 class Transaction:
 
-    def __init__(self, title, amount, category, date, description=None, transaction_id=None):
+    def __init__(self, title, amount, category, date, description=None, credit_card=None, transaction_id=None):
         # this constructor should really just be assignments... this conversion should happen in another file.
         self.title = title
         self.amount = float(amount)
@@ -30,6 +47,7 @@ class Transaction:
         self.category = categories
         self.date = date
         self.description = description
+        self.credit_card = credit_card
         self.transaction_id = transaction_id
 
     def get_transaction_day(self):
@@ -60,16 +78,23 @@ class Transaction:
     def get_categories(self,):
         return list([c.name for c in self.category])
 
-class Budget:
+class Recurrence:
 
-    def __init__(self, category, amount, amount_frequency, start_date, end_date, description=None, budget_id=None):
+    def __init__(self, category, amount, amount_frequency, start_date, end_date, description=None, recurrence_id=None, type=None, repeat_start_date=None, days_till_repeat=None):
+        self.type = RecurrenceType.EXPENSE if type is None else type
         self.amount = float(amount)
-        self.category = Category(name=category, is_income=True if self.amount > 0 else False)
+        self.category = Category(name=category, is_income=True if self.type == RecurrenceType.INCOME else False)
         self.amount_frequency = amount_frequency
         self.start_date = start_date
         self.end_date = end_date
         self.description = description
-        self.budget_id = budget_id
+        self.recurrence_id = recurrence_id
+
+        self.repeat_start_date = repeat_start_date
+        self.days_till_repeat = days_till_repeat
+
+        # start's on DATE, then repeats every x days (could be 14days, every other week) every 30 days 1x a month
+
 
     def to_dict(self):
         contents = {}
@@ -79,13 +104,27 @@ class Budget:
         contents["start_date"] = self.start_date
         contents["end_date"] = self.end_date
         contents["description"] = self.description
-        contents["budget_id"] = self.budget_id
+        contents["type"] = self.type
+        contents["repeat_start_date"] = self.repeat_start_date
+        contents["days_till_repeat"] = self.days_till_repeat
+        contents["recurrence_id"] = self.recurrence_id
         return contents
 
-class Period(Budget):
+    def generate_txn_days_in_range(self, clac_start_date, calc_end_date):
+        txn_day = self.repeat_start_date
+        txn_days = [txn_day]
 
-    def __init__(self, category, amount, start_date, end_date, description=None, budget_id=None):
-        Budget.__init__(self, category, amount, "period", start_date, end_date, description=description, budget_id=budget_id)
+        while txn_day < calc_end_date and self.days_till_repeat != 0:
+            if txn_day >= clac_start_date and txn_day <= calc_end_date:
+                txn_days.append(txn_day)
+            txn_day = txn_day + timedelta(days=self.days_till_repeat)
+
+        return txn_days
+
+class Period(Recurrence):
+
+    def __init__(self, category, amount, start_date, end_date, description=None, recurrence_id=None, type=None, repeat_start_date=None, days_till_repeat=None):
+        Recurrence.__init__(self, category, amount, "period", start_date, end_date, description=description, recurrence_id=recurrence_id, type=type)
 
     def get_date_month_year(self, is_start_date):
         if is_start_date:
@@ -93,22 +132,24 @@ class Period(Budget):
         else:
             return "{}-{}-{}_{}:{}:{}".format(self.end_date[0:4], self.end_date[5:7], self.end_date[8:10], self.end_date[11:13], self.end_date[14:16], self.end_date[17:19])
 
-class BudgetPageInfo:
+class RecurrencePageInfo:
 
-    def __init__(self, budget, spent_so_far_month, spent_so_far_year, spent_so_far_period=None):
-        self.budget = budget
+    def __init__(self, recurrence, spent_so_far_month, spent_so_far_year, spent_so_far_period=None):
+        self.recurrence = recurrence
 
-        if type(budget) is Period:
-            self.spent_so_far_period = spent_so_far_period
-            self.percent_period = (spent_so_far_period / budget.amount)
-            self.remaining_period = "{}".format(round((budget.amount - spent_so_far_period),2))
+        if type(recurrence) is Period or recurrence.amount_frequency == "variable":
+            tot = 500.0 if "prime" in recurrence.category.name else 60.0
+            self.spent_so_far_period = tot
+
+            self.percent_period = (spent_so_far_period / tot)
+            self.remaining_period = "{}".format(round((tot - spent_so_far_period), 2))
         else:
-            self.percent_month = (spent_so_far_month / (budget.amount if budget.amount_frequency == "month" else (budget.amount / 12.0) ))
-            self.percent_year = (spent_so_far_year / (budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0) ))
-            if budget.amount_frequency == "month":
-                self.remaining_month = "{}".format(round((budget.amount - spent_so_far_month),2))
+            self.percent_month = (spent_so_far_month / (recurrence.amount if recurrence.amount_frequency == "month" else (recurrence.amount / 12.0)))
+            self.percent_year = (spent_so_far_year / (recurrence.amount if recurrence.amount_frequency == "year" else (recurrence.amount * 12.0)))
+            if recurrence.amount_frequency == "month":
+                self.remaining_month = "{}".format(round((recurrence.amount - spent_so_far_month), 2))
 
-            self.remaining_year = "{}".format(round(((budget.amount if budget.amount_frequency == "year" else (budget.amount * 12.0)) - spent_so_far_year),2))
+            self.remaining_year = "{}".format(round(((recurrence.amount if recurrence.amount_frequency == "year" else (recurrence.amount * 12.0)) - spent_so_far_year), 2))
 
         self.spent_so_far_month = "{}".format(round(spent_so_far_month, 2))
         self.spent_so_far_year = "{}".format(round(spent_so_far_year, 2))
