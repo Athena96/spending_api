@@ -15,7 +15,7 @@ class TimelineGenerator:
         self.days_to_genrate = (days_in_month * months_to_generate)
         self.duration = timedelta(days=self.days_to_genrate)
         self.end_date = self.start_date + self.duration
-        self.starting_balance = 2400.0
+        self.starting_balance = 2060.08
         self.db_comms = db_comm
 
     def get_recurrences_for_day(self, date, recurrence_type):

@@ -9,13 +9,20 @@ class RecurrenceType(Enum):
 
 class BalanceRow:
 
-    def __init__(self, balance_date, balance, income, expense, income_desc, expenses_desc):
+    def __init__(self, balance_date, balance, income, expense, income_desc, expenses_desc, bal_percent=None):
         self.balance_date = balance_date
         self.balance = balance
         self.income = income
         self.expense = expense
         self.income_desc = income_desc
         self.expenses_desc = expenses_desc
+        if balance >= 2374.75:
+            self.bal_percent_color = "green"
+        elif balance < 2374.75 and balance > 100.00:
+            self.bal_percent_color = "orange"
+        else:
+            self.bal_percent_color = "red"
+
 
 class Category:
 
