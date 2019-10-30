@@ -22,8 +22,17 @@ DATABASE = ""
 ENVIRONMENT = ""
 db_comm = None
 with app.app_context():
-    file = current_app.open_resource('path_to_DB.txt')
-    DATABASE = str(file.read().decode("utf-8")).replace('\n','')
+    file = current_app.open_resource('app.properties')
+    text = str(file.read().decode("utf-8"))
+    parts = text.split("\n")
+    DATABASE = parts[0].split("=")[1]
+    STARTING_BAL = float(parts[1].split("=")[1])
+    MONTHS_GENERATED = int(parts[2].split("=")[1])
+
+    print("DATABASE: ",DATABASE)
+    print("STARTING_BAL: ",STARTING_BAL)
+    print("MONTHS_GENERATED: ",MONTHS_GENERATED)
+
     db_comm = DBCommms(DATABASE)
     if "inherentVice" in DATABASE:
         ENVIRONMENT = "http://inherentvice.pythonanywhere.com"
@@ -36,7 +45,7 @@ with app.app_context():
 def timeline_page():
     print("timeline_page()")
     recurrences = db_comm.get_recurrences(datetime.now())
-    generator = TimelineGenerator(months_to_generate=4, db_comm=db_comm, initial_recurrences=recurrences)
+    generator = TimelineGenerator(months_to_generate=MONTHS_GENERATED, db_comm=db_comm, initial_recurrences=recurrences, starting_balance=STARTING_BAL)
     table = generator.generate_table()
     last_day_bal_num = round(table[len(table)-1].balance,2)
     last_day_bal = "${}".format(last_day_bal_num)

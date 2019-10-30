@@ -121,7 +121,6 @@ class DBCommms:
 
         cmd = "select * from ledger where ledger.credit_card like '{}'".format(recurrence.category.name)
         self.cursor.execute(cmd)
-        print(cmd)
 
         return self.extract_transactions(self.cursor)
 

@@ -8,14 +8,14 @@ from utilities import is_valid_or_none
 
 class TimelineGenerator:
 
-    def __init__(self, months_to_generate, db_comm, initial_recurrences=None):
+    def __init__(self, months_to_generate, db_comm, initial_recurrences=None, starting_balance=None):
         days_in_month = 31
         n = datetime.now()
         self.start_date = datetime(n.year,n.month,n.day)
         self.days_to_genrate = (days_in_month * months_to_generate)
         self.duration = timedelta(days=self.days_to_genrate)
         self.end_date = self.start_date + self.duration
-        self.starting_balance = 2060.08
+        self.starting_balance = starting_balance
         self.db_comms = db_comm
         self.initial_recurrences = initial_recurrences
 
