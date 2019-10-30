@@ -2,6 +2,7 @@ from datetime import datetime
 from enum import Enum
 from datetime import timedelta
 from utilities import get_variable_recurrence_transactions
+from utilities import string_to_date
 
 class RecurrenceType(Enum):
     INCOME = 1
@@ -120,6 +121,10 @@ class Recurrence:
     def generate_txn_days_in_range(self, clac_start_date, calc_end_date):
         txn_day = self.repeat_start_date
         txn_days = [txn_day]
+
+        e = string_to_date(self.end_date)
+        if e < calc_end_date:
+            calc_end_date = e
 
         while txn_day < calc_end_date and self.days_till_repeat != 0:
             if txn_day >= clac_start_date and txn_day <= calc_end_date:

@@ -8,8 +8,8 @@ from utilities import is_valid_or_none
 
 class TimelineGenerator:
 
-    def __init__(self, months_to_generate, db_comm):
-        days_in_month = 30
+    def __init__(self, months_to_generate, db_comm, initial_recurrences=None):
+        days_in_month = 31
         n = datetime.now()
         self.start_date = datetime(n.year,n.month,n.day)
         self.days_to_genrate = (days_in_month * months_to_generate)
@@ -17,20 +17,21 @@ class TimelineGenerator:
         self.end_date = self.start_date + self.duration
         self.starting_balance = 2060.08
         self.db_comms = db_comm
+        self.initial_recurrences = initial_recurrences
 
     def get_recurrences_for_day(self, date, recurrence_type):
         todays_recurrences = []
-        recurrences = list(filter(lambda x: is_valid_or_none(x.repeat_start_date) is not None, self.db_comms.get_recurrences(date)))
+        recurrences = list(filter(lambda x: is_valid_or_none(x.repeat_start_date) is not None, self.initial_recurrences))
         todays_uncat_recurr = [] # todo
 
         for recurrence in recurrences:
             if recurrence_type == recurrence.type and date in recurrence.generate_txn_days_in_range(self.start_date, self.end_date):
                 if recurrence.days_till_repeat == 0 and "variable" in recurrence.amount_frequency and recurrence.amount == 0.0:
-                    var_txns = get_variable_recurrence_transactions(self.db_comms, recurrence)
+                    var_txns = self.db_comms.get_cc_transactions_for_statement(recurrence)
                     recurrence.amount = sum([x.amount for x in var_txns])
                 todays_recurrences.append(recurrence)
 
-        total_amnt = sum([x.amount for x in todays_recurrences])
+        total_amnt = round(sum([x.amount for x in todays_recurrences]),2)
         total_descriptions = ",\r\n".join([x.description for x in todays_recurrences])
         return (total_amnt, total_descriptions)
 

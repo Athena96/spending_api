@@ -35,10 +35,13 @@ with app.app_context():
 @app.route("/site/timeline", methods=["GET"])
 def timeline_page():
     print("timeline_page()")
-
-    generator = TimelineGenerator(months_to_generate=6, db_comm=db_comm)
+    recurrences = db_comm.get_recurrences(datetime.now())
+    generator = TimelineGenerator(months_to_generate=4, db_comm=db_comm, initial_recurrences=recurrences)
     table = generator.generate_table()
-    return render_template('timeline.html', timeline_table=table, prefix=ENVIRONMENT)
+    last_day_bal_num = round(table[len(table)-1].balance,2)
+    last_day_bal = "${}".format(last_day_bal_num)
+    last_day_bal_dff = "${}".format(round((last_day_bal_num-2374.75), 2))
+    return render_template('timeline.html', timeline_table=table, last_day_bal=last_day_bal, last_day_bal_dff=last_day_bal_dff, prefix=ENVIRONMENT)
 
 # Website page handlers: Transactions
 
@@ -53,7 +56,7 @@ def transactions_root_page():
 @app.route("/site/add_transaction/<string:transaction_id>", methods=["GET"])
 def add_transaction_page(transaction_id=None):
     print("add_transaction_page()")
-    
+
     transaction = db_comm.get_transaction(transaction_id)
     recurrences = db_comm.get_recurrences(datetime.now())
     return render_template('add_transaction.html', transaction=transaction, recurrences=recurrences, prefix=ENVIRONMENT)

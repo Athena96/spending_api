@@ -119,7 +119,7 @@ class DBCommms:
         print("     " + "get_cc_transactions_for_statement(recurrence:{})".format(recurrence.to_dict()))
         (self.db_conn, self.cursor) = self.get_instance()
 
-        cmd = "select * from ledger where ledger.credit_card like '%{}%'".format(recurrence.category.name)
+        cmd = "select * from ledger where ledger.credit_card like '{}'".format(recurrence.category.name)
         self.cursor.execute(cmd)
         print(cmd)
 
