@@ -10,10 +10,10 @@ function addTransaction() {
     }
     var amount = document.getElementById("amountTextBox").value;
     var creditCard = document.getElementById("creditCardType").value;
-
-    if (!category.includes("income")) {
-        amount = amount * -1.0;
+    if (creditCard == "" || creditCard == null || creditCard == " ") {
+        creditCard = null;
     }
+
     var date = document.getElementById("dateTextBox").value;
     if (date == "" || date == null) {
         var currentDate = new Date();
@@ -55,7 +55,9 @@ function updateTransaction(transaction_id) {
     var title = document.getElementById("titleTextBoxU").value;
     var amount = document.getElementById("amountTextBoxU").value;
     var creditCard = document.getElementById("creditCardTypeU").value;
-
+    if (creditCard == "" || creditCard == null || creditCard == " ") {
+        creditCard = null;
+    }
     var category = document.getElementById("mySelectCategoryU").value;
     var date = document.getElementById("dateTextBoxU").value;
     var description = document.getElementById("descriptionTextBoxU").value;

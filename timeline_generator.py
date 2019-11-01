@@ -37,11 +37,12 @@ class TimelineGenerator:
 
     def generate_table(self):
         rows = []
-        previous_bal = None
+        previous_bal = self.starting_balance
         for date in ([self.start_date + timedelta(days=x) for x in range(self.days_to_genrate)]):
+            print("date",date)
             (incomes, income_desc) = self.get_recurrences_for_day(date, RecurrenceType.INCOME)
             (expenses, expenses_desc) = self.get_recurrences_for_day(date, RecurrenceType.EXPENSE)
-            balance = self.starting_balance if previous_bal is None else (previous_bal + incomes - expenses)
+            balance = (previous_bal + incomes - expenses)
             balance = round(balance, 2)
             previous_bal = balance
             rows.append(BalanceRow(balance_date=date, balance=balance, income=incomes, income_desc=income_desc, expense=expenses, expenses_desc=expenses_desc))

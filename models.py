@@ -81,6 +81,8 @@ class Transaction:
         contents["category"] = self.category[0].name
         contents["date"] = self.date
         contents["description"] = self.description
+        contents["credit_card"] = self.credit_card
+
         return contents
 
     def get_categories(self,):

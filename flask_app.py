@@ -223,8 +223,9 @@ def add_transaction(title, amount, category, date, description, credit_card):
     print("[api] add_transaction()")
     # todo 1) send null txID here, 2) abstract out the duplicate code here and in update_transaction
     description = None if description == "null" else description
-    credit_card = None if is_valid_or_none(credit_card) is None else credit_card
+    credit_card = is_valid_or_none(credit_card)
     transaction = Transaction(title=title, amount=amount, category=category, date=date, description=description, credit_card=credit_card)
+    print("ADD TXN: ", transaction.to_dict())
     return db_comm.add_transaction(transaction)
 
 @app.route('/transactions/<string:transaction_id>/<string:title>/<string:amount>/<string:category>/<string:date>/<string:description>/<string:credit_card>', methods=['PUT'])

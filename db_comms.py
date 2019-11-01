@@ -30,8 +30,8 @@ class DBCommms:
 
         sql_note = "NULL" if (transaction.description == None) else "'{0}'".format(transaction.description)
 
-        cmd = """INSERT INTO ledger (title, amount, category, date, description) VALUES ('{0}', {1}, '{2}', '{3}', {4})""".format(transaction.title,
-            transaction.amount, ",".join(transaction.get_categories()), transaction.date, sql_note)
+        cmd = """INSERT INTO ledger (title, amount, category, date, description, credit_card) VALUES ('{0}', {1}, '{2}', '{3}', {4}, '{5}')""".format(transaction.title,
+            transaction.amount, ",".join(transaction.get_categories()), transaction.date, sql_note, transaction.credit_card)
         self.cursor.execute(cmd)
         self.db_conn.commit()
         self.db_conn.close()
@@ -63,8 +63,8 @@ class DBCommms:
 
         sql_note = "NULL" if (transaction.description == None) else "'{0}'".format(transaction.description)
 
-        cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = {4} WHERE ledger.transaction_id = {5}""".format(transaction.title,
-        transaction.amount, ",".join(transaction.get_categories()), transaction.date, sql_note, transaction.transaction_id)
+        cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = {4}, credit_card = '{5}' WHERE ledger.transaction_id = {6}""".format(transaction.title,
+        transaction.amount, ",".join(transaction.get_categories()), transaction.date, sql_note, transaction.credit_card, transaction.transaction_id)
         self.cursor.execute(cmd)
         self.db_conn.commit()
         print(cmd)
