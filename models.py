@@ -19,7 +19,7 @@ class BalanceRow:
         self.expenses_desc = expenses_desc
         if balance >= 2374.75:
             self.bal_percent_color = "green"
-        elif balance < 2374.75 and balance > 100.00:
+        elif balance < 2374.75 and balance > 1187.375:
             self.bal_percent_color = "orange"
         else:
             self.bal_percent_color = "red"

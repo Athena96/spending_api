@@ -50,7 +50,13 @@ def timeline_page():
     last_day_bal_num = round(table[len(table)-1].balance,2)
     last_day_bal = "${}".format(last_day_bal_num)
     last_day_bal_dff = "${}".format(round((last_day_bal_num-2374.75), 2))
-    return render_template('timeline.html', timeline_table=table, last_day_bal=last_day_bal, last_day_bal_dff=last_day_bal_dff, prefix=ENVIRONMENT)
+    print("HERE", generator.green, generator.yellow, generator.red)
+    return render_template('timeline.html', timeline_table=table, last_day_bal=last_day_bal,
+                           last_day_bal_dff=last_day_bal_dff,
+                           greens=generator.green,
+                           yellows=generator.yellow,
+                           reds=generator.red,
+                           prefix=ENVIRONMENT)
 
 # Website page handlers: Transactions
 

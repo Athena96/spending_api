@@ -18,6 +18,9 @@ class TimelineGenerator:
         self.starting_balance = starting_balance
         self.db_comms = db_comm
         self.initial_recurrences = initial_recurrences
+        self.green = 0.0
+        self.yellow = 0.0
+        self.red = 0.0
 
     def get_recurrences_for_day(self, date, recurrence_type):
         todays_recurrences = []
@@ -38,12 +41,27 @@ class TimelineGenerator:
     def generate_table(self):
         rows = []
         previous_bal = self.starting_balance
+        greens = 0
+        yellows = 0
+        reds = 0
+
         for date in ([self.start_date + timedelta(days=x) for x in range(self.days_to_genrate)]):
-            print("date",date)
             (incomes, income_desc) = self.get_recurrences_for_day(date, RecurrenceType.INCOME)
             (expenses, expenses_desc) = self.get_recurrences_for_day(date, RecurrenceType.EXPENSE)
             balance = (previous_bal + incomes - expenses)
             balance = round(balance, 2)
             previous_bal = balance
-            rows.append(BalanceRow(balance_date=date, balance=balance, income=incomes, income_desc=income_desc, expense=expenses, expenses_desc=expenses_desc))
+            br = BalanceRow(balance_date=date, balance=balance, income=incomes, income_desc=income_desc, expense=expenses, expenses_desc=expenses_desc)
+            rows.append(br)
+            if br.bal_percent_color == "green":
+                greens += 1
+            elif br.bal_percent_color == "orange":
+                yellows += 1
+            else:
+                reds += 1
+
+        tot = greens + reds + yellows
+        self.green = round(float(greens)/tot, 2)
+        self.yellow = round(float(yellows)/tot, 2)
+        self.red = round(float(reds)/tot, 2)
         return rows
