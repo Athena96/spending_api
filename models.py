@@ -39,7 +39,7 @@ class Category:
 
 class Transaction:
 
-    def __init__(self, title, amount, category, date, description=None, credit_card=None, transaction_id=None):
+    def __init__(self, title, amount, category, date, description=None, var_txn_tracking=None, transaction_id=None):
         # this constructor should really just be assignments... this conversion should happen in another file.
         self.title = title
         self.amount = float(amount)
@@ -55,7 +55,7 @@ class Transaction:
         self.category = categories
         self.date = date
         self.description = description
-        self.credit_card = credit_card
+        self.var_txn_tracking = var_txn_tracking
         self.transaction_id = transaction_id
 
     def get_transaction_day(self):
@@ -81,7 +81,7 @@ class Transaction:
         contents["category"] = self.category[0].name
         contents["date"] = self.date
         contents["description"] = self.description
-        contents["credit_card"] = self.credit_card
+        contents["var_txn_tracking"] = self.var_txn_tracking
 
         return contents
 

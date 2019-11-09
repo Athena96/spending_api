@@ -9,9 +9,9 @@ function addTransaction() {
         final_cat = final_cat + "," + categories;
     }
     var amount = document.getElementById("amountTextBox").value;
-    var creditCard = document.getElementById("creditCardType").value;
-    if (creditCard == "" || creditCard == null || creditCard == " ") {
-        creditCard = null;
+    var varTxnTrackingCode = document.getElementById("varTxnTrackingCode").value;
+    if (varTxnTrackingCode == "" || varTxnTrackingCode == null || varTxnTrackingCode == " ") {
+        varTxnTrackingCode = null;
     }
 
     var date = document.getElementById("dateTextBox").value;
@@ -31,7 +31,7 @@ function addTransaction() {
     }
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/transactions/" + title + "/" + amount + "/" + final_cat + "/" + date + "/" + description + "/" + creditCard;
+    var url_tmp = prefix + "/transactions/" + title + "/" + amount + "/" + final_cat + "/" + date + "/" + description + "/" + varTxnTrackingCode;
     var url = url_tmp.replace(" ", "%20");
 
     if (prefix == "http://inherentvice.pythonanywhere.com") {
@@ -54,9 +54,9 @@ function updateTransaction(transaction_id) {
 
     var title = document.getElementById("titleTextBoxU").value;
     var amount = document.getElementById("amountTextBoxU").value;
-    var creditCard = document.getElementById("creditCardTypeU").value;
-    if (creditCard == "" || creditCard == null || creditCard == " ") {
-        creditCard = null;
+    var varTxnTrackingCode = document.getElementById("varTxnTrackingCodeU").value;
+    if (varTxnTrackingCode == "" || varTxnTrackingCode == null || varTxnTrackingCode == " ") {
+        varTxnTrackingCode = null;
     }
     var category = document.getElementById("mySelectCategoryU").value;
     var date = document.getElementById("dateTextBoxU").value;
@@ -67,7 +67,7 @@ function updateTransaction(transaction_id) {
     var passcode = document.getElementById("passcodeTextBoxU").value;
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/transactions/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + description + "/" + creditCard;
+    var url_tmp = prefix + "/transactions/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + description + "/" + varTxnTrackingCode;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.withCredentials = true;

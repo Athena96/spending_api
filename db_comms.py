@@ -30,8 +30,8 @@ class DBCommms:
 
         sql_note = "NULL" if (transaction.description == None) else "'{0}'".format(transaction.description)
 
-        cmd = """INSERT INTO ledger (title, amount, category, date, description, credit_card) VALUES ('{0}', {1}, '{2}', '{3}', {4}, '{5}')""".format(transaction.title,
-            transaction.amount, ",".join(transaction.get_categories()), transaction.date, sql_note, transaction.credit_card)
+        cmd = """INSERT INTO ledger (title, amount, category, date, description, var_txn_tracking) VALUES ('{0}', {1}, '{2}', '{3}', {4}, '{5}')""".format(transaction.title,
+            transaction.amount, ",".join(transaction.get_categories()), transaction.date, sql_note, transaction.var_txn_tracking)
         self.cursor.execute(cmd)
         self.db_conn.commit()
         self.db_conn.close()
@@ -63,8 +63,8 @@ class DBCommms:
 
         sql_note = "NULL" if (transaction.description == None) else "'{0}'".format(transaction.description)
 
-        cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = {4}, credit_card = '{5}' WHERE ledger.transaction_id = {6}""".format(transaction.title,
-        transaction.amount, ",".join(transaction.get_categories()), transaction.date, sql_note, transaction.credit_card, transaction.transaction_id)
+        cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = {4}, var_txn_tracking = '{5}' WHERE ledger.transaction_id = {6}""".format(transaction.title,
+        transaction.amount, ",".join(transaction.get_categories()), transaction.date, sql_note, transaction.var_txn_tracking, transaction.transaction_id)
         self.cursor.execute(cmd)
         self.db_conn.commit()
         print(cmd)
@@ -119,7 +119,7 @@ class DBCommms:
         print("     " + "get_cc_transactions_for_statement(recurrence:{})".format(recurrence.to_dict()))
         (self.db_conn, self.cursor) = self.get_instance()
 
-        cmd = "select * from ledger where ledger.credit_card like '{}'".format(recurrence.category.name)
+        cmd = "select * from ledger where ledger.var_txn_tracking like '{}'".format(recurrence.category.name)
         self.cursor.execute(cmd)
 
         return self.extract_transactions(self.cursor)
@@ -255,9 +255,9 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "extract_transactions()")
         data = []
-        for transaction_id, title, amount, category, date, description, credit_card in cursor:
+        for transaction_id, title, amount, category, date, description, var_txn_tracking in cursor:
             description = None if description == "null" else description
-            transaction = Transaction(title, amount, category, date, description, credit_card, transaction_id)
+            transaction = Transaction(title, amount, category, date, description, var_txn_tracking, transaction_id)
             data.append(transaction)
         return data
 

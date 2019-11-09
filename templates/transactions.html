@@ -37,7 +37,7 @@
                 <th>Amount</th>
                 <th>Category</th>
                 <th>Date</th>
-                <th>Credit Card</th>
+                <th>Variable Transaction Tracking</th>
                 <th>Description</th>
                 <th>Delete</th>
             </tr>
@@ -49,8 +49,8 @@
                     <td>${{ transaction.amount }}</td>
                     <td>{{ transaction.get_categories() }}</td>
                     <td>{{ transaction.date }}</td>
-                    {% if transaction.credit_card != None %}
-                        <td>{{ transaction.credit_card }}</td>
+                    {% if transaction.var_txn_tracking != None %}
+                        <td>{{ transaction.var_txn_tracking }}</td>
                     {% else %}
                         <td></td>
                     {% endif %}
