@@ -13,146 +13,58 @@
 
 <body>
     <button class="btn timeline" onclick="location.href='{{prefix}}/site/timeline'">Timeline</button>
-    <button class="btn transactions" onclick="location.href='{{prefix}}/site/transactions'">Transaction</button>
+    <button class="btn summary" onclick="location.href='{{prefix}}/site/summary'">Summary</button>
+    <button class="btn transactions" onclick="location.href='{{prefix}}/site/transactions'">Transactions</button>
     <button class="btn recurrences" onclick="location.href='{{prefix}}/site/recurrences'">Recurrences</button>
     <button class="btn add_transaction" onclick="location.href='{{prefix}}/site/add_transaction'">Add Transaction</button>
     <button class="btn add_recurrence" onclick="location.href='{{prefix}}/site/add_recurrence'">Add Recurrence</button>
 
-<h2>Recurrences for {{month}}/{{year}}</h2>
-<h3>Total Spent for {{month}}/{{year}}: ${{spent_in_month}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Income for {{month}}/{{year}}: ${{month_income}}</h3>
-<h3>Total Spent for {{year}}: ${{spent_in_year}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Income for {{year}}: ${{year_income}}</h3>
+    <p>
+        <br />
+    </p>
 
-<p>
-    <br />
-</p>
+        <table class="a">
 
-<h2>Month Recurrence</h2>
-<table class="a">
-  <tr>
-    <th>Category <i>(click to edit)</i></th>
-    <th>Spent Month</th>
-    <th>Spent Year</th>
-    <th>Recurrence Alloc</th>
-    <th>Remaining Month</th>
-  </tr>
-  {% for recurrence_info in month_recurrences %}
-    <tr>
-        <td><p><button class="btnSmall select" id="{{recurrence_info.recurrence.recurrence_id}}" onclick="openUpdatePage(this.id)"><b><u>{{ recurrence_info.recurrence.category.name }}</u></b></button></p></td>
-        <td><button class="btnSmall select" id="month_year#{{recurrence_info.recurrence.category.name}}#{{month}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ recurrence_info.spent_so_far_month }}</u></button></td>
-        <td><button class="btnSmall select" id="year#{{recurrence_info.recurrence.category.name}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{recurrence_info.spent_so_far_year }}</u></button></td>
-        <td>${{ recurrence_info.recurrence.amount }}</td>
-        {% if recurrence_info.percent_month >=  0.0 and recurrence_info.percent_month <  0.85 %}
-            <td><font color="green">${{ recurrence_info.remaining_month }}</font></td>
-        {% else %}
-            {% if recurrence_info.percent_month >= 0.85 and  recurrence_info.percent_month < 0.99 %}
-                <td><font color="orange">${{ recurrence_info.remaining_month }}</font></td>
-            {% else %}
-                {% if recurrence_info.percent_month >= 0.99 and  recurrence_info.percent_month <= 1.00 %}
-                    <td><font color="blue">${{ recurrence_info.remaining_month }}</font></td>
-                {% else %}
-                    <td><font color="red">${{ recurrence_info.remaining_month }}</font></td>
-                {% endif %}
-            {% endif %}
-        {% endif %}
-    </tr>
-  {% endfor %}
-</table>
+            <tr>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Recurrence Type</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Days Till Repeat</th>
+                <th>Day of Month</th>
+            </tr>
 
-<p>
-</p>
+            {% for recurrence in recurrences %}
 
-<h2>Year recurrences</h2>
-<table class="a">
-  <tr>
-    <th>Category <i>(click to edit)</i></th>
-    <th>Spent Month</th>
-    <th>Spent Year</th>
-    <th>Recurrence Alloc</th>
-    <th>Remaining Year</th>
-  </tr>
-  {% for recurrence_info in year_recurrences %}
-    <tr>
-        <td><p><button class="btnSmall select" id="{{recurrence_info.recurrence.recurrence_id}}" onclick="openUpdatePage(this.id)"><b><u>{{ recurrence_info.recurrence.category.name }}</u></b></button></p></td>
-        <td><button class="btnSmall select" id="month_year#{{recurrence_info.recurrence.category.name}}#{{month}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ recurrence_info.spent_so_far_month }}</u></button></td>
-        <td><button class="btnSmall select" id="year#{{recurrence_info.recurrence.category.name}}#{{year}}" onclick="openPurhcasesPage(this.id)"><u>${{ recurrence_info.spent_so_far_year }}</u></button></td>
-        <td>${{ recurrence_info.recurrence.amount }}</td>
+                <tr>
+                    <td>{{ recurrence.name }}</td>
+                    <td>${{ recurrence.amount }}</td>
+                    <td>{{ recurrence.description }}</td>
+                    <td>{{ recurrence.rec_type }}</td>
+                    <td>{{ recurrence.start_date }}</td>
+                    <td>{{ recurrence.end_date }}</td>
+                    {% if recurrence.days_till_repeat != None %}
+                        <td>{{ recurrence.days_till_repeat }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                    {% if recurrence.day_of_month != None %}
+                        <td>{{ recurrence.day_of_month }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                </tr>
 
-        {% if recurrence_info.percent_year >=  0.0 and recurrence_info.percent_year <  0.85 %}
-            <td><font color="green">${{ recurrence_info.remaining_year }}</font></td>
-        {% else %}
-            {% if recurrence_info.percent_year >= 0.85 and  recurrence_info.percent_year < 0.99 %}
-                <td><font color="orange">${{ recurrence_info.remaining_year }}</font></td>
-            {% else %}
-                {% if recurrence_info.percent_year >= 0.99 and  recurrence_info.percent_year <= 1.00 %}
-                    <td><font color="blue">${{ recurrence_info.remaining_year }}</font></td>
-                {% else %}
-                    <td><font color="red">${{ recurrence_info.remaining_year }}</font></td>
-                {% endif %}
-            {% endif %}
-        {% endif %}
-    </tr>
-  {% endfor %}
-</table>
+            {% endfor %}
 
-<h2>Period recurrences</h2>
-<table class="a">
-  <tr>
-    <th>Category <i>(click to edit)</i></th>
-    <th>Spent Period</th>
-    <th>Recurrence Alloc</th>
-    <th>Remaining Period</th>
-  </tr>
-  {% for recurrence_info in period_recurrences %}
-    <tr>
-        <td><p><button class="btnSmall select" id="{{recurrence_info.recurrence.recurrence_id}}" onclick="openUpdatePage(this.id)"><b><u>{{ recurrence_info.recurrence.category.name }}</u></b></button></p></td>
-        <td><button class="btnSmall select" id="period#{{recurrence_info.recurrence.get_date_month_year(true)}}#{{recurrence_info.recurrence.get_date_month_year(false)}}#{{recurrence_info.recurrence.category.name}}" onclick="openPurhcasesPage(this.id)"><u>${{ recurrence_info.spent_so_far_period }}</u></button></td>
-        <td>${{ recurrence_info.recurrence.amount }}</td>
-        {% if recurrence_info.percent_period >=  0.0 and recurrence_info.percent_period <  0.85 %}
-            <td><font color="green">${{ recurrence_info.remaining_period }}</font></td>
-        {% else %}
-            {% if recurrence_info.percent_period >= 0.85 and  recurrence_info.percent_period < 0.99 %}
-                <td><font color="orange">${{ recurrence_info.remaining_period }}</font></td>
-            {% else %}
-                {% if recurrence_info.percent_period >= 0.99 and  recurrence_info.percent_period <= 1.00 %}
-                    <td><font color="blue">${{ recurrence_info.remaining_period }}</font></td>
-                {% else %}
-                    <td><font color="red">${{ recurrence_info.remaining_period }}</font></td>
-                {% endif %}
-            {% endif %}
-        {% endif %}
-    </tr>
-  {% endfor %}
-</table>
+        </table>
 
-<h2>Variable recurrences</h2>
-<table class="a">
-  <tr>
-    <th>Category <i>(click to edit)</i></th>
-    <th>Spent Period</th>
-    <th>Recurrence Alloc</th>
-    <th>Remaining Period</th>
-  </tr>
-  {% for recurrence_info in variable_recurrences %}
-    <tr>
-        <td><b><u>{{ recurrence_info.recurrence.category.name }}</u></b></td>
-        <td><u>${{ recurrence_info.recurrence.amount }}</u></td>
-        <td>${{ recurrence_info.spent_so_far_period }}</td>
-        {% if recurrence_info.percent_period >=  0.0 and recurrence_info.percent_period <  0.85 %}
-            <td><font color="green">${{ recurrence_info.remaining_period }}</font></td>
-        {% else %}
-            {% if recurrence_info.percent_period >= 0.85 and  recurrence_info.percent_period < 0.99 %}
-                <td><font color="orange">${{ recurrence_info.remaining_period }}</font></td>
-            {% else %}
-                {% if recurrence_info.percent_period >= 0.99 and  recurrence_info.percent_period <= 1.00 %}
-                    <td><font color="blue">${{ recurrence_info.remaining_period }}</font></td>
-                {% else %}
-                    <td><font color="red">${{ recurrence_info.remaining_period }}</font></td>
-                {% endif %}
-            {% endif %}
-        {% endif %}
-    </tr>
-  {% endfor %}
-</table>
+    <p>
+        <br />
+    </p>
+
 
 <script src="/static/js/recurrences.js"></script>
 

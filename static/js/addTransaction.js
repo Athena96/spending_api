@@ -3,16 +3,20 @@
 function addTransaction() {
     var title = document.getElementById("titleTextBox").value;
     var category = document.getElementById("mySelectCategory").value;
-    var categories = document.getElementById("mySelectCategories").value;
-    var final_cat = category
-    if (categories != null && categories != "" ) {
-        final_cat = final_cat + "," + categories;
-    }
+    var final_cat = category;
+
     var amount = document.getElementById("amountTextBox").value;
-    var creditCard = document.getElementById("creditCardType").value;
-    if (creditCard == "" || creditCard == null || creditCard == " ") {
-        creditCard = null;
+    var varTxnTrackingCode = document.getElementById("varTxnTrackingCode").value;
+    if (varTxnTrackingCode == "" || varTxnTrackingCode == null || varTxnTrackingCode == " ") {
+        varTxnTrackingCode = null;
     }
+
+    var transactionType = document.getElementById("transactionTypeTextBox").value;
+    if (transactionType == "" || transactionType == null || transactionType == " ") {
+        transactionType = null;
+    }
+
+
 
     var date = document.getElementById("dateTextBox").value;
     if (date == "" || date == null) {
@@ -31,7 +35,7 @@ function addTransaction() {
     }
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/transactions/" + title + "/" + amount + "/" + final_cat + "/" + date + "/" + description + "/" + creditCard;
+    var url_tmp = prefix + "/transactions/" + title + "/" + amount + "/" + final_cat + "/" + date + "/" + description + "/" + varTxnTrackingCode + "/" + transactionType;
     var url = url_tmp.replace(" ", "%20");
 
     if (prefix == "http://inherentvice.pythonanywhere.com") {
@@ -54,10 +58,16 @@ function updateTransaction(transaction_id) {
 
     var title = document.getElementById("titleTextBoxU").value;
     var amount = document.getElementById("amountTextBoxU").value;
-    var creditCard = document.getElementById("creditCardTypeU").value;
-    if (creditCard == "" || creditCard == null || creditCard == " ") {
-        creditCard = null;
+    var varTxnTrackingCode = document.getElementById("varTxnTrackingCodeU").value;
+    if (varTxnTrackingCode == "" || varTxnTrackingCode == null || varTxnTrackingCode == " ") {
+        varTxnTrackingCode = null;
     }
+
+    var transactionType = document.getElementById("transactionTypeTextBoxU").value;
+    if (transactionType == "" || transactionType == null || transactionType == " ") {
+        transactionType = null;
+    }
+
     var category = document.getElementById("mySelectCategoryU").value;
     var date = document.getElementById("dateTextBoxU").value;
     var description = document.getElementById("descriptionTextBoxU").value;
@@ -67,7 +77,7 @@ function updateTransaction(transaction_id) {
     var passcode = document.getElementById("passcodeTextBoxU").value;
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/transactions/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + description + "/" + creditCard;
+    var url_tmp = prefix + "/transactions/" + transaction_id + "/" + title + "/" + amount + "/" + category + "/" + date + "/" + description + "/" + varTxnTrackingCode + "/" + transactionType;
     var url = url_tmp.replace(" ", "%20");
 
     xhr.withCredentials = true;
