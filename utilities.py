@@ -38,7 +38,12 @@ def outside_to_python_transaction(title, amount, category, date, description, va
     # amount
 
     # category
-    # multi category logic
+    categories = []
+    if (len(category.split('/')) > 1):
+        for category in category.split('/'):
+            categories.append(category)
+    else:
+        categories.append(category)
 
     # date
     # create datetime obj
@@ -55,7 +60,7 @@ def outside_to_python_transaction(title, amount, category, date, description, va
     # transaction_id
     transaction_id = is_valid_or_none(transaction_id)
 
-    return Transaction(title=title, amount=amount, category=category, date=date, description=description,
+    return Transaction(title=title, amount=amount, category=categories, date=date, description=description,
                        var_txn_tracking=var_txn_tracking, txn_type=txn_type, transaction_id=transaction_id)
 
 
@@ -63,7 +68,7 @@ def python_to_outside_transaction(transaction):
     writable_transaction = {}
     writable_transaction["title"] = transaction.title
     writable_transaction["amount"] = transaction.amount
-    writable_transaction["category"] = transaction.category
+    writable_transaction["category"] = "/".join(transaction.category)
     writable_transaction["date"] = transaction.date
     writable_transaction["description"] = SQL_NULL_or_valid(transaction.description)
     writable_transaction["var_txn_tracking"] = SQL_NULL_or_valid(transaction.var_txn_tracking)

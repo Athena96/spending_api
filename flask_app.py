@@ -190,13 +190,13 @@ def get_transactions(year=None, month=None, category="ALL"):
 def add_transaction(title, amount, category, date, description, var_txn_tracking, txn_type):
     print("[api] add_transaction()")
 
-    obj_fields = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
+    transaction = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
                                                description=description, var_txn_tracking=var_txn_tracking,
                                                txn_type=txn_type)
-    transaction = Transaction(title=obj_fields["title"], amount=obj_fields["amount"], category=obj_fields["category"],
-                              date=obj_fields["date"], description=obj_fields["description"],
-                              var_txn_tracking=obj_fields["var_txn_tracking"], txn_type=obj_fields["txn_type"],
-                              transaction_id=obj_fields["transaction_id"])
+    # transaction = Transaction(title=obj_fields["title"], amount=obj_fields["amount"], category=obj_fields["category"],
+    #                           date=obj_fields["date"], description=obj_fields["description"],
+    #                           var_txn_tracking=obj_fields["var_txn_tracking"], txn_type=obj_fields["txn_type"],
+    #                           transaction_id=obj_fields["transaction_id"])
     return db_comm.add_transaction(transaction)
 
 
@@ -206,13 +206,13 @@ def add_transaction(title, amount, category, date, description, var_txn_tracking
 def update_transaction(transaction_id, title, amount, category, date, description, var_txn_tracking, txn_type):
     print("[api] update_transaction()")
 
-    obj_fields = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
+    transaction = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
                                                description=description, var_txn_tracking=var_txn_tracking,
                                                txn_type=txn_type, transaction_id=transaction_id)
-    transaction = Transaction(title=obj_fields["title"], amount=obj_fields["amount"], category=obj_fields["category"],
-                              date=obj_fields["date"], description=obj_fields["description"],
-                              var_txn_tracking=obj_fields["var_txn_tracking"], txn_type=obj_fields["txn_type"],
-                              transaction_id=obj_fields["transaction_id"])
+    # transaction = Transaction(title=obj_fields["title"], amount=obj_fields["amount"], category=obj_fields["category"],
+    #                           date=obj_fields["date"], description=obj_fields["description"],
+    #                           var_txn_tracking=obj_fields["var_txn_tracking"], txn_type=obj_fields["txn_type"],
+    #                           transaction_id=obj_fields["transaction_id"])
     return db_comm.update_transaction(transaction)
 
 
@@ -238,13 +238,13 @@ def get_recurrences():
 def add_recurrence(name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month):
     print("[api] add_recurrence()")
 
-    obj_fields = outside_to_python_recurrence(name=name, amount=amount, description=description, rec_type=rec_type,
+    recurrence = outside_to_python_recurrence(name=name, amount=amount, description=description, rec_type=rec_type,
                                               start_date=start_date, end_date=end_date,
                                               days_till_repeat=days_till_repeat, day_of_month=day_of_month)
-    recurrence = Recurrence(name=obj_fields["name"], amount=obj_fields["amount"], description=obj_fields["description"],
-                            rec_type=obj_fields["rec_type"], start_date=obj_fields["start_date"],
-                            end_date=obj_fields["end_date"], days_till_repeat=obj_fields["days_till_repeat"],
-                            day_of_month=obj_fields["day_of_month"], recurrence_id=obj_fields["recurrence_id"])
+    # recurrence = Recurrence(name=obj_fields["name"], amount=obj_fields["amount"], description=obj_fields["description"],
+    #                         rec_type=obj_fields["rec_type"], start_date=obj_fields["start_date"],
+    #                         end_date=obj_fields["end_date"], days_till_repeat=obj_fields["days_till_repeat"],
+    #                         day_of_month=obj_fields["day_of_month"], recurrence_id=obj_fields["recurrence_id"])
     return db_comm.add_recurrence(recurrence)
 
 
@@ -255,14 +255,14 @@ def update_recurrence(recurrence_id, name, amount, description, rec_type, start_
                       day_of_month):
     print("[api] update_recurrence()")
 
-    obj_fields = outside_to_python_recurrence(name=name, amount=amount, description=description, rec_type=rec_type,
+    recurrence = outside_to_python_recurrence(name=name, amount=amount, description=description, rec_type=rec_type,
                                               start_date=start_date, end_date=end_date,
                                               days_till_repeat=days_till_repeat, day_of_month=day_of_month,
                                               recurrence_id=recurrence_id)
-    recurrence = Recurrence(name=obj_fields["name"], amount=obj_fields["amount"], description=obj_fields["description"],
-                            rec_type=obj_fields["rec_type"], start_date=obj_fields["start_date"],
-                            end_date=obj_fields["end_date"], days_till_repeat=obj_fields["days_till_repeat"],
-                            day_of_month=obj_fields["day_of_month"], recurrence_id=obj_fields["recurrence_id"])
+    # recurrence = Recurrence(name=obj_fields["name"], amount=obj_fields["amount"], description=obj_fields["description"],
+    #                         rec_type=obj_fields["rec_type"], start_date=obj_fields["start_date"],
+    #                         end_date=obj_fields["end_date"], days_till_repeat=obj_fields["days_till_repeat"],
+    #                         day_of_month=obj_fields["day_of_month"], recurrence_id=obj_fields["recurrence_id"])
     return db_comm.update_recurrence(recurrence)
 
 

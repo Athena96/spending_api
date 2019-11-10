@@ -9,6 +9,7 @@
 
 <body>
     <button class="btn timeline" onclick="location.href='{{prefix}}/site/timeline'">Timeline</button>
+    <button class="btn summary" onclick="location.href='{{prefix}}/site/aggregations'">Summary</button>
     <button class="btn transactions" onclick="location.href='{{prefix}}/site/transactions'">Transactions</button>
     <button class="btn recurrences" onclick="location.href='{{prefix}}/site/recurrences'">Recurrences</button>
     <button class="btn add_transaction" onclick="location.href='{{prefix}}/site/add_transaction'">Add Transaction</button>
@@ -40,7 +41,7 @@
         End Date: <input type="text" id="endDateTextBoxU" name="date" value="{{recurrence.end_date}}"><br>
         Repeat Start Date: <input type="text" id="repeatStartDateTextBoxU" name="date" value="{{recurrence.repeat_start_date}}"><br>
         Repeat Interval (Days): <input type="text" id="daysTillRepeateTextBoxU" name="repeateDays" value="{{recurrence.days_till_repeat}}"><br>
-        Type (1=INCOME,2=EXPENSE): <input type="text" id="typeTextBoxU" name="type" value="{{recurrence.type}}"><br>
+        Type (1=INCOME,2=EXPENSE): <input type="text" id="typeTextBoxU" name="type" value="{{recurrence.rec_type}}"><br>
 
         {% if recurrence.description != None %}
             Description:<br>

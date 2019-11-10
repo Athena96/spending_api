@@ -52,15 +52,12 @@ class Transaction:
         contents["transaction_id"] = self.transaction_id
         contents["title"] = self.title
         contents["amount"] = self.amount
-        contents["category"] = self.category[0].name
+        contents["category"] = "/".join(self.category)
         contents["date"] = self.date
         contents["description"] = self.description
         contents["var_txn_tracking"] = self.var_txn_tracking
         contents["txn_type"] = self.txn_type
         return contents
-
-    def get_categories(self, ):
-        return list([c.name for c in self.category])
 
 
 class Recurrence:

@@ -36,11 +36,11 @@ class DBCommms:
         sql_note = "NULL" if (transaction.description == None) else "'{0}'".format(transaction.description)
         var_txn_tracking = "NULL" if (transaction.var_txn_tracking == None) else "'{0}'".format(
             transaction.var_txn_tracking)
-        txn_type = 1 if transaction.type is RecurrenceType.INCOME else 2
+        txn_type = 1 if transaction.txn_type is RecurrenceType.INCOME else 2
 
         cmd = """INSERT INTO ledger (title, amount, category, date, description, var_txn_tracking, type) VALUES ('{0}', {1}, '{2}', '{3}', {4}, {5}, {6})""".format(
             transaction.title,
-            transaction.amount, ",".join(transaction.get_categories()), transaction.date, sql_note, var_txn_tracking,
+            transaction.amount, ",".join(transaction.category), transaction.date, sql_note, var_txn_tracking,
             txn_type)
         self.cursor.execute(cmd)
         self.db_conn.commit()
@@ -59,7 +59,7 @@ class DBCommms:
         sql_description = "NULL" if (recurrence.description == None) else "'{0}'".format(recurrence.description)
 
         cmd = """INSERT INTO recurrences (name, amount, description, type, start_date, end_date, days_till_repeat, day_of_month) VALUES ('{}', {}, '{}', {}, '{}', '{}', {}, {})""".format(
-            recurrence.name, recurrence.amount, sql_description, recurrence.type, recurrence.start_date,
+            recurrence.name, recurrence.amount, sql_description, recurrence.rec_type, recurrence.start_date,
             recurrence.end_date, recurrence.days_till_repeat, recurrence.day_of_month)
         self.cursor.execute(cmd)
         self.db_conn.commit()
@@ -80,11 +80,11 @@ class DBCommms:
         sql_note = "NULL" if (transaction.description == None) else "'{0}'".format(transaction.description)
         var_txn_tracking = "NULL" if (transaction.var_txn_tracking == None) else "'{0}'".format(
             transaction.var_txn_tracking)
-        txn_type = 1 if transaction.type is RecurrenceType.INCOME else 2
+        txn_type = 1 if transaction.txn_type is RecurrenceType.INCOME else 2
 
         cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = {4}, var_txn_tracking = {5}, type = {6} WHERE ledger.transaction_id = {7}""".format(
             transaction.title,
-            transaction.amount, ",".join(transaction.get_categories()), transaction.date, sql_note, var_txn_tracking,
+            transaction.amount, ",".join(transaction.category), transaction.date, sql_note, var_txn_tracking,
             txn_type, transaction.transaction_id)
         self.cursor.execute(cmd)
         self.db_conn.commit()
@@ -114,7 +114,7 @@ class DBCommms:
             recurrence.name,
             recurrence.amount,
             sql_description,
-            recurrence.type,
+            recurrence.rec_type,
             recurrence.start_date,
             recurrence.end_date,
             recurrence.days_till_repeat,
@@ -280,18 +280,18 @@ class DBCommms:
 
             # 4 calculate spent_in_year
             spent_in_year = sum([transaction.amount for transaction in year_transactions if
-                                 (transaction.type == RecurrenceType.EXPENSE) and int(transaction.date[5:7]) <= int(
+                                 (transaction.txn_type == RecurrenceType.EXPENSE) and int(transaction.date[5:7]) <= int(
                                      month)])
             spent_in_year_str = str(round(spent_in_year, 2))
 
             # 5 calculate spent_in_month
             spent_in_month = sum([transaction.amount for transaction in month_transactions if
-                                  (transaction.type == RecurrenceType.EXPENSE)])
+                                  (transaction.txn_type == RecurrenceType.EXPENSE)])
             spent_in_month_str = str(round(spent_in_month, 2))
         else:
             # 4 calculate spent_in_month
             spent_in_year = sum([transaction.amount for transaction in year_transactions if
-                                 (transaction.type == RecurrenceType.EXPENSE)])
+                                 (transaction.txn_type == RecurrenceType.EXPENSE)])
             spent_in_year_str = str(round(spent_in_year, 2))
 
             # 5 calculate spent_in_month
@@ -308,10 +308,10 @@ class DBCommms:
         year_transactions = self.get_transactions(year=year)
 
         year_income = round(sum([transaction.amount for transaction in year_transactions if
-                                 (transaction.type == RecurrenceType.INCOME) and int(transaction.date[5:7]) <= int(
+                                 (transaction.txn_type == RecurrenceType.INCOME) and int(transaction.date[5:7]) <= int(
                                      month)]), 2)
         month_income = round(sum([transaction.amount for transaction in year_transactions if
-                                  (transaction.type == RecurrenceType.INCOME) and (transaction.date[5:7] == month)]), 2)
+                                  (transaction.txn_type == RecurrenceType.INCOME) and (transaction.date[5:7] == month)]), 2)
         return (year_income, month_income)
 
     def get_transaction_aggregations(self, year, month):
@@ -338,14 +338,14 @@ class DBCommms:
         print("     " + "extract_transactions()")
         data = []
         for transaction_id, title, amount, category, date, description, var_txn_tracking, txn_type in cursor:
-            obj_fields = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
+            transaction = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
                                                        description=description, var_txn_tracking=var_txn_tracking,
                                                        txn_type=txn_type, transaction_id=transaction_id)
-            transaction = Transaction(title=obj_fields["title"], amount=obj_fields["amount"],
-                                      category=obj_fields["category"],
-                                      date=obj_fields["date"], description=obj_fields["description"],
-                                      var_txn_tracking=obj_fields["var_txn_tracking"], txn_type=obj_fields["txn_type"],
-                                      transaction_id=obj_fields["transaction_id"])
+            # transaction = Transaction(title=obj_fields["title"], amount=obj_fields["amount"],
+            #                           category=obj_fields["category"],
+            #                           date=obj_fields["date"], description=obj_fields["description"],
+            #                           var_txn_tracking=obj_fields["var_txn_tracking"], txn_type=obj_fields["txn_type"],
+            #                           transaction_id=obj_fields["transaction_id"])
 
             data.append(transaction)
         return data
@@ -355,16 +355,16 @@ class DBCommms:
         print("     " + "extract_recurrence()")
         data = []
         for recurrence_id, name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month in cursor:
-            obj_fields = outside_to_python_recurrence(name=name, amount=amount, description=description,
+            recurrence = outside_to_python_recurrence(name=name, amount=amount, description=description,
                                                       rec_type=rec_type,
                                                       start_date=start_date, end_date=end_date,
                                                       days_till_repeat=days_till_repeat, day_of_month=day_of_month,
                                                       recurrence_id=recurrence_id)
-            recurrence = Recurrence(name=obj_fields["name"], amount=obj_fields["amount"],
-                                    description=obj_fields["description"],
-                                    rec_type=obj_fields["rec_type"], start_date=obj_fields["start_date"],
-                                    end_date=obj_fields["end_date"], days_till_repeat=obj_fields["days_till_repeat"],
-                                    day_of_month=obj_fields["day_of_month"], recurrence_id=obj_fields["recurrence_id"])
+            # recurrence = Recurrence(name=obj_fields["name"], amount=obj_fields["amount"],
+            #                         description=obj_fields["description"],
+            #                         rec_type=obj_fields["rec_type"], start_date=obj_fields["start_date"],
+            #                         end_date=obj_fields["end_date"], days_till_repeat=obj_fields["days_till_repeat"],
+            #                         day_of_month=obj_fields["day_of_month"], recurrence_id=obj_fields["recurrence_id"])
             data.append(recurrence)
 
         return data
