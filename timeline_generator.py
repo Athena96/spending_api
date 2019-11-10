@@ -30,7 +30,7 @@ class TimelineGenerator:
         for recurrence in recurrences:
             if recurrence_type == recurrence.type and date in recurrence.generate_txn_days_in_range(self.start_date, self.end_date):
                 if recurrence.days_till_repeat == 0 and "variable" in recurrence.amount_frequency and recurrence.amount == 0.0:
-                    var_txns = self.db_comms.get_cc_transactions_for_statement(recurrence)
+                    var_txns = self.db_comms.get_transactions_with_var_tag(recurrence)
                     recurrence.amount = sum([x.amount for x in var_txns])
                 todays_recurrences.append(recurrence)
 
