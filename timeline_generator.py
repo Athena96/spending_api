@@ -8,7 +8,7 @@ from utilities import is_valid_or_none
 
 class TimelineGenerator:
 
-    def __init__(self, months_to_generate, db_comm, initial_recurrences=None, starting_balance=None):
+    def __init__(self, months_to_generate, db_comm, initial_recurrences, starting_balance, green_range, yellow_range):
         days_in_month = 31
         n = datetime.now()
         self.start_date = datetime(n.year, n.month, n.day)
@@ -21,6 +21,8 @@ class TimelineGenerator:
         self.green = 0.0
         self.yellow = 0.0
         self.red = 0.0
+        self.green_range = green_range
+        self.yellow_range = yellow_range
 
     def get_recurrences_for_day(self, date, recurrence_type):
         todays_recurrences = []
@@ -48,20 +50,25 @@ class TimelineGenerator:
         reds = 0
 
         for date in ([self.start_date + timedelta(days=x) for x in range(self.days_to_genrate)]):
+
             (incomes, income_desc) = self.get_recurrences_for_day(date, RecurrenceType.INCOME)
             (expenses, expenses_desc) = self.get_recurrences_for_day(date, RecurrenceType.EXPENSE)
-            balance = (previous_bal + incomes - expenses)
-            balance = round(balance, 2)
+
+            balance = round((previous_bal + incomes - expenses), 2)
             previous_bal = balance
-            br = BalanceRow(balance_date=date, balance=balance, income=incomes, income_desc=income_desc,
-                            expense=expenses, expenses_desc=expenses_desc)
-            rows.append(br)
-            if br.bal_percent_color == "green":
+
+            if balance >= self.green_range:
+                bal_percent_color = "green"
                 greens += 1
-            elif br.bal_percent_color == "orange":
+            elif balance < self.green_range and balance > self.yellow_range:
+                bal_percent_color = "orange"
                 yellows += 1
             else:
+                bal_percent_color = "red"
                 reds += 1
+
+            rows.append(BalanceRow(balance_date=date, balance=balance, income=incomes, income_desc=income_desc,
+                            expense=expenses, expenses_desc=expenses_desc, bal_percent_color=bal_percent_color))
 
         tot = greens + reds + yellows
         self.green = round(float(greens) / tot, 2)

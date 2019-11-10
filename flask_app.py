@@ -26,10 +26,14 @@ with app.app_context():
     DATABASE = parts[0].split("=")[1]
     STARTING_BAL = float(parts[1].split("=")[1])
     MONTHS_GENERATED = int(parts[2].split("=")[1])
+    GREEN_RANGE = float(parts[3].split("=")[1])
+    YELLOW_RANGE = float(parts[4].split("=")[1])
 
     print("DATABASE: ", DATABASE)
     print("STARTING_BAL: ", STARTING_BAL)
     print("MONTHS_GENERATED: ", MONTHS_GENERATED)
+    print("GREEN_RANGE: ", GREEN_RANGE)
+    print("YELLOW_RANGE: ", YELLOW_RANGE)
 
     db_comm = DBCommms(DATABASE)
     if "inherentVice" in DATABASE:
@@ -45,7 +49,7 @@ def timeline_page():
     print("timeline_page()")
     recurrences = db_comm.get_recurrences(datetime.now())
     generator = TimelineGenerator(months_to_generate=MONTHS_GENERATED, db_comm=db_comm, initial_recurrences=recurrences,
-                                  starting_balance=STARTING_BAL)
+                                  starting_balance=STARTING_BAL, green_range=GREEN_RANGE, yellow_range=YELLOW_RANGE)
     table = generator.generate_table()
     last_day_bal_num = round(table[len(table) - 1].balance, 2)
     last_day_bal = "${}".format(last_day_bal_num)
