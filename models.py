@@ -1,12 +1,14 @@
 from datetime import datetime
-from enum import Enum
 from datetime import timedelta
-from utilities import get_variable_recurrence_transactions
+from enum import Enum
+
 from utilities import string_to_date
+
 
 class RecurrenceType(Enum):
     INCOME = 1
     EXPENSE = 2
+
 
 class BalanceRow:
 
@@ -23,6 +25,7 @@ class BalanceRow:
             self.bal_percent_color = "orange"
         else:
             self.bal_percent_color = "red"
+
 
 class Transaction:
 
@@ -63,12 +66,14 @@ class Transaction:
         contents["txn_type"] = self.txn_type
         return contents
 
-    def get_categories(self,):
+    def get_categories(self, ):
         return list([c.name for c in self.category])
+
 
 class Recurrence:
 
-    def __init__(self, name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month, recurrence_id=None):
+    def __init__(self, name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month,
+                 recurrence_id=None):
         self.name = name
         self.amount = amount
         self.description = description
@@ -106,6 +111,7 @@ class Recurrence:
             txn_day = txn_day + timedelta(days=self.days_till_repeat)
 
         return txn_days
+
 
 class RecurrencePageInfo:
 

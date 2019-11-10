@@ -1,7 +1,9 @@
 from datetime import datetime
+
+from models import Recurrence
 from models import RecurrenceType
 from models import Transaction
-from models import Recurrence
+
 
 def string_to_date(date_string):
     year = int(date_string.split("_")[0][0:4])
@@ -9,11 +11,13 @@ def string_to_date(date_string):
     day = int(date_string.split("_")[0][8:10])
     return datetime(year=year, month=month, day=day)
 
+
 def is_valid_or_none(string):
     val = None
     if string is not None and string != "NULL" and string != "None" and string != "null" and string != "nil" and string != "":
         val = string
     return val
+
 
 def SQL_NULL_or_valid(opt_str):
     val = "NULL"
@@ -21,11 +25,14 @@ def SQL_NULL_or_valid(opt_str):
         val = opt_str
     return val
 
+
 def get_variable_recurrence_transactions(db_comm, recurrence):
     txns = db_comm.get_transactions_with_var_tag(recurrence)
     return txns
 
-def outside_to_python_transaction(title, amount, category, date, description, var_txn_tracking, txn_type, transaction_id=None):
+
+def outside_to_python_transaction(title, amount, category, date, description, var_txn_tracking, txn_type,
+                                  transaction_id=None):
     # title
 
     # amount
@@ -48,7 +55,9 @@ def outside_to_python_transaction(title, amount, category, date, description, va
     # transaction_id
     transaction_id = is_valid_or_none(transaction_id)
 
-    return Transaction(title=title, amount=amount, category=category, date=date, description=description, var_txn_tracking=var_txn_tracking, txn_type=txn_type, transaction_id=transaction_id)
+    return Transaction(title=title, amount=amount, category=category, date=date, description=description,
+                       var_txn_tracking=var_txn_tracking, txn_type=txn_type, transaction_id=transaction_id)
+
 
 def python_to_outside_transaction(transaction):
     writable_transaction = {}
@@ -63,7 +72,8 @@ def python_to_outside_transaction(transaction):
     return writable_transaction
 
 
-def outside_to_python_recurrence(name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month, recurrence_id=None):
+def outside_to_python_recurrence(name, amount, description, rec_type, start_date, end_date, days_till_repeat,
+                                 day_of_month, recurrence_id=None):
     # name
 
     # amount
@@ -87,8 +97,10 @@ def outside_to_python_recurrence(name, amount, description, rec_type, start_date
     # recurrence_id
     recurrence_id = is_valid_or_none(recurrence_id)
 
+    return Recurrence(name=name, amount=amount, description=description, rec_type=rec_type, start_date=start_date,
+                      end_date=end_date, days_till_repeat=days_till_repeat, day_of_month=day_of_month,
+                      recurrence_id=recurrence_id)
 
-    return Recurrence(name=name, amount=amount, description=description, rec_type=rec_type, start_date=start_date, end_date=end_date, days_till_repeat=days_till_repeat, day_of_month=day_of_month, recurrence_id=recurrence_id)
 
 def python_to_outside_recurrence(recurrence):
     writable_recurrence = {}
