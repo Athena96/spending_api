@@ -52,12 +52,13 @@ table.a {
 .btn:hover {background: #eee;}
 
 .timeline {color: grey;}
+.summary {color: pink;}
 .transactions {color: green;}
 .recurrences {color: dodgerblue;}
 .chart {color: gold;}
-
 .add_transaction {color: purple;}
 .add_recurrence {color: orange;}
+
 .delete {color: red;}
 .select {color: black;}
 

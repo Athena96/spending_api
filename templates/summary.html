@@ -1,10 +1,8 @@
-
 <!DOCTYPE html>
+<html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <head>
-<link rel="icon" href="/favicon.ico">
-<link rel="stylesheet" type="text/css" href="/static/css/timeline.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/summary.css">
     <script type="text/javascript">
             var prefix = "{{ prefix }}"
     </script>
@@ -18,42 +16,40 @@
     <button class="btn add_transaction" onclick="location.href='{{prefix}}/site/add_transaction'">Add Transaction</button>
     <button class="btn add_recurrence" onclick="location.href='{{prefix}}/site/add_recurrence'">Add Recurrence</button>
 
-<p>
-    <br />
-</p>
+    <h2>Summary for {{month}}/{{year}}</h2>
+    <h3>Total Spent for {{month}}/{{year}}: ${{spent_in_month}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Income for {{month}}/{{year}}: ${{month_income}}</h3>
+    <h3>Total Spent for {{year}}: ${{spent_in_year}} &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Income for {{year}}: ${{year_income}}</h3>
 
-<p><b>Last Day Bal</b>: {{last_day_bal}}</p>
-<p><b>Last Day Bal DIFF</b>: {{last_day_bal_dff}}</p>
-<p><b>Greens</b>: {{greens}}, <b>Yellows</b>: {{yellows}}, <b>Reds</b>: {{reds}}</p>
+    <p>
+        <br />
+    </p>
 
         <table class="a">
-            <tr>
-                <th>Balance Date</th>
-                <th>Balance</th>
-                <th>Income</th>
-                <th>Income Description</th>
-                <th>Expense</th>
-                <th>Expense Description</th>
-            </tr>
-
-            {% for day in timeline_table %}
 
             <tr>
-                <td>{{ day.balance_date }}</td>
-                <td><b><font color="{{ day.bal_percent_color }}">${{ day.balance }}</font></b></td>
-                <td>${{ day.income }}</td>
-                <td>{{ day.income_desc }}</td>
-                <td>${{ day.expense }}</td>
-                <td>{{ day.expenses_desc }}</td>
+                <th>Name</th>
+                <th>Month Aggregation (sorted by)</th>
+                <th>Year Aggregation</th>
             </tr>
+
+            {% for aggregation in aggregations %}
+
+                <tr>
+                    <td>{{ aggregation.category }}</td>
+                    <td>${{ aggregation.spent_so_far_month }}</td>
+                    <td>${{ aggregation.spent_so_far_year }}</td>
+                </tr>
 
             {% endfor %}
+
         </table>
 
     <p>
         <br />
     </p>
 
-<script src="/static/js/timeline.js"></script>
+<script src="/static/js/summary.js"></script>
 
 </body>
+
+</html>

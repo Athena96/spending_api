@@ -26,11 +26,9 @@ class TimelineGenerator:
 
     def get_recurrences_for_day(self, date, rec_type):
         todays_recurrences = []
-        recurrences = list(
-            filter(lambda x: is_valid_or_none(x.repeat_start_date) is not None, self.initial_recurrences))
         todays_uncat_recurr = []  # todo
 
-        for recurrence in recurrences:
+        for recurrence in self.initial_recurrences:
             if rec_type == recurrence.rec_type and date in recurrence.generate_recurrence_days_in_range(self.timeline_start_date,
                                                                                                         self.timeline_end_date):
 

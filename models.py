@@ -97,14 +97,18 @@ class Recurrence:
             # "fast forward" or "skip over" out of range dates
             if txn_day >= self.start_date and txn_day <= self.end_date and txn_day >= clac_start_date and txn_day <= calc_end_date:
                 txn_days.append(txn_day)
+
+            if txn_day >= self.start_date and txn_day >= self.end_date and txn_day >= clac_start_date and txn_day >= calc_end_date:
+                break
+
             txn_day = txn_day + timedelta(days=self.days_till_repeat)
 
         return txn_days
 
 
-class RecurrencePageInfo:
+class SummaryPageInfo:
 
     def __init__(self, category, spent_so_far_month, spent_so_far_year):
         self.category = category
-        self.spent_so_far_month = "{}".format(round(spent_so_far_month, 2))
-        self.spent_so_far_year = "{}".format(round(spent_so_far_year, 2))
+        self.spent_so_far_month = round(spent_so_far_month, 2)
+        self.spent_so_far_year = round(spent_so_far_year, 2)

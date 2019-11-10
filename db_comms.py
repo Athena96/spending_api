@@ -4,13 +4,10 @@ from datetime import datetime
 from dateutil.rrule import rrule, MONTHLY
 from flask import jsonify
 
-from models import Recurrence
 from models import RecurrenceType
-from models import Transaction
-from utilities import is_valid_or_none
-from utilities import string_to_date
 from utilities import outside_to_python_recurrence
 from utilities import outside_to_python_transaction
+
 
 class DBCommms:
 
@@ -38,7 +35,7 @@ class DBCommms:
             transaction.var_txn_tracking)
         txn_type = 1 if transaction.txn_type is RecurrenceType.INCOME else 2
 
-        cmd = """INSERT INTO ledger (title, amount, category, date, description, var_txn_tracking, type) VALUES ('{0}', {1}, '{2}', '{3}', {4}, {5}, {6})""".format(
+        cmd = """INSERT INTO ledger (title, amount, category, date, description, var_txn_tracking, txn_type) VALUES ('{0}', {1}, '{2}', '{3}', {4}, {5}, {6})""".format(
             transaction.title,
             transaction.amount, ",".join(transaction.category), transaction.date, sql_note, var_txn_tracking,
             txn_type)
@@ -58,7 +55,7 @@ class DBCommms:
         # python_to_outside_recurrence
         sql_description = "NULL" if (recurrence.description == None) else "'{0}'".format(recurrence.description)
 
-        cmd = """INSERT INTO recurrences (name, amount, description, type, start_date, end_date, days_till_repeat, day_of_month) VALUES ('{}', {}, '{}', {}, '{}', '{}', {}, {})""".format(
+        cmd = """INSERT INTO recurrences (name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month) VALUES ('{}', {}, '{}', {}, '{}', '{}', {}, {})""".format(
             recurrence.name, recurrence.amount, sql_description, recurrence.rec_type, recurrence.start_date,
             recurrence.end_date, recurrence.days_till_repeat, recurrence.day_of_month)
         self.cursor.execute(cmd)
@@ -82,7 +79,7 @@ class DBCommms:
             transaction.var_txn_tracking)
         txn_type = 1 if transaction.txn_type is RecurrenceType.INCOME else 2
 
-        cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = {4}, var_txn_tracking = {5}, type = {6} WHERE ledger.transaction_id = {7}""".format(
+        cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = {4}, var_txn_tracking = {5}, txn_type = {6} WHERE ledger.transaction_id = {7}""".format(
             transaction.title,
             transaction.amount, ",".join(transaction.category), transaction.date, sql_note, var_txn_tracking,
             txn_type, transaction.transaction_id)
@@ -101,16 +98,7 @@ class DBCommms:
         # python_to_outside_recurrence
         sql_description = "NULL" if (recurrence.description == None) else "'{0}'".format(recurrence.description)
 
-        cmd = """UPDATE recurrences SET 
-        name = '{}', 
-        amount = {}, 
-        description = '{}', 
-        type = {}, 
-        start_date = '{}', 
-        end_date = '{}', 
-        days_till_repeat = {}, 
-        day_of_month = {} 
-        WHERE recurrences.recurrence_id = {}""".format(
+        cmd = """UPDATE recurrences SET name = '{}', amount = {}, description = '{}', rec_type = {}, start_date = '{}', end_date = '{}', days_till_repeat = {}, day_of_month = {} WHERE recurrences.recurrence_id = {}""".format(
             recurrence.name,
             recurrence.amount,
             sql_description,
@@ -146,7 +134,7 @@ class DBCommms:
         print("     " + "delete_recurrence({})", recurrence_id)
         (self.db_conn, self.cursor) = self.get_instance()
 
-        cmd = "DELETE FROM budget WHERE budget.category_id = {0};".format(int(recurrence_id))
+        cmd = "DELETE FROM recurrences WHERE recurrences.recurrence_id = {0};".format(int(recurrence_id))
         self.cursor.execute(cmd)
         self.db_conn.commit()
         print(cmd)
@@ -237,7 +225,7 @@ class DBCommms:
 
         cmd = """select * 
         from recurrences 
-        where recurrences.start_date <= '{0}-{1}-{2} {3}:{4}:{5}' and budget.end_date >= '{0}-{1}-{2} {3}:{4}:{5}' """.format(
+        where recurrences.start_date <= '{0}-{1}-{2} {3}:{4}:{5}' and recurrences.end_date >= '{0}-{1}-{2} {3}:{4}:{5}' """.format(
             date.year,
             '{:02d}'.format(date.month),
             '{:02d}'.format(date.day),
@@ -311,7 +299,8 @@ class DBCommms:
                                  (transaction.txn_type == RecurrenceType.INCOME) and int(transaction.date[5:7]) <= int(
                                      month)]), 2)
         month_income = round(sum([transaction.amount for transaction in year_transactions if
-                                  (transaction.txn_type == RecurrenceType.INCOME) and (transaction.date[5:7] == month)]), 2)
+                                  (transaction.txn_type == RecurrenceType.INCOME) and (
+                                          transaction.date[5:7] == month)]), 2)
         return (year_income, month_income)
 
     def get_transaction_aggregations(self, year, month):
@@ -339,8 +328,8 @@ class DBCommms:
         data = []
         for transaction_id, title, amount, category, date, description, var_txn_tracking, txn_type in cursor:
             transaction = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
-                                                       description=description, var_txn_tracking=var_txn_tracking,
-                                                       txn_type=txn_type, transaction_id=transaction_id)
+                                                        description=description, var_txn_tracking=var_txn_tracking,
+                                                        txn_type=txn_type, transaction_id=transaction_id)
             # transaction = Transaction(title=obj_fields["title"], amount=obj_fields["amount"],
             #                           category=obj_fields["category"],
             #                           date=obj_fields["date"], description=obj_fields["description"],

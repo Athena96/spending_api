@@ -50,8 +50,10 @@ tr:nth-child(even) {
 .btn:hover {background: #eee;}
 
 .timeline {color: grey;}
+.summary {color: pink;}
 .transactions {color: green;}
 .recurrences {color: dodgerblue;}
 .add_transaction {color: purple;}
 .add_recurrence {color: orange;}
+
 .chart {color: gold;}

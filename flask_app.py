@@ -5,7 +5,7 @@ from flask import current_app
 
 from db_comms import DBCommms
 from models import Recurrence
-from models import RecurrencePageInfo
+from models import SummaryPageInfo
 from models import Transaction
 from timeline_generator import TimelineGenerator
 from utilities import outside_to_python_recurrence
@@ -41,6 +41,34 @@ with app.app_context():
     else:
         ENVIRONMENT = "http://127.0.0.1:5000"
 
+
+# Website page handlers: Summary
+
+@app.route("/site/summary", methods=["GET"])
+def summary_root_page():
+    print("summary_root_page()")
+
+    summary_links = get_date_page_links("summary")
+    return render_template('root_summary.html', summary_links=summary_links, prefix=ENVIRONMENT)
+
+
+@app.route("/site/summary/year:<string:year>/month:<string:month>", methods=["GET"])
+def summary_page(year, month):
+    print("summary_page()")
+    (year_income, month_income) = db_comm.get_income(year, month)
+    (spent_in_year_str, spent_in_month_str) = db_comm.get_spending(year, month)
+
+    aggregations = []
+    aggregate_map = db_comm.get_transaction_aggregations(year=year, month=month)
+    for category in aggregate_map.keys():
+        aggregations.append(SummaryPageInfo(category=category, spent_so_far_month=aggregate_map[category][0], spent_so_far_year=aggregate_map[category][1]))
+
+    sorted_aggregations = sorted(aggregations, key=lambda x: x.spent_so_far_month, reverse=True)
+    return render_template('summary.html',
+                           aggregations=sorted_aggregations,
+                           month=month, year=year,
+                           spent_in_month=spent_in_month_str, spent_in_year=spent_in_year_str,
+                           month_income=month_income, year_income=year_income, prefix=ENVIRONMENT)
 
 # Website page handlers: Timeline
 
@@ -78,8 +106,7 @@ def add_transaction_page(transaction_id=None):
     print("add_transaction_page()")
 
     transaction = db_comm.get_transaction(transaction_id)
-    recurrences = db_comm.get_recurrences(datetime.now())
-    return render_template('add_transaction.html', transaction=transaction, recurrences=recurrences, prefix=ENVIRONMENT)
+    return render_template('add_transaction.html', transaction=transaction, prefix=ENVIRONMENT)
 
 
 @app.route("/site/transactions/year:<string:year>", methods=["GET"])
@@ -139,14 +166,6 @@ def transactions_page(year=None, month=None, category="ALL", start_date=None, en
 
 # Website page handlers: Recurrence
 
-@app.route("/site/recurrences", methods=["GET"])
-def recurrences_root_page():
-    print("recurrences_root_page()")
-
-    recurrence_links = get_date_page_links("recurrences")
-    return render_template('root_recurrences.html', recurrence_links=recurrence_links, prefix=ENVIRONMENT)
-
-
 @app.route("/site/add_recurrence", methods=["GET"])
 @app.route("/site/add_recurrence/<string:recurrence_id>", methods=["GET"])
 def add_recurrence_page(recurrence_id=None):
@@ -156,22 +175,11 @@ def add_recurrence_page(recurrence_id=None):
     return render_template('add_recurrence.html', recurrence=recurrence, prefix=ENVIRONMENT)
 
 
-@app.route("/site/recurrences/year:<string:year>/month:<string:month>", methods=["GET"])
-def recurrence_page(year=None, month=None):
+@app.route("/site/recurrences", methods=["GET"])
+def recurrence_page():
     print("recurrences_page()")
-    (year_income, month_income) = db_comm.get_income(year, month)
-    (spent_in_year_str, spent_in_month_str) = db_comm.get_spending(year, month)
-
-    aggregations = []
-    aggregate_map = db_comm.get_transaction_aggregations(year=year, month=month)
-    for category in aggregate_map.keys():
-        aggregations.append(RecurrencePageInfo(category, aggregate_map[category][0], aggregate_map[category][1]))
-
-    return render_template('recurrences.html',
-                           aggregations=aggregations,
-                           month=month, year=year,
-                           spent_in_month=spent_in_month_str, spent_in_year=spent_in_year_str,
-                           month_income=month_income, year_income=year_income, prefix=ENVIRONMENT)
+    recurrences = db_comm.get_recurrences(datetime.now())
+    return render_template('recurrences.html', recurrences=recurrences, prefix=ENVIRONMENT)
 
 
 # Transaction API endpoints
@@ -193,10 +201,6 @@ def add_transaction(title, amount, category, date, description, var_txn_tracking
     transaction = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
                                                description=description, var_txn_tracking=var_txn_tracking,
                                                txn_type=txn_type)
-    # transaction = Transaction(title=obj_fields["title"], amount=obj_fields["amount"], category=obj_fields["category"],
-    #                           date=obj_fields["date"], description=obj_fields["description"],
-    #                           var_txn_tracking=obj_fields["var_txn_tracking"], txn_type=obj_fields["txn_type"],
-    #                           transaction_id=obj_fields["transaction_id"])
     return db_comm.add_transaction(transaction)
 
 
@@ -209,10 +213,6 @@ def update_transaction(transaction_id, title, amount, category, date, descriptio
     transaction = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
                                                description=description, var_txn_tracking=var_txn_tracking,
                                                txn_type=txn_type, transaction_id=transaction_id)
-    # transaction = Transaction(title=obj_fields["title"], amount=obj_fields["amount"], category=obj_fields["category"],
-    #                           date=obj_fields["date"], description=obj_fields["description"],
-    #                           var_txn_tracking=obj_fields["var_txn_tracking"], txn_type=obj_fields["txn_type"],
-    #                           transaction_id=obj_fields["transaction_id"])
     return db_comm.update_transaction(transaction)
 
 
@@ -241,10 +241,6 @@ def add_recurrence(name, amount, description, rec_type, start_date, end_date, da
     recurrence = outside_to_python_recurrence(name=name, amount=amount, description=description, rec_type=rec_type,
                                               start_date=start_date, end_date=end_date,
                                               days_till_repeat=days_till_repeat, day_of_month=day_of_month)
-    # recurrence = Recurrence(name=obj_fields["name"], amount=obj_fields["amount"], description=obj_fields["description"],
-    #                         rec_type=obj_fields["rec_type"], start_date=obj_fields["start_date"],
-    #                         end_date=obj_fields["end_date"], days_till_repeat=obj_fields["days_till_repeat"],
-    #                         day_of_month=obj_fields["day_of_month"], recurrence_id=obj_fields["recurrence_id"])
     return db_comm.add_recurrence(recurrence)
 
 
@@ -259,10 +255,6 @@ def update_recurrence(recurrence_id, name, amount, description, rec_type, start_
                                               start_date=start_date, end_date=end_date,
                                               days_till_repeat=days_till_repeat, day_of_month=day_of_month,
                                               recurrence_id=recurrence_id)
-    # recurrence = Recurrence(name=obj_fields["name"], amount=obj_fields["amount"], description=obj_fields["description"],
-    #                         rec_type=obj_fields["rec_type"], start_date=obj_fields["start_date"],
-    #                         end_date=obj_fields["end_date"], days_till_repeat=obj_fields["days_till_repeat"],
-    #                         day_of_month=obj_fields["day_of_month"], recurrence_id=obj_fields["recurrence_id"])
     return db_comm.update_recurrence(recurrence)
 
 
