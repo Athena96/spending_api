@@ -11,10 +11,10 @@ class TimelineGenerator:
     def __init__(self, months_to_generate, db_comm, initial_recurrences, starting_balance, green_range, yellow_range):
         days_in_month = 31
         n = datetime.now()
-        self.start_date = datetime(n.year, n.month, n.day)
+        self.timeline_start_date = datetime(n.year, n.month, n.day)
         self.days_to_genrate = (days_in_month * months_to_generate)
         self.duration = timedelta(days=self.days_to_genrate)
-        self.end_date = self.start_date + self.duration
+        self.timeline_end_date = self.timeline_start_date + self.duration
         self.starting_balance = starting_balance
         self.db_comms = db_comm
         self.initial_recurrences = initial_recurrences
@@ -24,18 +24,22 @@ class TimelineGenerator:
         self.green_range = green_range
         self.yellow_range = yellow_range
 
-    def get_recurrences_for_day(self, date, recurrence_type):
+    def get_recurrences_for_day(self, date, rec_type):
         todays_recurrences = []
         recurrences = list(
             filter(lambda x: is_valid_or_none(x.repeat_start_date) is not None, self.initial_recurrences))
         todays_uncat_recurr = []  # todo
 
         for recurrence in recurrences:
-            if recurrence_type == recurrence.type and date in recurrence.generate_txn_days_in_range(self.start_date,
-                                                                                                    self.end_date):
-                if recurrence.days_till_repeat == 0 and "variable" in recurrence.amount_frequency and recurrence.amount == 0.0:
-                    var_txns = self.db_comms.get_transactions_with_var_tag(recurrence)
-                    recurrence.amount = sum([x.amount for x in var_txns])
+            if rec_type == recurrence.rec_type and date in recurrence.generate_recurrence_days_in_range(self.timeline_start_date,
+                                                                                                        self.timeline_end_date):
+
+                # if it's a variable recurrence, then we need to query to see how much i've spent in
+                # those variable categories, then update the 'amount' field of the Recurrence
+                if recurrence.days_till_repeat is None and recurrence.day_of_month is None:
+                    variable_txns = self.db_comms.get_transactions_with_var_tag(recurrence)
+                    recurrence.amount = sum([x.amount for x in variable_txns])
+
                 todays_recurrences.append(recurrence)
 
         total_amnt = round(sum([x.amount for x in todays_recurrences]), 2)
@@ -49,7 +53,7 @@ class TimelineGenerator:
         yellows = 0
         reds = 0
 
-        for date in ([self.start_date + timedelta(days=x) for x in range(self.days_to_genrate)]):
+        for date in ([self.timeline_start_date + timedelta(days=x) for x in range(self.days_to_genrate)]):
 
             (incomes, income_desc) = self.get_recurrences_for_day(date, RecurrenceType.INCOME)
             (expenses, expenses_desc) = self.get_recurrences_for_day(date, RecurrenceType.EXPENSE)

@@ -9,7 +9,8 @@ from models import RecurrenceType
 from models import Transaction
 from utilities import is_valid_or_none
 from utilities import string_to_date
-
+from utilities import outside_to_python_recurrence
+from utilities import outside_to_python_transaction
 
 class DBCommms:
 
@@ -336,15 +337,15 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "extract_transactions()")
         data = []
-        for transaction_id, title, amount, category, date, description, var_txn_tracking, type in cursor:
-            # transform SQL transaction into python object transaction
-            # outside_to_python_transaction()
-            description = None if description == "null" or description == "NULL" or description == "" else description
-            var_txn_tracking = None if var_txn_tracking == "null" or var_txn_tracking == "NULL" or var_txn_tracking == "" else var_txn_tracking
-            type = RecurrenceType.INCOME if type == 1 else RecurrenceType.EXPENSE
-
-            transaction = Transaction(title=title, amount=amount, category=category, date=date, description=description,
-                                      var_txn_tracking=var_txn_tracking, transaction_id=transaction_id, type=type)
+        for transaction_id, title, amount, category, date, description, var_txn_tracking, txn_type in cursor:
+            obj_fields = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
+                                                       description=description, var_txn_tracking=var_txn_tracking,
+                                                       txn_type=txn_type, transaction_id=transaction_id)
+            transaction = Transaction(title=obj_fields["title"], amount=obj_fields["amount"],
+                                      category=obj_fields["category"],
+                                      date=obj_fields["date"], description=obj_fields["description"],
+                                      var_txn_tracking=obj_fields["var_txn_tracking"], txn_type=obj_fields["txn_type"],
+                                      transaction_id=obj_fields["transaction_id"])
 
             data.append(transaction)
         return data
@@ -353,17 +354,17 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "extract_recurrence()")
         data = []
-        for recurrence_id, name, amount, description, type, start_date, end_date, days_till_repeat, day_of_month in cursor:
-            # transform SQL recurrence into python object recurrence
-            # outside_to_python_recurrence()
-            repeat_start_date = None if is_valid_or_none(repeat_start_date) is None else string_to_date(
-                repeat_start_date)
-            description = None if is_valid_or_none(description) is None else description
-            type = RecurrenceType.EXPENSE if type == 2 else RecurrenceType.INCOME
-
-            recurrence = Recurrence(name=name, amount=amount, description=description, type=type,
-                                    start_date=start_date, end_date=end_date, days_till_repeat=days_till_repeat,
-                                    day_of_month=day_of_month, recurrence_id=recurrence_id)
+        for recurrence_id, name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month in cursor:
+            obj_fields = outside_to_python_recurrence(name=name, amount=amount, description=description,
+                                                      rec_type=rec_type,
+                                                      start_date=start_date, end_date=end_date,
+                                                      days_till_repeat=days_till_repeat, day_of_month=day_of_month,
+                                                      recurrence_id=recurrence_id)
+            recurrence = Recurrence(name=obj_fields["name"], amount=obj_fields["amount"],
+                                    description=obj_fields["description"],
+                                    rec_type=obj_fields["rec_type"], start_date=obj_fields["start_date"],
+                                    end_date=obj_fields["end_date"], days_till_repeat=obj_fields["days_till_repeat"],
+                                    day_of_month=obj_fields["day_of_month"], recurrence_id=obj_fields["recurrence_id"])
             data.append(recurrence)
 
         return data

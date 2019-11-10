@@ -91,8 +91,10 @@ def outside_to_python_recurrence(name, amount, description, rec_type, start_date
     end_date = None if is_valid_or_none(end_date) is None else string_to_date(end_date)
 
     # days_till_repeat
+    days_till_repeat = is_valid_or_none(days_till_repeat)
 
     # day_of_month
+    day_of_month = is_valid_or_none(day_of_month)
 
     # recurrence_id
     recurrence_id = is_valid_or_none(recurrence_id)
@@ -110,7 +112,7 @@ def python_to_outside_recurrence(recurrence):
     writable_recurrence["rec_type"] = 1 if recurrence.rec_type == RecurrenceType.INCOME else 2
     writable_recurrence["start_date"] = SQL_NULL_or_valid(recurrence.start_date)
     writable_recurrence["end_date"] = SQL_NULL_or_valid(recurrence.end_date)
-    writable_recurrence["days_till_repeat"] = recurrence.days_till_repeat
-    writable_recurrence["day_of_month"] = recurrence.day_of_month
+    writable_recurrence["days_till_repeat"] = SQL_NULL_or_valid(recurrence.days_till_repeat)
+    writable_recurrence["day_of_month"] = SQL_NULL_or_valid(recurrence.day_of_month)
     writable_recurrence["recurrence_id"] = SQL_NULL_or_valid(recurrence.recurrence_id)
     return writable_recurrence

@@ -18,7 +18,6 @@
     {% if recurrence != None %}
         Title: <input type="text" id="categoryTextBoxU" name="item" value="{{recurrence.category.name}}"><br>
         Amount: <input type="text" id="amountTextBoxU" name="price" value="{{recurrence.amount}}"><br>
-        <!--Amount Frequency: <input type="text" id="amountFrequencyTextBoxU" name="category" value="{{recurrence.amount_frequency}}"><br>-->
 
         Amount Frequency:<br>
         {% if recurrence.amount_frequency == "month" %}

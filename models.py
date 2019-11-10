@@ -2,8 +2,6 @@ from datetime import datetime
 from datetime import timedelta
 from enum import Enum
 
-from utilities import string_to_date
-
 
 class RecurrenceType(Enum):
     INCOME = 1
@@ -92,16 +90,15 @@ class Recurrence:
         contents["recurrence_id"] = self.recurrence_id
         return contents
 
-    def generate_txn_days_in_range(self, clac_start_date, calc_end_date):
-        txn_day = self.repeat_start_date
+    def generate_recurrence_days_in_range(self, clac_start_date, calc_end_date):
+        # for this recurrence, generate all of its occurrences within this clac_start_date, clac_end_date window
+        txn_day = self.start_date
         txn_days = [txn_day]
 
-        e = string_to_date(self.end_date)
-        if e < calc_end_date:
-            calc_end_date = e
-
-        while txn_day < calc_end_date and self.days_till_repeat != 0:
-            if txn_day >= clac_start_date and txn_day <= calc_end_date:
+        # while the txn day is int BOTH clac_start_date, clac_end_date, AND self.start, self.end
+        while True:
+            # "fast forward" or "skip over" out of range dates
+            if txn_day >= self.start_date and txn_day <= self.end_date and txn_day >= clac_start_date and txn_day <= calc_end_date:
                 txn_days.append(txn_day)
             txn_day = txn_day + timedelta(days=self.days_till_repeat)
 
