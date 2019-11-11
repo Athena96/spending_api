@@ -34,8 +34,12 @@ class TimelineGenerator:
 
                 # if it's a variable recurrence, then we need to query to see how much i've spent in
                 # those variable categories, then update the 'amount' field of the Recurrence
-                if recurrence.days_till_repeat is None and recurrence.day_of_month is None:
-                    variable_txns = self.db_comms.get_transactions_with_var_tag(recurrence)
+                if recurrence.days_till_repeat is None and recurrence.day_of_month is None and recurrence.amount == 0.0:
+
+                    variable_txns = self.db_comms.get_transactions_with_var_tag(recurrence.name)
+                    print(variable_txns)
+                    print(recurrence.name)
+
                     recurrence.amount = sum([x.amount for x in variable_txns])
 
                 todays_recurrences.append(recurrence)

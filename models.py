@@ -92,14 +92,13 @@ class Recurrence:
         txn_day = self.start_date
         txn_days = [txn_day]
 
-        # while the txn day is int BOTH clac_start_date, clac_end_date, AND self.start, self.end
-        while True:
-            # "fast forward" or "skip over" out of range dates
-            if txn_day >= self.start_date and txn_day <= self.end_date and txn_day >= clac_start_date and txn_day <= calc_end_date:
-                txn_days.append(txn_day)
+        if self.end_date < calc_end_date:
+            calc_end_date = self.end_date
 
-            if txn_day >= self.start_date and txn_day >= self.end_date and txn_day >= clac_start_date and txn_day >= calc_end_date:
-                break
+        while txn_day < calc_end_date and (self.days_till_repeat is not None or self.day_of_month is not None):
+
+            if txn_day >= clac_start_date and txn_day <= calc_end_date:
+                txn_days.append(txn_day)
 
             txn_day = txn_day + timedelta(days=self.days_till_repeat)
 
