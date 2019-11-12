@@ -7,7 +7,7 @@ from flask import jsonify
 from models import RecurrenceType
 from utilities import outside_to_python_recurrence
 from utilities import outside_to_python_transaction
-
+from utilities import python_to_outside_recurrence
 
 class DBCommms:
 
@@ -50,14 +50,10 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "add_recurrence({})", recurrence)
         (self.db_conn, self.cursor) = self.get_instance()
-
-        # transform recurrence into SQL writable
-        # python_to_outside_recurrence
-        sql_description = "NULL" if (recurrence.description == None) else "'{0}'".format(recurrence.description)
-
+        recurrenceMP = python_to_outside_recurrence(recurrence)
         cmd = """INSERT INTO recurrences (name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month) VALUES ('{}', {}, '{}', {}, '{}', '{}', {}, {})""".format(
-            recurrence.name, recurrence.amount, sql_description, recurrence.rec_type, recurrence.start_date,
-            recurrence.end_date, recurrence.days_till_repeat, recurrence.day_of_month)
+            recurrenceMP["name"], recurrenceMP["amount"], recurrenceMP["description"], recurrenceMP["rec_type"], recurrenceMP["start_date"],
+            recurrenceMP["end_date"], recurrenceMP["days_till_repeat"], recurrenceMP["day_of_month"])
         self.cursor.execute(cmd)
         self.db_conn.commit()
         self.db_conn.close()
@@ -246,8 +242,8 @@ class DBCommms:
         if recurrence_id is None:
             return None
 
-        cmd = """select * 
-        from recurrences 
+        cmd = """select *
+        from recurrences
         where recurrences.recurrence_id = {}""".format(recurrence_id)
         self.cursor.execute(cmd)
         print(cmd)
@@ -307,10 +303,10 @@ class DBCommms:
     def get_transaction_aggregations(self, year, month):
         cmd = """select A.category, A.month_total, B.year_total
         from (select ledger.category as 'category', sum(ledger.amount) as 'month_total'
-            from ledger 
+            from ledger
             where ledger.date like( '%{}%')
             group by ledger.category) A, (select ledger.category  as 'category', sum(ledger.amount) as 'year_total'
-                from ledger 
+                from ledger
                 where ledger.date like('%{}%' )
                 group by ledger.category) B
         where A.category = B.category""".format("{}-{}-".format(year, month), "{}-".format(year))

@@ -14,21 +14,19 @@ function deleteRecurrence(recurrence_id) {
 }
 
 function addRecurrence() {
-    var category = document.getElementById("categoryTextBox").value;
+    var name = document.getElementById("nameTextBox").value;
     var amount = document.getElementById("amountTextBox").value;
-    var amountFrequencies = document.getElementsByName("amountFrequencyRadioButtons");
-    var selectedAmountFrequency;
-    for(var i = 0; i < amountFrequencies.length; i++) {
-        if(amountFrequencies[i].checked)
-            selectedAmountFrequency = amountFrequencies[i].value;
-    }
-    alert(selectedAmountFrequency)
+    var recType = document.getElementById("recTypeTextBox").value;
     var startDate = document.getElementById("startDateTextBox").value;
     var endDate = document.getElementById("endDateTextBox").value;
-
-    var repeatStartDate = document.getElementById("repeatStartDateTextBox").value;
-    var repeatInterval = document.getElementById("daysTillRepeateTextBox").value;
-    var type = document.getElementById("typeTextBox").value;
+    var daysTillRepeat = document.getElementById("daysTillRepeatTextBox").value;
+    if (daysTillRepeat == "" || daysTillRepeat == null || daysTillRepeat == " ") {
+        daysTillRepeat = null;
+    }
+    var dayOfMonth = document.getElementById("dayOfMonthTextBox").value;
+    if (dayOfMonth == "" || dayOfMonth == null || dayOfMonth == " ") {
+        dayOfMonth = null;
+    }
 
     var description = document.getElementById("descriptionTextBox").value;
     if (description == "" || description == null || description == " ") {
@@ -36,9 +34,9 @@ function addRecurrence() {
     }
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/recurrence/" + category + "/" + amount + "/" + selectedAmountFrequency + "/" + description + "/" + startDate + "/" + endDate + "/" + type + "/" + repeatStartDate + "/" + repeatInterval;
+    var url_tmp = prefix + "/recurrence/" + name + "/" + amount + "/" + description + "/" recType + "/" + startDate + "/" + endDate  + "/" + daysTillRepeat + "/" + dayOfMonth;
     var url = url_tmp.replace(" ", "%20");
-
+alert(url_tmp);
     if (prefix == "http://inherentvice.pythonanywhere.com") {
         console.log("A");
         var passcode = document.getElementById("passcodeTextBox").value;
@@ -55,28 +53,26 @@ function addRecurrence() {
 }
 
 function updateRecurrence(recurrence_id) {
-    var category = document.getElementById("categoryTextBoxU").value;
+    var name = document.getElementById("nameTextBoxU").value;
     var amount = document.getElementById("amountTextBoxU").value;
-    var amountFrequencies = document.getElementsByName("amountFrequencyRadioButtonsU");
-    var selectedAmountFrequency;
-    for(var i = 0; i < amountFrequencies.length; i++) {
-        if(amountFrequencies[i].checked)
-            selectedAmountFrequency = amountFrequencies[i].value;
-    }    var startDate = document.getElementById("startDateTextBoxU").value;
+    var recType = document.getElementById("recTypeTextBoxU").value;
+    var startDate = document.getElementById("startDateTextBoxU").value;
     var endDate = document.getElementById("endDateTextBoxU").value;
-
-    var repeatStartDate = document.getElementById("repeatStartDateTextBoxU").value;
-    var repeatInterval = document.getElementById("daysTillRepeateTextBoxU").value;
-    var type = document.getElementById("typeTextBoxU").value;
-
-
+    var daysTillRepeat = document.getElementById("daysTillRepeatTextBoxU").value;
+    if (daysTillRepeat == "" || daysTillRepeat == null || daysTillRepeat == " ") {
+        daysTillRepeat = null;
+    }
+    var dayOfMonth = document.getElementById("dayOfMonthTextBoxU").value;
+    if (dayOfMonth == "" || dayOfMonth == null || dayOfMonth == " ") {
+        dayOfMonth = null;
+    }
     var description = document.getElementById("descriptionTextBoxU").value;
     if (description == "" || description == null || description == " ") {
         description = null;
     }
 
     var xhr = new XMLHttpRequest();
-    var url_w_spc = prefix + "/recurrence/" + recurrence_id + "/" + category + "/" + amount + "/" + amountFrequency + "/" + description + "/" + startDate + "/" + endDate + "/" + type + "/" + repeatStartDate + "/" + repeatInterval;
+    var url_w_spc = prefix + "/recurrence/" + recurrence_id + "/" + name + "/" + amount + "/" + description + "/" recType + "/" + startDate + "/" + endDate  + "/" + daysTillRepeat + "/" + dayOfMonth;
     var url = url_w_spc.replace(" ", "%20");
 
     if (prefix == "http://inherentvice.pythonanywhere.com") {
