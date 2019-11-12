@@ -34,6 +34,8 @@
                 <th>End Date</th>
                 <th>Days Till Repeat</th>
                 <th>Day of Month</th>
+                <th>Delete</th>
+
             </tr>
 
             {% for recurrence in recurrences %}
@@ -55,6 +57,8 @@
                     {% else %}
                         <td></td>
                     {% endif %}
+                    <td><button class="btnSmall delete" id="{{recurrence.recurrence_id}}" onclick="deleteRecurrence(this.id)"><u>delete</u></button></td>
+
                 </tr>
 
             {% endfor %}

@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<html>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <head>
     <link rel="stylesheet" type="text/css" href="/static/css/add_recurrence.css">
@@ -35,6 +37,8 @@
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
         <button class="button buttonUpdate" id="{{recurrence.recurrence_id}}" onclick="updateRecurrence(this.id)">Update</button> <br>
         <button class="button buttonDelete" id="{{recurrence.recurrence_id}}" onclick="deleteRecurrence(this.id)">Delete</button>
+        <p>Click the "Update" button to save the recurrence.</p>
+
     {% else %}
         Name: <input type="text" id="nameTextBox" name="item" value=""><br>
         Amount: <input type="text" id="amountTextBox" name="price" value=""><br>
@@ -47,12 +51,14 @@
         <textarea name="description" id="descriptionTextBox" style="width:200px; height:100px;" value=""></textarea><br>
         Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
         <button class="button" onclick="addRecurrence()">Insert</button>
+
+        <p>Click the "Insert" button to save the recurrence.</p>
+
     {% endif %}
 
 </form>
 
-<p>Click the "Submit" button to save the recurrence.</p>
-
 <script src="/static/js/addRecurrence.js"></script>
 
 </body>
+</html>

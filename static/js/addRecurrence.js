@@ -7,7 +7,7 @@ function deleteRecurrence(recurrence_id) {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({}));
     xhr.onload = function() {
-        console.log("Deleted Recurrence Category")
+        console.log("Deleted Recurrence Category");
         location.reload();
         alert(this.responseText);
     }
@@ -34,9 +34,9 @@ function addRecurrence() {
     }
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/recurrence/" + name + "/" + amount + "/" + description + "/" recType + "/" + startDate + "/" + endDate  + "/" + daysTillRepeat + "/" + dayOfMonth;
+    var url_tmp = prefix + "/recurrence/" + name + "/" + amount + "/" + description + "/" + recType + "/" + startDate + "/" + endDate  + "/" + daysTillRepeat + "/" + dayOfMonth;
     var url = url_tmp.replace(" ", "%20");
-alert(url_tmp);
+    console.log(url_tmp);
     if (prefix == "http://inherentvice.pythonanywhere.com") {
         console.log("A");
         var passcode = document.getElementById("passcodeTextBox").value;
@@ -72,7 +72,7 @@ function updateRecurrence(recurrence_id) {
     }
 
     var xhr = new XMLHttpRequest();
-    var url_w_spc = prefix + "/recurrence/" + recurrence_id + "/" + name + "/" + amount + "/" + description + "/" recType + "/" + startDate + "/" + endDate  + "/" + daysTillRepeat + "/" + dayOfMonth;
+    var url_w_spc = prefix + "/recurrence/" + recurrence_id + "/" + name + "/" + amount + "/" + description + "/" + recType + "/" + startDate + "/" + endDate  + "/" + daysTillRepeat + "/" + dayOfMonth;
     var url = url_w_spc.replace(" ", "%20");
 
     if (prefix == "http://inherentvice.pythonanywhere.com") {
