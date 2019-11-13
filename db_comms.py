@@ -9,6 +9,7 @@ from utilities import outside_to_python_recurrence
 from utilities import outside_to_python_transaction
 from utilities import python_to_outside_recurrence
 
+
 class DBCommms:
 
     def __init__(self, database_path):
@@ -52,7 +53,8 @@ class DBCommms:
         (self.db_conn, self.cursor) = self.get_instance()
         recurrenceMP = python_to_outside_recurrence(recurrence)
         cmd = """INSERT INTO recurrences (name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month) VALUES ('{}', {}, '{}', {}, '{}', '{}', {}, {})""".format(
-            recurrenceMP["name"], recurrenceMP["amount"], recurrenceMP["description"], recurrenceMP["rec_type"], recurrenceMP["start_date"],
+            recurrenceMP["name"], recurrenceMP["amount"], recurrenceMP["description"], recurrenceMP["rec_type"],
+            recurrenceMP["start_date"],
             recurrenceMP["end_date"], recurrenceMP["days_till_repeat"], recurrenceMP["day_of_month"])
         self.cursor.execute(cmd)
         self.db_conn.commit()
@@ -90,21 +92,12 @@ class DBCommms:
         print("     " + "update_recurrence({})", recurrence)
         (self.db_conn, self.cursor) = self.get_instance()
 
-        # transform recurrence into SQL writable
-        # python_to_outside_recurrence
-
-
+        recurrenceMP = python_to_outside_recurrence(recurrence)
         cmd = """UPDATE recurrences SET name = '{}', amount = {}, description = '{}', rec_type = {}, start_date = '{}', end_date = '{}', days_till_repeat = {}, day_of_month = {} WHERE recurrences.recurrence_id = {}""".format(
-            recurrence.name,
-            recurrence.amount,
-            recurrence.description,
-            recurrence.rec_type,
-            recurrence.start_date,
-            recurrence.end_date,
-            recurrence.days_till_repeat,
-            recurrence.day_of_month,
-            recurrence.recurrence_id)
-
+            recurrenceMP["name"], recurrenceMP["amount"], recurrenceMP["description"], recurrenceMP["rec_type"],
+            recurrenceMP["start_date"],
+            recurrenceMP["end_date"], recurrenceMP["days_till_repeat"], recurrenceMP["day_of_month"],
+            recurrenceMP["recurrence_id"])
         self.cursor.execute(cmd)
         self.db_conn.commit()
         print(cmd)
@@ -224,11 +217,11 @@ class DBCommms:
         else:
             cmd = """select * from recurrences where recurrences.start_date <= '{0}-{1}-{2} {3}:{4}:{5}' and recurrences.end_date >= '{0}-{1}-{2} {3}:{4}:{5}' """.format(
                 date.year,
-            '{:02d}'.format(date.month),
-            '{:02d}'.format(date.day),
-            '{:02d}'.format(date.hour),
-            '{:02d}'.format(date.minute),
-            '{:02d}'.format(date.second))
+                '{:02d}'.format(date.month),
+                '{:02d}'.format(date.day),
+                '{:02d}'.format(date.hour),
+                '{:02d}'.format(date.minute),
+                '{:02d}'.format(date.second))
         self.cursor.execute(cmd)
         print(cmd)
 

@@ -75,18 +75,12 @@ function updateRecurrence(recurrence_id) {
     var url_w_spc = prefix + "/recurrence/" + recurrence_id + "/" + name + "/" + amount + "/" + description + "/" + recType + "/" + startDate + "/" + endDate  + "/" + daysTillRepeat + "/" + dayOfMonth;
     var url = url_w_spc.replace(" ", "%20");
 
+    xhr.withCredentials = true;
+    xhr.open("PUT", url);
+    xhr.setRequestHeader('Content-Type', 'application/json');
     if (prefix == "http://inherentvice.pythonanywhere.com") {
-        console.log("A");
-        var passcode = document.getElementById("passcodeTextBox").value;
-        xhr.withCredentials = true;
-        xhr.open("POST", url);
-        xhr.setRequestHeader("Authorization", ("Basic " + btoa(passcode)));
-    } else {
-        console.log("B");
-        xhr.open("POST", url);
+        xhr.setRequestHeader("Authorization", "Basic " + btoa(passcode));
     }
 
-    xhr.setRequestHeader("cache-control", "no-cache");
-    xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({}));
 }
