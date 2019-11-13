@@ -41,10 +41,14 @@
             {% for recurrence in recurrences %}
 
                 <tr>
-                    <td>{{ recurrence.name }}</td>
+                    <td><button class="btnSmall select" id="{{recurrence.recurrence_id}}" onclick="openUpdatePage(this.id)"><u>{{ recurrence.name }}</u></button></td>
                     <td>${{ recurrence.amount }}</td>
                     <td>{{ recurrence.description }}</td>
-                    <td>{{ recurrence.rec_type }}</td>
+                    {% if recurrence.rec_type.value == 2 %}
+                        <td>EXPENSE</td>
+                    {% else %}
+                        <td>INCOME</td>
+                    {% endif %}
                     <td>{{ recurrence.start_date }}</td>
                     <td>{{ recurrence.end_date }}</td>
                     {% if recurrence.days_till_repeat != None %}

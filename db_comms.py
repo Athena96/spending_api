@@ -92,12 +92,12 @@ class DBCommms:
 
         # transform recurrence into SQL writable
         # python_to_outside_recurrence
-        sql_description = "NULL" if (recurrence.description == None) else "'{0}'".format(recurrence.description)
+
 
         cmd = """UPDATE recurrences SET name = '{}', amount = {}, description = '{}', rec_type = {}, start_date = '{}', end_date = '{}', days_till_repeat = {}, day_of_month = {} WHERE recurrences.recurrence_id = {}""".format(
             recurrence.name,
             recurrence.amount,
-            sql_description,
+            recurrence.description,
             recurrence.rec_type,
             recurrence.start_date,
             recurrence.end_date,
@@ -242,9 +242,7 @@ class DBCommms:
         if recurrence_id is None:
             return None
 
-        cmd = """select *
-        from recurrences
-        where recurrences.recurrence_id = {}""".format(recurrence_id)
+        cmd = """select * from recurrences where recurrences.recurrence_id = {}""".format(recurrence_id)
         self.cursor.execute(cmd)
         print(cmd)
 
