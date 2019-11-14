@@ -25,17 +25,13 @@ def SQL_NULL_or_valid(opt_str):
         val = opt_str
     return val
 
-
-def get_variable_recurrence_transactions(db_comm, recurrence):
-    txns = db_comm.get_transactions_with_var_tag(recurrence)
-    return txns
-
-
 def outside_to_python_transaction(title, amount, category, date, description, var_txn_tracking, txn_type,
                                   transaction_id=None):
+    print("outside_to_python_transaction()")
     # title
 
     # amount
+    amount = float(amount)
 
     # category
     categories = []
@@ -55,7 +51,7 @@ def outside_to_python_transaction(title, amount, category, date, description, va
     var_txn_tracking = is_valid_or_none(var_txn_tracking)
 
     # txn_type
-    txn_type = RecurrenceType.INCOME if txn_type == 1 else RecurrenceType.EXPENSE
+    txn_type = RecurrenceType.INCOME if int(txn_type) == 1 else RecurrenceType.EXPENSE
 
     # transaction_id
     transaction_id = is_valid_or_none(transaction_id)
@@ -65,6 +61,7 @@ def outside_to_python_transaction(title, amount, category, date, description, va
 
 
 def python_to_outside_transaction(transaction):
+    print("python_to_outside_transaction()")
     writable_transaction = {}
     writable_transaction["title"] = transaction.title
     writable_transaction["amount"] = transaction.amount
@@ -79,16 +76,17 @@ def python_to_outside_transaction(transaction):
 
 def outside_to_python_recurrence(name, amount, description, rec_type, start_date, end_date, days_till_repeat,
                                  day_of_month, recurrence_id=None):
+    print("outside_to_python_recurrence()")
     # name
 
     # amount
+    amount = float(amount)
 
     # description
     description = is_valid_or_none(description)
 
     # type
-    print("rec_type ", rec_type)
-    rec_type = RecurrenceType.INCOME if rec_type == 1 else RecurrenceType.EXPENSE
+    rec_type = RecurrenceType.INCOME if int(rec_type) == 1 else RecurrenceType.EXPENSE
 
     # start_date
     start_date = None if is_valid_or_none(start_date) is None else string_to_date(start_date)
@@ -111,6 +109,7 @@ def outside_to_python_recurrence(name, amount, description, rec_type, start_date
 
 
 def python_to_outside_recurrence(recurrence):
+    print("python_to_outside_recurrence()")
     writable_recurrence = {}
     writable_recurrence["name"] = recurrence.name
     writable_recurrence["amount"] = recurrence.amount
