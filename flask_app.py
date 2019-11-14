@@ -24,13 +24,11 @@ with app.app_context():
     text = str(file.read().decode("utf-8"))
     parts = text.split("\n")
     DATABASE = parts[0].split("=")[1]
-    STARTING_BAL = float(parts[1].split("=")[1])
-    MONTHS_GENERATED = int(parts[2].split("=")[1])
-    GREEN_RANGE = float(parts[3].split("=")[1])
-    YELLOW_RANGE = float(parts[4].split("=")[1])
+    MONTHS_GENERATED = int(parts[1].split("=")[1])
+    GREEN_RANGE = float(parts[2].split("=")[1])
+    YELLOW_RANGE = float(parts[3].split("=")[1])
 
     print("DATABASE: ", DATABASE)
-    print("STARTING_BAL: ", STARTING_BAL)
     print("MONTHS_GENERATED: ", MONTHS_GENERATED)
     print("GREEN_RANGE: ", GREEN_RANGE)
     print("YELLOW_RANGE: ", YELLOW_RANGE)
@@ -76,6 +74,7 @@ def summary_page(year, month):
 def timeline_page():
     print("timeline_page()")
     recurrences = db_comm.get_recurrences(None)
+    STARTING_BAL = db_comm.get_starting_bal()
     generator = TimelineGenerator(months_to_generate=MONTHS_GENERATED, db_comm=db_comm, initial_recurrences=recurrences,
                                   starting_balance=STARTING_BAL, green_range=GREEN_RANGE, yellow_range=YELLOW_RANGE)
     table = generator.generate_table()
@@ -263,6 +262,14 @@ def delete_recurrence(recurrence_id):
     print("[api] delete_recurrence()")
 
     return db_comm.delete_recurrence(recurrence_id)
+
+
+@app.route('/timeline/<string:starting_bal>', methods=['POST'])
+def set_starting_bal(starting_bal):
+    print("[api] set_starting_bal()")
+
+    return db_comm.set_starting_bal(starting_bal)
+
 
 
 # helpers
