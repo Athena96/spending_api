@@ -71,6 +71,8 @@ function updateRecurrence(recurrence_id) {
         description = null;
     }
 
+    var passcode = document.getElementById("passcodeTextBoxU").value;
+
     var xhr = new XMLHttpRequest();
     var url_w_spc = prefix + "/recurrence/" + recurrence_id + "/" + name + "/" + amount + "/" + description + "/" + recType + "/" + startDate + "/" + endDate  + "/" + daysTillRepeat + "/" + dayOfMonth;
     var url = url_w_spc.replace(" ", "%20");

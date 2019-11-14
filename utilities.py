@@ -87,6 +87,7 @@ def outside_to_python_recurrence(name, amount, description, rec_type, start_date
     description = is_valid_or_none(description)
 
     # type
+    print("rec_type ", rec_type)
     rec_type = RecurrenceType.INCOME if rec_type == 1 else RecurrenceType.EXPENSE
 
     # start_date
