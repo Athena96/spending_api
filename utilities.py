@@ -27,7 +27,6 @@ def SQL_NULL_or_valid(opt_str):
 
 def outside_to_python_transaction(title, amount, category, date, description, var_txn_tracking, txn_type,
                                   transaction_id=None):
-    print("outside_to_python_transaction()")
     # title
 
     # amount

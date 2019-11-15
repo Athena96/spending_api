@@ -73,11 +73,12 @@ def summary_page(year, month):
 @app.route("/site/timeline", methods=["GET"])
 def timeline_page():
     print("timeline_page()")
-    recurrences = db_comm.get_recurrences(None)
     STARTING_BAL = db_comm.get_starting_bal()
+    recurrences = db_comm.get_recurrences(None)
     generator = TimelineGenerator(months_to_generate=MONTHS_GENERATED, db_comm=db_comm, initial_recurrences=recurrences,
                                   starting_balance=STARTING_BAL, green_range=GREEN_RANGE, yellow_range=YELLOW_RANGE)
     table = generator.generate_table()
+
     last_day_bal_num = round(table[len(table) - 1].balance, 2)
     last_day_bal = "${}".format(last_day_bal_num)
     last_day_bal_dff = "${}".format(round((last_day_bal_num - GREEN_RANGE), 2))
@@ -86,6 +87,7 @@ def timeline_page():
                            greens=generator.green,
                            yellows=generator.yellow,
                            reds=generator.red,
+                           STARTING_BAL=STARTING_BAL,
                            prefix=ENVIRONMENT)
 
 

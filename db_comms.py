@@ -343,6 +343,8 @@ class DBCommms:
             data.append(float(starting_bal))
             break
 
+        self.cursor.close()
+
         return data[0]
 
     def get_min_max_transaction_dates(self):
@@ -381,6 +383,7 @@ class DBCommms:
         cmd = """UPDATE balance SET starting_bal = {} WHERE balance.starting_bal_id = 1""".format(starting_bal)
         self.cursor.execute(cmd)
         self.db_conn.commit()
+        self.db_conn.close()
         print(cmd)
 
         return jsonify({'result': 'successfully updated starting_bal!'})
