@@ -4,7 +4,7 @@ from datetime import datetime
 from dateutil.rrule import rrule, MONTHLY
 from flask import jsonify
 
-from models import RecurrenceType
+from models import RecurrenceType, SummaryPageInfo
 from utilities import outside_to_python_recurrence
 from utilities import outside_to_python_transaction
 from utilities import python_to_outside_recurrence
@@ -306,7 +306,16 @@ class DBCommms:
 
         aggregate_map = {}
         for category, month_total, year_total in self.cursor:
-            aggregate_map[category] = [month_total, year_total]
+            aggregate_map[category] = SummaryPageInfo(category=category, spent_so_far_month=month_total, spent_so_far_year=year_total)
+
+        # add sub category balances to main category for summary viewing
+        for category in aggregate_map.keys():
+            if "/" in category:
+                main_cat = category.split("/")[0]
+                spi = aggregate_map[main_cat]
+                spi.spent_so_far_month += aggregate_map[category].spent_so_far_month
+                spi.spent_so_far_year += aggregate_map[category].spent_so_far_year
+                aggregate_map[main_cat] = spi
 
         return aggregate_map
 

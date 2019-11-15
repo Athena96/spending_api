@@ -59,7 +59,7 @@ def summary_page(year, month):
     aggregations = []
     aggregate_map = db_comm.get_transaction_aggregations(year=year, month=month)
     for category in aggregate_map.keys():
-        aggregations.append(SummaryPageInfo(category=category, spent_so_far_month=aggregate_map[category][0], spent_so_far_year=aggregate_map[category][1]))
+        aggregations.append(aggregate_map[category])
 
     sorted_aggregations = sorted(aggregations, key=lambda x: x.spent_so_far_month, reverse=True)
     return render_template('summary.html',
