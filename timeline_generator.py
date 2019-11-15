@@ -3,12 +3,12 @@ from datetime import timedelta
 
 from models import BalanceRow
 from models import RecurrenceType
-from utilities import is_valid_or_none
 
 
 class TimelineGenerator:
 
-    def __init__(self, months_to_generate, db_comm, initial_recurrences, starting_balance, green_range, yellow_range):
+    def __init__(self, months_to_generate, db_comm_txn, initial_recurrences, starting_balance, green_range,
+                 yellow_range):
         days_in_month = 31
         n = datetime.now()
         self.timeline_start_date = datetime(n.year, n.month, n.day)
@@ -16,7 +16,7 @@ class TimelineGenerator:
         self.duration = timedelta(days=self.days_to_genrate)
         self.timeline_end_date = self.timeline_start_date + self.duration
         self.starting_balance = starting_balance
-        self.db_comms = db_comm
+        self.db_comm_txn = db_comm_txn
         self.initial_recurrences = initial_recurrences
         self.green = 0.0
         self.yellow = 0.0
@@ -29,14 +29,14 @@ class TimelineGenerator:
         todays_uncat_recurr = []  # todo
 
         for recurrence in self.initial_recurrences:
-            if rec_type == recurrence.rec_type and date in recurrence.generate_recurrence_days_in_range(self.timeline_start_date,
-                                                                                                        self.timeline_end_date):
+            if rec_type == recurrence.rec_type and date in recurrence.generate_recurrence_days_in_range(
+                    self.timeline_start_date,
+                    self.timeline_end_date):
 
                 # if it's a variable recurrence, then we need to query to see how much i've spent in
                 # those variable categories, then update the 'amount' field of the Recurrence
                 if recurrence.days_till_repeat is None and recurrence.day_of_month is None and recurrence.amount == 0.0:
-
-                    variable_txns = self.db_comms.get_transactions_with_var_tag(recurrence.name)
+                    variable_txns = self.db_comm_txn.get_transactions_by_payment_method(recurrence.name)
                     print(variable_txns)
                     print(recurrence.name)
 
@@ -74,7 +74,7 @@ class TimelineGenerator:
                 reds += 1
 
             rows.append(BalanceRow(balance_date=date, balance=balance, income=incomes, income_desc=income_desc,
-                            expense=expenses, expenses_desc=expenses_desc, bal_percent_color=bal_percent_color))
+                                   expense=expenses, expenses_desc=expenses_desc, bal_percent_color=bal_percent_color))
 
         tot = greens + reds + yellows
         self.green = round(float(greens) / tot, 2)

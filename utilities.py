@@ -25,7 +25,7 @@ def SQL_NULL_or_valid(opt_str):
         val = opt_str
     return val
 
-def outside_to_python_transaction(title, amount, category, date, description, var_txn_tracking, txn_type,
+def outside_to_python_transaction(title, amount, category, date, description, payment_method, txn_type,
                                   transaction_id=None):
     # title
 
@@ -46,8 +46,8 @@ def outside_to_python_transaction(title, amount, category, date, description, va
     # description
     description = is_valid_or_none(description)
 
-    # var_txn_tracking
-    var_txn_tracking = is_valid_or_none(var_txn_tracking)
+    # payment_method
+    payment_method = is_valid_or_none(payment_method)
 
     # txn_type
     txn_type = RecurrenceType.INCOME if int(txn_type) == 1 else RecurrenceType.EXPENSE
@@ -56,7 +56,7 @@ def outside_to_python_transaction(title, amount, category, date, description, va
     transaction_id = is_valid_or_none(transaction_id)
 
     return Transaction(title=title, amount=amount, category=categories, date=date, description=description,
-                       var_txn_tracking=var_txn_tracking, txn_type=txn_type, transaction_id=transaction_id)
+                       payment_method=payment_method, txn_type=txn_type, transaction_id=transaction_id)
 
 
 def python_to_outside_transaction(transaction):
@@ -66,7 +66,7 @@ def python_to_outside_transaction(transaction):
     writable_transaction["category"] = "-".join(transaction.category)
     writable_transaction["date"] = transaction.date
     writable_transaction["description"] = SQL_NULL_or_valid(transaction.description)
-    writable_transaction["var_txn_tracking"] = SQL_NULL_or_valid(transaction.var_txn_tracking)
+    writable_transaction["payment_method"] = SQL_NULL_or_valid(transaction.payment_method)
     writable_transaction["txn_type"] = 1 if transaction.txn_type == RecurrenceType.INCOME else 2
     writable_transaction["transaction_id"] = SQL_NULL_or_valid(transaction.transaction_id)
     return writable_transaction

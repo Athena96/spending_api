@@ -22,13 +22,13 @@ class BalanceRow:
 
 class Transaction:
 
-    def __init__(self, title, amount, category, date, description, var_txn_tracking, txn_type, transaction_id=None):
+    def __init__(self, title, amount, category, date, description, payment_method, txn_type, transaction_id=None):
         self.title = title
         self.amount = amount
         self.category = category
         self.date = date
         self.description = description
-        self.var_txn_tracking = var_txn_tracking
+        self.payment_method = payment_method
         self.transaction_id = transaction_id
         self.txn_type = txn_type
 
@@ -55,7 +55,7 @@ class Transaction:
         contents["category"] = "/".join(self.category)
         contents["date"] = self.date
         contents["description"] = self.description
-        contents["var_txn_tracking"] = self.var_txn_tracking
+        contents["payment_method"] = self.payment_method
         contents["txn_type"] = self.txn_type
         return contents
 
