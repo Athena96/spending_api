@@ -8,7 +8,12 @@ from models import RecurrenceType, SummaryPageInfo
 from utilities import outside_to_python_recurrence
 from utilities import outside_to_python_transaction
 from utilities import python_to_outside_recurrence
+from utilities import python_to_outside_transaction
 
+
+# todo DBComms/Transaction
+# todo DBComms/Recurrence
+# todo DBComms/Balance
 
 class DBCommms:
 
@@ -29,17 +34,11 @@ class DBCommms:
         print("     " + "add_transaction({})".format(transaction))
         (self.db_conn, self.cursor) = self.get_instance()
 
-        # transform transaction into SQL writable
-        # python_to_outside_transaction
-        sql_note = "NULL" if (transaction.description == None) else "'{0}'".format(transaction.description)
-        var_txn_tracking = "NULL" if (transaction.var_txn_tracking == None) else "'{0}'".format(
-            transaction.var_txn_tracking)
-        txn_type = 1 if transaction.txn_type is RecurrenceType.INCOME else 2
-
+        writable_txn = python_to_outside_transaction(transaction)
         cmd = """INSERT INTO ledger (title, amount, category, date, description, var_txn_tracking, txn_type) VALUES ('{0}', {1}, '{2}', '{3}', {4}, {5}, {6})""".format(
-            transaction.title,
-            transaction.amount, ",".join(transaction.category), transaction.date, sql_note, var_txn_tracking,
-            txn_type)
+            writable_txn["title"],
+            writable_txn["amount"], writable_txn["category"], writable_txn["date"], writable_txn["description"],
+            writable_txn["var_txn_tracking"], writable_txn["txn_type"])
         self.cursor.execute(cmd)
         self.db_conn.commit()
         self.db_conn.close()
@@ -51,11 +50,12 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "add_recurrence({})", recurrence)
         (self.db_conn, self.cursor) = self.get_instance()
-        recurrenceMP = python_to_outside_recurrence(recurrence)
+
+        writable_recurr = python_to_outside_recurrence(recurrence)
         cmd = """INSERT INTO recurrences (name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month) VALUES ('{}', {}, '{}', {}, '{}', '{}', {}, {})""".format(
-            recurrenceMP["name"], recurrenceMP["amount"], recurrenceMP["description"], recurrenceMP["rec_type"],
-            recurrenceMP["start_date"],
-            recurrenceMP["end_date"], recurrenceMP["days_till_repeat"], recurrenceMP["day_of_month"])
+            writable_recurr["name"], writable_recurr["amount"], writable_recurr["description"], writable_recurr["rec_type"],
+            writable_recurr["start_date"],
+            writable_recurr["end_date"], writable_recurr["days_till_repeat"], writable_recurr["day_of_month"])
         self.cursor.execute(cmd)
         self.db_conn.commit()
         self.db_conn.close()
@@ -70,17 +70,11 @@ class DBCommms:
         print("     " + "update_transaction({})".format(transaction))
         (self.db_conn, self.cursor) = self.get_instance()
 
-        # transform transaction into SQL writable
-        # python_to_outside_transaction
-        sql_note = "NULL" if (transaction.description == None) else "'{0}'".format(transaction.description)
-        var_txn_tracking = "NULL" if (transaction.var_txn_tracking == None) else "'{0}'".format(
-            transaction.var_txn_tracking)
-        txn_type = 1 if transaction.txn_type is RecurrenceType.INCOME else 2
-
+        writable_txn = python_to_outside_transaction(transaction)
         cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = {4}, var_txn_tracking = {5}, txn_type = {6} WHERE ledger.transaction_id = {7}""".format(
-            transaction.title,
-            transaction.amount, ",".join(transaction.category), transaction.date, sql_note, var_txn_tracking,
-            txn_type, transaction.transaction_id)
+            writable_txn["title"],
+            writable_txn["amount"], writable_txn["category"], writable_txn["date"], writable_txn["description"],
+            writable_txn["var_txn_tracking"], writable_txn["txn_type"],  writable_txn["transaction_id"])
         self.cursor.execute(cmd)
         self.db_conn.commit()
         print(cmd)
@@ -146,7 +140,6 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "get_transaction(month:{},year:{},category:{})".format(month, year, category))
         (self.db_conn, self.cursor) = self.get_instance()
-        # todo update category so that you pass obj and not string (or change recurrence to not store category as Obj)
 
         base_query = "select * from ledger"
         if month is None:
@@ -306,7 +299,8 @@ class DBCommms:
 
         aggregate_map = {}
         for category, month_total, year_total in self.cursor:
-            aggregate_map[category] = SummaryPageInfo(category=category, spent_so_far_month=month_total, spent_so_far_year=year_total)
+            aggregate_map[category] = SummaryPageInfo(category=category, spent_so_far_month=month_total,
+                                                      spent_so_far_year=year_total)
 
         # add sub category balances to main category for summary viewing
         for category in aggregate_map.keys():
@@ -352,8 +346,6 @@ class DBCommms:
             data.append(float(starting_bal))
             break
 
-        self.cursor.close()
-
         return data[0]
 
     def get_min_max_transaction_dates(self):
@@ -388,6 +380,7 @@ class DBCommms:
         print("     " + self.__class__.__name__)
         print("     " + "set_starting_bal({})".format(starting_bal))
         (self.db_conn, self.cursor) = self.get_instance()
+
         starting_bal = float(starting_bal)
         cmd = """UPDATE balance SET starting_bal = {} WHERE balance.starting_bal_id = 1""".format(starting_bal)
         self.cursor.execute(cmd)
@@ -396,7 +389,6 @@ class DBCommms:
         print(cmd)
 
         return jsonify({'result': 'successfully updated starting_bal!'})
-
 
     def get_starting_bal(self):
         print("     " + self.__class__.__name__)

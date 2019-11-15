@@ -34,8 +34,8 @@ def outside_to_python_transaction(title, amount, category, date, description, va
 
     # category
     categories = []
-    if (len(category.split('/')) > 1):
-        for category in category.split('/'):
+    if (len(category.split('-')) > 1):
+        for category in category.split('-'):
             categories.append(category)
     else:
         categories.append(category)
@@ -60,11 +60,10 @@ def outside_to_python_transaction(title, amount, category, date, description, va
 
 
 def python_to_outside_transaction(transaction):
-    print("python_to_outside_transaction()")
     writable_transaction = {}
     writable_transaction["title"] = transaction.title
     writable_transaction["amount"] = transaction.amount
-    writable_transaction["category"] = "/".join(transaction.category)
+    writable_transaction["category"] = "-".join(transaction.category)
     writable_transaction["date"] = transaction.date
     writable_transaction["description"] = SQL_NULL_or_valid(transaction.description)
     writable_transaction["var_txn_tracking"] = SQL_NULL_or_valid(transaction.var_txn_tracking)
@@ -75,7 +74,6 @@ def python_to_outside_transaction(transaction):
 
 def outside_to_python_recurrence(name, amount, description, rec_type, start_date, end_date, days_till_repeat,
                                  day_of_month, recurrence_id=None):
-    print("outside_to_python_recurrence()")
     # name
 
     # amount
@@ -108,7 +106,6 @@ def outside_to_python_recurrence(name, amount, description, rec_type, start_date
 
 
 def python_to_outside_recurrence(recurrence):
-    print("python_to_outside_recurrence()")
     writable_recurrence = {}
     writable_recurrence["name"] = recurrence.name
     writable_recurrence["amount"] = recurrence.amount
