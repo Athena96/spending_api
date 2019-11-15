@@ -310,8 +310,8 @@ class DBCommms:
 
         # add sub category balances to main category for summary viewing
         for category in aggregate_map.keys():
-            if "/" in category:
-                main_cat = category.split("/")[0]
+            if "-" in category:
+                main_cat = category.split("-")[0]
                 spi = aggregate_map[main_cat]
                 spi.spent_so_far_month += aggregate_map[category].spent_so_far_month
                 spi.spent_so_far_year += aggregate_map[category].spent_so_far_year
