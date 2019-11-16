@@ -299,16 +299,11 @@ class DBCommms:
 
         aggregate_map = {}
         for category, month_total, year_total in self.cursor:
-<<<<<<< HEAD
             aggregate_map[category] = SummaryPageInfo(category=category, spent_so_far_month=month_total, spent_so_far_year=year_total)
             if "-" in category:
                 main_cat = category.split("-")[0]
                 if main_cat not in aggregate_map.keys():
                     aggregate_map[main_cat] = SummaryPageInfo(category=main_cat, spent_so_far_month=0.0, spent_so_far_year=0.0)
-=======
-            aggregate_map[category] = SummaryPageInfo(category=category, spent_so_far_month=month_total,
-                                                      spent_so_far_year=year_total)
->>>>>>> 0a776790a80c2dc0d1a18a8581f7b4979c97d768
 
         # add sub category balances to main category for summary viewing
         for category in aggregate_map.keys():
