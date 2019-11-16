@@ -34,8 +34,8 @@ def outside_to_python_transaction(title, amount, category, date, description, va
 
     # category
     categories = []
-    if (len(category.split('/')) > 1):
-        for category in category.split('/'):
+    if (len(category.split('-')) > 1):
+        for category in category.split('-'):
             categories.append(category)
     else:
         categories.append(category)
@@ -64,7 +64,7 @@ def python_to_outside_transaction(transaction):
     writable_transaction = {}
     writable_transaction["title"] = transaction.title
     writable_transaction["amount"] = transaction.amount
-    writable_transaction["category"] = "/".join(transaction.category)
+    writable_transaction["category"] = "-".join(transaction.category)
     writable_transaction["date"] = transaction.date
     writable_transaction["description"] = SQL_NULL_or_valid(transaction.description)
     writable_transaction["var_txn_tracking"] = SQL_NULL_or_valid(transaction.var_txn_tracking)
