@@ -35,14 +35,14 @@ class DBCommms:
         (self.db_conn, self.cursor) = self.get_instance()
 
         writable_txn = python_to_outside_transaction(transaction)
-        cmd = """INSERT INTO ledger (title, amount, category, date, description, var_txn_tracking, txn_type) VALUES ('{0}', {1}, '{2}', '{3}', {4}, {5}, {6})""".format(
+        cmd = """INSERT INTO ledger (title, amount, category, date, description, var_txn_tracking, txn_type) VALUES ('{0}', {1}, '{2}', '{3}', {4}, '{5}', {6})""".format(
             writable_txn["title"],
             writable_txn["amount"], writable_txn["category"], writable_txn["date"], writable_txn["description"],
             writable_txn["var_txn_tracking"], writable_txn["txn_type"])
+        print(cmd)
         self.cursor.execute(cmd)
         self.db_conn.commit()
         self.db_conn.close()
-        print(cmd)
 
         return jsonify({'result': 'successfully added transaction!'})
 
@@ -71,13 +71,13 @@ class DBCommms:
         (self.db_conn, self.cursor) = self.get_instance()
 
         writable_txn = python_to_outside_transaction(transaction)
-        cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = {4}, var_txn_tracking = {5}, txn_type = {6} WHERE ledger.transaction_id = {7}""".format(
+        cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = {4}, var_txn_tracking = '{5}', txn_type = {6} WHERE ledger.transaction_id = {7}""".format(
             writable_txn["title"],
             writable_txn["amount"], writable_txn["category"], writable_txn["date"], writable_txn["description"],
             writable_txn["var_txn_tracking"], writable_txn["txn_type"],  writable_txn["transaction_id"])
+        print(cmd)
         self.cursor.execute(cmd)
         self.db_conn.commit()
-        print(cmd)
 
         return jsonify({'result': 'successfully updated transaction!'})
 
