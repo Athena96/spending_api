@@ -79,17 +79,6 @@ class DBCommsTransaction(DBComms):
 
         return self.extract_transactions(self.cursor)
 
-    def extract_transactions(self, cursor):
-        print("     " + self.__class__.__name__)
-        print("     " + "extract_transactions()")
-        data = []
-        for transaction_id, title, amount, category, date, description, payment_method, txn_type in cursor:
-            transaction = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
-                                                        description=description, payment_method=payment_method,
-                                                        txn_type=txn_type, transaction_id=transaction_id)
-            data.append(transaction)
-        return data
-
     def get_spending(self, year, month):
         print("     " + self.__class__.__name__)
         print("     " + "get_spending()")
@@ -205,16 +194,19 @@ class DBCommsTransaction(DBComms):
 
         aggregate_map = {}
         for category, month_total, year_total in self.cursor:
-            aggregate_map[category] = SummaryPageInfo(category=category, spent_so_far_month=round(month_total,2),
-                                                      spent_so_far_year=round(year_total,2))
+            aggregate_map[category] = SummaryPageInfo(category=category, spent_so_far_month=month_total, spent_so_far_year=year_total)
+            if "-" in category:
+                main_cat = category.split("-")[0]
+                if main_cat not in aggregate_map.keys():
+                    aggregate_map[main_cat] = SummaryPageInfo(category=main_cat, spent_so_far_month=0.0, spent_so_far_year=0.0)
 
         # add sub category balances to main category for summary viewing
         for category in aggregate_map.keys():
             if "-" in category:
                 main_cat = category.split("-")[0]
                 spi = aggregate_map[main_cat]
-                spi.spent_so_far_month += round(aggregate_map[category].spent_so_far_month,2)
-                spi.spent_so_far_year += round(aggregate_map[category].spent_so_far_year,2)
+                spi.spent_so_far_month += aggregate_map[category].spent_so_far_month
+                spi.spent_so_far_year += aggregate_map[category].spent_so_far_year
                 aggregate_map[main_cat] = spi
 
         return aggregate_map
