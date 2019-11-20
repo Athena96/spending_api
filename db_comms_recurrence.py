@@ -17,8 +17,7 @@ class DBCommsRecurrence(DBComms):
 
         writable_recurr = python_to_outside_recurrence(recurrence)
         cmd = """INSERT INTO recurrences (name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month) VALUES ('{}', {}, '{}', {}, '{}', '{}', {}, {})""".format(
-            writable_recurr["name"], writable_recurr["amount"], writable_recurr["description"],
-            writable_recurr["rec_type"],
+            writable_recurr["name"], writable_recurr["amount"], writable_recurr["description"], writable_recurr["rec_type"],
             writable_recurr["start_date"],
             writable_recurr["end_date"], writable_recurr["days_till_repeat"], writable_recurr["day_of_month"])
         self.cursor.execute(cmd)
