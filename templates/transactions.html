@@ -38,7 +38,8 @@
                 <th>Amount</th>
                 <th>Category</th>
                 <th>Date</th>
-                <th>Variable Transaction Tracking Tag</th>
+                <th>Type</th>
+                <th>Payment Method</th>
                 <th>Description</th>
                 <th>Delete</th>
             </tr>
@@ -50,8 +51,13 @@
                     <td>${{ transaction.amount }}</td>
                     <td>{{ transaction.category }}</td>
                     <td>{{ transaction.date }}</td>
-                    {% if transaction.var_txn_tracking != None %}
-                        <td>{{ transaction.var_txn_tracking }}</td>
+                    {% if transaction.txn_type.value == 2 %}
+                        <td>EXPENSE</td>
+                    {% else %}
+                        <td>INCOME</td>
+                    {% endif %}
+                    {% if transaction.payment_method != None %}
+                        <td>{{ transaction.payment_method }}</td>
                     {% else %}
                         <td></td>
                     {% endif %}

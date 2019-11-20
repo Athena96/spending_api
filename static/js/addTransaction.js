@@ -6,7 +6,7 @@ function addTransaction() {
     var final_cat = category;
 
     var amount = document.getElementById("amountTextBox").value;
-    var varTxnTrackingCode = document.getElementById("varTxnTrackingCode").value;
+    var varTxnTrackingCode = document.getElementById("paymentMethodU").value;
     if (varTxnTrackingCode == "" || varTxnTrackingCode == null || varTxnTrackingCode == " ") {
         varTxnTrackingCode = null;
     }
@@ -58,7 +58,7 @@ function updateTransaction(transaction_id) {
 
     var title = document.getElementById("titleTextBoxU").value;
     var amount = document.getElementById("amountTextBoxU").value;
-    var varTxnTrackingCode = document.getElementById("varTxnTrackingCodeU").value;
+    var varTxnTrackingCode = document.getElementById("paymentMethodU").value;
     if (varTxnTrackingCode == "" || varTxnTrackingCode == null || varTxnTrackingCode == " ") {
         varTxnTrackingCode = null;
     }
