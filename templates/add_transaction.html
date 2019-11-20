@@ -21,7 +21,7 @@
 
         Title: <input type="text" id="titleTextBoxU" name="title" value="{{transaction.title}}"><br>
         Amount: <input type="text" id="amountTextBoxU" name="amount" value="{{transaction.amount}}"><br>
-        Variable Transaction Tracking Code: <input type="text" id="paymentMethodU" name="amount" value="{{transaction.var_txn_tracking}}"><br>
+        Variable Transaction Tracking Code: <input type="text" id="paymentMethodU" name="amount" value="{{transaction.payment_method}}"><br>
         Categories: <input type="text" id="mySelectCategoryU" name="category" value="{{"-".join(transaction.category)}}"><br>
         Date: <input type="text" id="dateTextBoxU" name="date" value="{{transaction.date}}"><br>
         {% if transaction.txn_type.value == 2 %}
