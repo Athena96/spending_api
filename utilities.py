@@ -4,6 +4,32 @@ from models import Recurrence
 from models import RecurrenceType
 from models import Transaction
 
+# helpers
+def get_date_page_links(type, db_comm_txn, ENVIRONMENT):
+    print("Helper: root_page_helper({})".format(type))
+
+    (min_year, month_year_list) = db_comm_txn.get_min_max_transaction_dates()
+    final_year_links = []
+    curr_year = min_year
+    year_idx = 0
+    year_first = True
+    for (month, year) in month_year_list:
+        if curr_year != year:
+            curr_year = year
+            year_idx += 1
+            year_first = True
+
+        month_str = "{:02d}".format(month)
+        month_year_str = "{}-{}".format(month_str, year)
+        link = "location.href='{}/site/{}/year:{}/month:{}'".format(ENVIRONMENT, type, year, month_str)
+
+        if year_first:
+            final_year_links.append((year, []))
+            year_first = False
+
+        final_year_links[year_idx][1].append((month_year_str, link))
+
+    return ((obj[0], (sorted(obj[1], reverse=True))) for obj in sorted(final_year_links, reverse=True))
 
 def string_to_date(date_string):
     year = int(date_string.split("_")[0][0:4])

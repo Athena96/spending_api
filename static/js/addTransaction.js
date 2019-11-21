@@ -6,7 +6,7 @@ function addTransaction() {
     var final_cat = category;
 
     var amount = document.getElementById("amountTextBox").value;
-    var varTxnTrackingCode = document.getElementById("paymentMethodU").value;
+    var varTxnTrackingCode = document.getElementById("paymentMethod").value;
     if (varTxnTrackingCode == "" || varTxnTrackingCode == null || varTxnTrackingCode == " ") {
         varTxnTrackingCode = null;
     }

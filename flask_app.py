@@ -10,6 +10,7 @@ from timeline_generator import TimelineGenerator
 from utilities import outside_to_python_recurrence
 from utilities import outside_to_python_transaction
 from utilities import string_to_date
+from utilities import get_date_page_links
 
 # declare our Flask app
 app = Flask(__name__)
@@ -47,7 +48,7 @@ with app.app_context():
 def summary_root_page():
     print("summary_root_page()")
 
-    summary_links = get_date_page_links("summary")
+    summary_links = get_date_page_links("summary", db_comm_txn, ENVIRONMENT)
     return render_template('root_summary.html', summary_links=summary_links, prefix=ENVIRONMENT)
 
 
@@ -100,7 +101,7 @@ def timeline_page():
 def transactions_root_page():
     print("transactions_root_page()")
 
-    transaction_links = get_date_page_links("transactions")
+    transaction_links = get_date_page_links("transactions", db_comm_txn, ENVIRONMENT)
     return render_template('root_transactions.html', transaction_links=transaction_links, prefix=ENVIRONMENT)
 
 
@@ -275,30 +276,3 @@ def set_starting_bal(starting_bal):
 
     return db_comm_bal.set_starting_balance(starting_bal)
 
-
-# helpers
-def get_date_page_links(type):
-    print("Helper: root_page_helper({})".format(type))
-
-    (min_year, month_year_list) = db_comm_txn.get_min_max_transaction_dates()
-    final_year_links = []
-    curr_year = min_year
-    year_idx = 0
-    year_first = True
-    for (month, year) in month_year_list:
-        if curr_year != year:
-            curr_year = year
-            year_idx += 1
-            year_first = True
-
-        month_str = "{:02d}".format(month)
-        month_year_str = "{}-{}".format(month_str, year)
-        link = "location.href='{}/site/{}/year:{}/month:{}'".format(ENVIRONMENT, type, year, month_str)
-
-        if year_first:
-            final_year_links.append((year, []))
-            year_first = False
-
-        final_year_links[year_idx][1].append((month_year_str, link))
-
-    return ((obj[0], (sorted(obj[1], reverse=True))) for obj in sorted(final_year_links, reverse=True))
