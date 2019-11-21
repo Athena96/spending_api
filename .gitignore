@@ -1,3 +1,4 @@
 app.properties
 *.pyc
 *.idea/ 
+spending_log.db
