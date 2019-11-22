@@ -4,7 +4,12 @@ from models import Recurrence
 from models import RecurrenceType
 from models import Transaction
 
-# helpers
+
+def get_day(balance_date):
+    dow = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    dt = "{}-{}-{}".format(balance_date.year, balance_date.month, balance_date.day)
+    return "{} {}".format(dow[balance_date.weekday()], dt)
+
 def get_date_page_links(type, db_comm_txn, ENVIRONMENT):
     print("Helper: root_page_helper({})".format(type))
 

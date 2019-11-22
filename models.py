@@ -19,6 +19,14 @@ class BalanceRow:
         self.expenses_desc = expenses_desc
         self.bal_percent_color = bal_percent_color
 
+    def get_balance_day(self):
+        dow = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        year = int(self.balance_date.split("_")[0][0:4])
+        month = int(self.balance_date.split("_")[0][5:7])
+        day = int(self.balance_date.split("_")[0][8:10])
+        date = datetime(year, month, day)
+        return "{} {}".format(dow[date.weekday()], self.balance_date[0:10])
+
 
 class Transaction:
 

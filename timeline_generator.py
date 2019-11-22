@@ -4,6 +4,7 @@ from datetime import timedelta
 from models import BalanceRow
 from models import RecurrenceType
 
+from utilities import get_day
 
 class TimelineGenerator:
 
@@ -73,7 +74,8 @@ class TimelineGenerator:
                 bal_percent_color = "red"
                 reds += 1
 
-            rows.append(BalanceRow(balance_date=date, balance=balance, income=incomes, income_desc=income_desc,
+            pretty_date = get_day(date)
+            rows.append(BalanceRow(balance_date=pretty_date, balance=balance, income=incomes, income_desc=income_desc,
                                    expense=expenses, expenses_desc=expenses_desc, bal_percent_color=bal_percent_color))
 
         tot = greens + reds + yellows

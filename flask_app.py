@@ -12,6 +12,8 @@ from utilities import outside_to_python_transaction
 from utilities import string_to_date
 from utilities import get_date_page_links
 
+from collections import OrderedDict
+
 # declare our Flask app
 app = Flask(__name__)
 
@@ -152,7 +154,8 @@ def transactions_page(year=None, month=None, category="ALL", start_date=None, en
                           reverse=True)
 
     # create date map to group txns by day
-    txn_date_map = {}
+    # todo use OrderedDict and the utility i have for dates formatting
+    txn_date_map = OrderedDict()
     for txn in transactions:
         key = txn.get_transaction_day_date()
         if key not in txn_date_map.keys():
