@@ -35,7 +35,7 @@
             {% for aggregation in aggregations %}
 
                 <tr>
-                    <td>{{ aggregation.category }}</td>
+                    <td><button class="btnSmall select" id="{{aggregation.category}}" onclick="openTransactionsPage({{year}}, {{month}}, this.id)"><u>{{ aggregation.category }}</u></button></td>
                     <td>${{ aggregation.spent_so_far_month }}</td>
                     <td>${{ aggregation.spent_so_far_year }}</td>
                 </tr>
