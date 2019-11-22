@@ -31,6 +31,8 @@ function addRecurrence() {
     var description = document.getElementById("descriptionTextBox").value;
     if (description == "" || description == null || description == " ") {
         description = null;
+    } else {
+        description = description.replace("/", "-");
     }
 
     var xhr = new XMLHttpRequest();
@@ -69,6 +71,8 @@ function updateRecurrence(recurrence_id) {
     var description = document.getElementById("descriptionTextBoxU").value;
     if (description == "" || description == null || description == " ") {
         description = null;
+    } else {
+        description = description.replace("/", "-");
     }
 
     var passcode = document.getElementById("passcodeTextBoxU").value;

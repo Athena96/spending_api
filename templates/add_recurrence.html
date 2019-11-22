@@ -24,9 +24,16 @@
         Recurrence Type (1=INCOME,2=EXPENSE): <input type="text" id="recTypeTextBoxU" name="recType" value="{{recurrence.rec_type.value}}"><br>
         Start Date: <input type="text" id="startDateTextBoxU" name="date" value="{{recurrence.start_date}}"><br>
         End Date: <input type="text" id="endDateTextBoxU" name="date" value="{{recurrence.end_date}}"><br>
-        Days Till Repeat: <input type="text" id="daysTillRepeatTextBoxU" name="date" value="{{recurrence.days_till_repeat}}"><br>
-        Day of Month: <input type="text" id="dayOfMonthTextBoxU" name="repeateDays" value="{{recurrence.day_of_month}}"><br>
-
+        {% if recurrence.days_till_repeat != None %}
+            Days Till Repeat: <input type="text" id="daysTillRepeatTextBoxU" name="date" value="{{recurrence.days_till_repeat}}"><br>
+        {% else %}
+            Days Till Repeat: <input type="text" id="daysTillRepeatTextBoxU" name="date" value=""><br>
+        {% endif %}
+        {% if recurrence.day_of_month != None %}
+            Day of Month: <input type="text" id="dayOfMonthTextBoxU" name="date" value="{{recurrence.day_of_month}}"><br>
+        {% else %}
+            Day of Month: <input type="text" id="dayOfMonthTextBoxU" name="date" value=""><br>
+        {% endif %}
         {% if recurrence.description != None %}
             Description:<br>
             <textarea name="description" id="descriptionTextBoxU" style="width:200px; height:100px;" >{{recurrence.description}}</textarea><br>
@@ -36,7 +43,6 @@
         {% endif %}
         Passcode: <input type="text" id="passcodeTextBoxU" name="passcode" value=""><br>
         <button class="button buttonUpdate" id="{{recurrence.recurrence_id}}" onclick="updateRecurrence(this.id)">Update</button> <br>
-        <button class="button buttonDelete" id="{{recurrence.recurrence_id}}" onclick="deleteRecurrence(this.id)">Delete</button>
         <p>Click the "Update" button to save the recurrence.</p>
 
     {% else %}
