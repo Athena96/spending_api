@@ -180,16 +180,24 @@ class DBCommsTransaction(DBComms):
         return self.extract_transactions(self.cursor)
 
     def get_transaction_aggregations(self, year, month):
-        cmd = """select A.category, A.month_total, B.year_total
-        from (select ledger.category as 'category', sum(ledger.amount) as 'month_total'
-            from ledger
-            where ledger.date like( '%{}%')
-            group by ledger.category) A, (select ledger.category  as 'category', sum(ledger.amount) as 'year_total'
+        print("     " + self.__class__.__name__)
+        print("     " + "get_transaction_aggregations({},{})".format(year, month))
+        if month is not None:
+            cmd = """select A.category, A.month_total, B.year_total
+            from (select ledger.category as 'category', sum(ledger.amount) as 'month_total'
                 from ledger
-                where ledger.date like('%{}%' )
-                group by ledger.category) B
-        where A.category = B.category""".format("{}-{}-".format(year, month), "{}-".format(year))
-
+                where ledger.date like( '%{}%')
+                group by ledger.category) A, (select ledger.category  as 'category', sum(ledger.amount) as 'year_total'
+                    from ledger
+                    where ledger.date like('%{}%' )
+                    group by ledger.category) B
+            where A.category = B.category""".format("{}-{}-".format(year, month), "{}-".format(year))
+        else:
+            cmd = """select ledger.category  as 'category', 0.0 as 'month_total', sum(ledger.amount) as 'year_total'
+            from ledger
+            where ledger.date like('%{}%' )
+            group by ledger.category
+            order by year_total desc""".format("{}-".format(year))
         self.cursor.execute(cmd)
 
         aggregate_map = {}

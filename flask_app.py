@@ -55,7 +55,8 @@ def summary_root_page():
 
 
 @app.route("/site/summary/year:<string:year>/month:<string:month>", methods=["GET"])
-def summary_page(year, month):
+@app.route("/site/summary/year:<string:year>", methods=["GET"])
+def summary_page(year, month=None):
     print("summary_page()")
     (year_income, month_income) = db_comm_txn.get_income(year, month)
     (spent_in_year_str, spent_in_month_str) = db_comm_txn.get_spending(year, month)
