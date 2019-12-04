@@ -24,6 +24,7 @@ class TimelineGenerator:
         self.red = 0.0
         self.green_range = green_range
         self.yellow_range = yellow_range
+        self.table = None
 
     def get_recurrences_for_day(self, date, rec_type):
         todays_recurrences = []
@@ -38,8 +39,6 @@ class TimelineGenerator:
                 # those variable categories, then update the 'amount' field of the Recurrence
                 if recurrence.days_till_repeat is None and recurrence.day_of_month is None and recurrence.amount == 0.0:
                     variable_txns = self.db_comm_txn.get_transactions_by_payment_method(recurrence.name)
-                    print(variable_txns)
-                    print(recurrence.name)
 
                     recurrence.amount = sum([x.amount for x in variable_txns])
 
@@ -50,6 +49,22 @@ class TimelineGenerator:
         return (total_amnt, total_descriptions)
 
     def generate_table(self):
+
+        if self.table is not None:
+            print("balance_date", self.table[0].balance_date)
+            print("type", type(self.table[0].balance_date))
+            print("timeline_start_date", self.timeline_start_date)
+            print("type", type(self.timeline_start_date))
+
+            st_dt = self.table[0].balance_date.split(' ')[1].split('-')
+            cached_date = datetime(year=int(st_dt[0]), month=int(st_dt[1]), day=int(st_dt[2]))
+            today_date = self.timeline_start_date
+
+            if cached_date == today_date:
+                print("USING CACHE!")
+                return self.table
+
+
         rows = []
         previous_bal = self.starting_balance
         greens = 0
@@ -82,4 +97,5 @@ class TimelineGenerator:
         self.green = round(float(greens) / tot, 2)
         self.yellow = round(float(yellows) / tot, 2)
         self.red = round(float(reds) / tot, 2)
+        self.table = rows
         return rows

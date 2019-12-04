@@ -81,6 +81,7 @@ def timeline_page():
     print("timeline_page()")
     starting_balance = db_comm_bal.get_starting_balance()
     recurrences = db_comm_recurr.get_recurrences(None)
+
     generator = TimelineGenerator(months_to_generate=MONTHS_GENERATED, db_comm_txn=db_comm_txn,
                                   initial_recurrences=recurrences,
                                   starting_balance=starting_balance, green_range=GREEN_RANGE, yellow_range=YELLOW_RANGE)
