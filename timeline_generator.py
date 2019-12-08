@@ -40,7 +40,7 @@ class TimelineGenerator:
                 if recurrence.days_till_repeat is None and recurrence.day_of_month is None and recurrence.amount == 0.0:
                     variable_txns = self.db_comm_txn.get_transactions_by_payment_method(recurrence.name)
 
-                    recurrence.amount = sum([x.amount for x in variable_txns])
+                    recurrence.amount = sum([x.amount if x.txn_type is RecurrenceType.EXPENSE else (-1.0*x.amount) for x in variable_txns])
 
                 todays_recurrences.append(recurrence)
 

@@ -90,8 +90,15 @@ def timeline_page():
     last_day_bal_num = round(table[len(table) - 1].balance, 2)
     last_day_bal = "${}".format(last_day_bal_num)
     last_day_bal_dff = "${}".format(round((last_day_bal_num - GREEN_RANGE), 2))
+
+    average_bal_num = round((sum([x.balance for x in table])/len(table)),2)
+    average_bal = "${}".format( average_bal_num )
+    average_bal_dff = "${}".format(round((average_bal_num - GREEN_RANGE), 2))
+
     return render_template('timeline.html', timeline_table=table, last_day_bal=last_day_bal,
                            last_day_bal_dff=last_day_bal_dff,
+                           average_bal=average_bal,
+                           average_bal_dff=average_bal_dff,
                            greens=generator.green,
                            yellows=generator.yellow,
                            reds=generator.red,
