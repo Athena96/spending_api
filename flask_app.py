@@ -122,7 +122,9 @@ def add_transaction_page(transaction_id=None):
     print("add_transaction_page()")
 
     transaction = db_comm_txn.get_transaction(transaction_id)
-    return render_template('add_transaction.html', transaction=transaction, prefix=ENVIRONMENT)
+    used_categories = db_comm_txn.get_categories()
+    used_categories.insert(0,"-")
+    return render_template('add_transaction.html', transaction=transaction, used_categories=used_categories, prefix=ENVIRONMENT)
 
 
 @app.route("/site/transactions/year:<string:year>", methods=["GET"])

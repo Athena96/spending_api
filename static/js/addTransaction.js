@@ -2,8 +2,15 @@
 
 function addTransaction() {
     var title = document.getElementById("titleTextBox").value;
+
     var category = document.getElementById("mySelectCategory").value;
-    var final_cat = category;
+    var selectorCategory = document.getElementById("mySelectorCategory").value;
+    var final_cat = "";
+    if (selectorCategory == "-") {
+        final_cat = category;
+    } else {
+        final_cat = selectorCategory;
+    }
 
     var amount = document.getElementById("amountTextBox").value;
     var varTxnTrackingCode = document.getElementById("paymentMethod").value;
@@ -71,6 +78,14 @@ function updateTransaction(transaction_id) {
     }
 
     var category = document.getElementById("mySelectCategoryU").value;
+    var selectorCategory = document.getElementById("mySelectorCategoryU").value;
+    var final_cat = "";
+    if (selectorCategory == "-") {
+        final_cat = category;
+    } else {
+        final_cat = selectorCategory;
+    }
+
     var date = document.getElementById("dateTextBoxU").value;
     var description = document.getElementById("descriptionTextBoxU").value;
     if (description == "" || description == null || description == " ") {

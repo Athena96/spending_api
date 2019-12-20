@@ -79,6 +79,17 @@ class DBCommsTransaction(DBComms):
 
         return self.extract_transactions(self.cursor)
 
+    def get_categories(self):
+        print("     " + self.__class__.__name__)
+        print("     " + "get_categories()")
+        (self.db_conn, self.cursor) = self.get_instance()
+
+        cmd = "select distinct(ledger.category) from ledger order by ledger.category;"
+        self.cursor.execute(cmd)
+
+        return self.extract_categories(self.cursor)
+
+
     def get_spending(self, year, month):
         print("     " + self.__class__.__name__)
         print("     " + "get_spending()")
@@ -203,19 +214,6 @@ class DBCommsTransaction(DBComms):
         aggregate_map = {}
         for category, month_total, year_total in self.cursor:
             aggregate_map[category] = SummaryPageInfo(category=category, spent_so_far_month=month_total, spent_so_far_year=year_total)
-            if "-" in category:
-                main_cat = category.split("-")[0]
-                if main_cat not in aggregate_map.keys():
-                    aggregate_map[main_cat] = SummaryPageInfo(category=main_cat, spent_so_far_month=0.0, spent_so_far_year=0.0)
-
-        # add sub category balances to main category for summary viewing
-        for category in aggregate_map.keys():
-            if "-" in category:
-                main_cat = category.split("-")[0]
-                spi = aggregate_map[main_cat]
-                spi.spent_so_far_month += aggregate_map[category].spent_so_far_month
-                spi.spent_so_far_year += aggregate_map[category].spent_so_far_year
-                aggregate_map[main_cat] = spi
 
         return aggregate_map
 
@@ -228,6 +226,15 @@ class DBCommsTransaction(DBComms):
                                                         description=description, payment_method=payment_method,
                                                         txn_type=txn_type, transaction_id=transaction_id)
             data.append(transaction)
+        return data
+
+    def extract_categories(self, cursor):
+        print("     " + self.__class__.__name__)
+        print("     " + "extract_categories()")
+
+        data = []
+        for category, in cursor:
+            data.append(str(category))
         return data
 
     def get_min_max_transaction_dates(self):
