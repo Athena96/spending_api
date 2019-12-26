@@ -1,6 +1,5 @@
 
 function deleteTransaction(transaction_id) {
-
     var xhr = new XMLHttpRequest();
     var url = prefix + "/transactions/" + transaction_id;
     xhr.open("DELETE", url, true);
@@ -14,8 +13,13 @@ function deleteTransaction(transaction_id) {
 }
 
 function openUpdatePage(transaction_id) {
-
     var xhr = new XMLHttpRequest();
     var url = prefix + "/site/add_transaction/" + transaction_id;
+    window.open(url);
+}
+
+function duplicateTransaction(transaction_id) {
+    var xhr = new XMLHttpRequest();
+    var url = prefix + "/site/add_transaction/" + transaction_id + "/true";
     window.open(url);
 }

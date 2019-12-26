@@ -124,14 +124,16 @@ def transactions_root_page():
 
 
 @app.route("/site/add_transaction", methods=["GET"])
+@app.route("/site/add_transaction/<string:transaction_id>/<string:duplicated>", methods=["GET"])
 @app.route("/site/add_transaction/<string:transaction_id>", methods=["GET"])
-def add_transaction_page(transaction_id=None):
+def add_transaction_page(transaction_id=None, duplicated=None):
     print("add_transaction_page()")
-
+    print("duplicated: ", duplicated)
+    is_duplicated = True if duplicated is not None else False
     transaction = db_comm_txn.get_transaction(transaction_id)
     used_categories = db_comm_txn.get_categories()
     used_categories.insert(0,"-")
-    return render_template('add_transaction.html', transaction=transaction, used_categories=used_categories, prefix=ENVIRONMENT)
+    return render_template('add_transaction.html', transaction=transaction, is_duplicated=is_duplicated, used_categories=used_categories, prefix=ENVIRONMENT)
 
 
 @app.route("/site/transactions/year:<string:year>", methods=["GET"])

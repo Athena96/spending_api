@@ -17,6 +17,41 @@
     <button class="btn add_recurrence" onclick="location.href='{{prefix}}/site/add_recurrence'">Add Recurrence</button>
 
 <form>
+
+    {% if is_duplicated == True %}
+
+        Title: <input type="text" id="titleTextBox" name="title" value="{{transaction.title}}"><br>
+        Amount: <input type="text" id="amountTextBox" name="amount" value="{{transaction.amount}}"><br>
+        Variable Transaction Tracking Code: <input type="text" id="paymentMethod" name="amount" value="{{transaction.payment_method}}"><br>
+        Categories: <input type="text" id="mySelectCategory" name="category" value="{{"-".join(transaction.category)}}">
+        <select id="mySelectorCategory">
+            {% for category in used_categories %}
+                <option value="{{category}}">{{category}}</option>
+            {% endfor %}
+        </select><br>
+        Date: <input type="text" id="dateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
+        {% if transaction.txn_type.value == 2 %}
+            Transaction Type (1=INCOME,2=EXPENSE): <input type="text" id="transactionTypeTextBox" name="transactionType" value="2"><br>
+        {% else %}
+            Transaction Type (1=INCOME,2=EXPENSE): <input type="text" id="transactionTypeTextBox" name="transactionType" value="1"><br>
+        {% endif %}
+
+        {% if transaction.description != None %}
+            Description:<br>
+            <textarea name="description" id="descriptionTextBox" style="width:200px; height:100px;" >{{transaction.description}}</textarea><br>
+        {% else %}
+            Description:<br>
+            <textarea name="description" id="descriptionTextBox" style="width:200px; height:100px;" ></textarea><br>
+        {% endif %}
+
+        Passcode: <input type="text" id="passcodeTextBox" name="passcode" value=""><br>
+        <button class="button" onclick="addTransaction()">Insert</button>
+
+        <p>Click the "Insert" button to insert the transaction.</p>
+
+
+    {% else %}
+
     {% if transaction != None %}
 
         Title: <input type="text" id="titleTextBoxU" name="title" value="{{transaction.title}}"><br>
@@ -68,6 +103,7 @@
 
         <p>Click the "Insert" button to insert the transaction.</p>
 
+    {% endif %}
     {% endif %}
 
 
