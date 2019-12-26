@@ -47,7 +47,31 @@
     <p>
         <br />
     </p>
+        <table class="a">
 
+            <tr>
+                <th>Payment Method</th>
+                <th>Debit</th>
+                <th>Credit</th>
+                <th>Due</th>
+            </tr>
+
+            {% for payment_method_aggregation in payment_method_aggregations %}
+
+                <tr>
+                    <td>{{ payment_method_aggregation[0] }}</td>
+                    <td>${{  payment_method_aggregation[1] }}</td>
+                    <td>${{  payment_method_aggregation[2] }}</td>
+                    <td>${{  payment_method_aggregation[3] }}</td>
+                </tr>
+
+            {% endfor %}
+
+        </table>
+
+    <p>
+        <br />
+    </p>
 <script src="/static/js/summary.js"></script>
 
 </body>

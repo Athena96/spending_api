@@ -217,6 +217,36 @@ class DBCommsTransaction(DBComms):
 
         return aggregate_map
 
+    def get_transaction_payment_methods_aggregations(self):
+        print("     " + self.__class__.__name__)
+        print("     " + "get_transaction_payment_methods_aggregations()")
+        cmd = """
+        select A.var_txn_tracking as 'payment_method', A.amt as 'debit', ifnull(B.amt, 0.0) as 'credit', ifnull(A.amt, 0.0) - ifnull(B.amt, 0.0) as 'due'
+        from
+        (
+        select ledger.var_txn_tracking as 'var_txn_tracking', ifnull(sum(ledger.amount),0.0) as 'amt'
+        from ledger
+        where ledger.txn_type = '2'  and ledger.var_txn_tracking like ('cc_%')
+        group by ledger.var_txn_tracking
+        ) A
+        left join
+        (
+        select ledger.var_txn_tracking as 'var_txn_tracking', ifnull(sum(ledger.amount),0.0) as 'amt'
+        from ledger
+        where ledger.txn_type = '1'  and ledger.var_txn_tracking like ('cc_%')
+        group by ledger.var_txn_tracking
+        ) B
+        on A.var_txn_tracking = B.var_txn_tracking
+        order by payment_method;
+        """
+        self.cursor.execute(cmd)
+
+        aggregate_map = {}
+        for payment_method, debit, credit, due in self.cursor:
+            aggregate_map[payment_method] = [payment_method, round(float(debit),2), round(float(credit),2), round(float(due),2)]
+
+        return aggregate_map
+
     def extract_transactions(self, cursor):
         print("     " + self.__class__.__name__)
         print("     " + "extract_transactions()")

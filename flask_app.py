@@ -66,9 +66,16 @@ def summary_page(year, month=None):
     for category in aggregate_map.keys():
         aggregations.append(aggregate_map[category])
 
+    payment_method_aggregations = []
+    payment_method_aggregations_map = db_comm_txn.get_transaction_payment_methods_aggregations()
+    for payment_type in payment_method_aggregations_map.keys():
+        payment_method_aggregations.append(payment_method_aggregations_map[payment_type])
+
+
     sorted_aggregations = sorted(aggregations, key=lambda x: x.spent_so_far_month, reverse=True)
     return render_template('summary.html',
                            aggregations=sorted_aggregations,
+                           payment_method_aggregations=payment_method_aggregations,
                            month=month, year=year,
                            spent_in_month=spent_in_month_str, spent_in_year=spent_in_year_str,
                            month_income=month_income, year_income=year_income, prefix=ENVIRONMENT)

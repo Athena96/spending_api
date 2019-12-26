@@ -14,6 +14,9 @@ p {
     font-family:helvetica;
 }
 
+.floatLeft {  float: left; }
+.floatRight { float: right; }
+.container { overflow: hidden; }
 
 
 td, th {
@@ -30,6 +33,7 @@ table.a {
   table-layout: auto;
   width: 800px;
 }
+
 
 .btn {
   border: none;
