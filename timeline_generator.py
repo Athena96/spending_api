@@ -4,7 +4,7 @@ from datetime import timedelta
 from models import BalanceRow
 from models import RecurrenceType
 
-from utilities import get_day
+from utilities import get_day, outside_to_python_transaction
 
 class TimelineGenerator:
 
@@ -45,7 +45,27 @@ class TimelineGenerator:
 
         total_amnt = round(sum([x.amount for x in todays_recurrences]), 2)
         total_descriptions = ",\r\n".join([x.description for x in todays_recurrences])
-        return (total_amnt, total_descriptions)
+        return (total_amnt, total_descriptions, todays_recurrences)
+
+
+    def auto_add_todays_recurring_txns(self, recurrences, date):
+        print("auto_add_todays_recurring_txns()")
+        print("date: ", date)
+
+        not_added_yet = True if len(self.db_comm_txn.get_auto_added_transaction_for_date(date)) == 0 else False
+
+        if not_added_yet:
+            for recurrence in recurrences:
+                print("recurrence: ", recurrence.to_dict())
+                transaction = outside_to_python_transaction(title="[AUTO_ADDED] {}".format(recurrence.description),
+                                                            amount=recurrence.amount,
+                                                            category=recurrence.name,
+                                                            date=date,
+                                                            description=recurrence.description,
+                                                            payment_method="checking",
+                                                            txn_type=recurrence.rec_type.value)
+                self.db_comm_txn.add_transaction(transaction)
+
 
     def generate_table(self):
 
@@ -70,10 +90,17 @@ class TimelineGenerator:
         yellows = 0
         reds = 0
 
+        today = True
+
         for date in ([self.timeline_start_date + timedelta(days=x) for x in range(self.days_to_genrate)]):
 
-            (incomes, income_desc) = self.get_recurrences_for_day(date, RecurrenceType.INCOME)
-            (expenses, expenses_desc) = self.get_recurrences_for_day(date, RecurrenceType.EXPENSE)
+            (incomes, income_desc, income_recurrs) = self.get_recurrences_for_day(date, RecurrenceType.INCOME)
+            (expenses, expenses_desc, expense_recurrs) = self.get_recurrences_for_day(date, RecurrenceType.EXPENSE)
+
+            if today == True:
+                self.auto_add_todays_recurring_txns(income_recurrs + expense_recurrs, date)
+                today = False
+
 
             balance = round((previous_bal + incomes - expenses), 2)
             previous_bal = balance

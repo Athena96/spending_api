@@ -128,7 +128,6 @@ def transactions_root_page():
 @app.route("/site/add_transaction/<string:transaction_id>", methods=["GET"])
 def add_transaction_page(transaction_id=None, duplicated=None):
     print("add_transaction_page()")
-    print("duplicated: ", duplicated)
     is_duplicated = True if duplicated is not None else False
     transaction = db_comm_txn.get_transaction(transaction_id)
     used_categories = db_comm_txn.get_categories()

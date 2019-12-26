@@ -79,6 +79,17 @@ class DBCommsTransaction(DBComms):
 
         return self.extract_transactions(self.cursor)
 
+    def get_auto_added_transaction_for_date(self, date):
+        print("     " + self.__class__.__name__)
+        print("     " + "get_auto_added_transaction_for_date(date:{})".format(date))
+        (self.db_conn, self.cursor) = self.get_instance()
+
+        cmd = "select * from ledger where ledger.title like '[AUTO_ADDED]%' and ledger.date like '{}-{}-{}%'".format(date.year, date.month, date.day)
+        print(cmd)
+        self.cursor.execute(cmd)
+
+        return self.extract_transactions(self.cursor)
+
     def get_categories(self):
         print("     " + self.__class__.__name__)
         print("     " + "get_categories()")
