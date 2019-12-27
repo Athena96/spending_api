@@ -30,7 +30,7 @@ class TimelineStats:
 
 class BalanceRow:
 
-    def __init__(self, balance_date, balance, income, expense, income_desc, expenses_desc, bal_percent_color):
+    def __init__(self, balance_date, balance, income, expense, income_desc, income_recurrences, expense_recurrences, expenses_desc, bal_percent_color):
         self.balance_date = balance_date
         self.balance = balance
         self.income = income
@@ -38,6 +38,8 @@ class BalanceRow:
         self.income_desc = income_desc
         self.expenses_desc = expenses_desc
         self.bal_percent_color = bal_percent_color
+        self.income_recurrences = income_recurrences
+        self.expense_recurrences = expense_recurrences
 
     def get_balance_day(self):
         dow = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]

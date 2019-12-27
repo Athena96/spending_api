@@ -49,11 +49,24 @@
 
             <tr>
                 <td>{{ day.balance_date }}</td>
+
                 <td><b><font color="{{ day.bal_percent_color }}">${{ day.balance }}</font></b></td>
+
                 <td>${{ day.income }}</td>
-                <td>{{ day.income_desc }}</td>
+
+                <td>
+                {% for income in day.income_recurrences %}
+                    <button class="btnSmall select" id="{{income.recurrence_id}}" onclick="openUpdatePage(this.id)"><u>{{ income.description }},</u></button>
+                {% endfor %}
+                </td>
+
                 <td>${{ day.expense }}</td>
-                <td>{{ day.expenses_desc }}</td>
+
+                <td>
+                {% for expense in day.expense_recurrences %}
+                    <button class="btnSmall select" id="{{expense.recurrence_id}}" onclick="openUpdatePage(this.id)"><u>{{ expense.description }},</u></button>
+                {% endfor %}
+                </td>
             </tr>
 
             {% endfor %}

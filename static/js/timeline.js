@@ -20,3 +20,9 @@ function setStartingBal() {
     xhr.send(JSON.stringify({}));
     window.open('timeline');
 }
+
+function openUpdatePage(recurrence_id) {
+    var xhr = new XMLHttpRequest();
+    var url = prefix + "/site/add_recurrence/" + recurrence_id;
+    window.open(url);
+}
