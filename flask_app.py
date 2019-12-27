@@ -57,15 +57,15 @@ def summary_root_page():
 def summary_page(year, month=None):
     print("summary_page()")
     (year_income, month_income) = db_comm_txn.get_income(year, month)
-    (spent_in_year_str, spent_in_month_str) = db_comm_txn.get_spending(year, month)
+    (year_spent, month_spent) = db_comm_txn.get_spending(year, month)
 
     aggregations = []
-    aggregate_map = db_comm_txn.get_transaction_aggregations(year=year, month=month)
+    aggregate_map = db_comm_txn.get_transaction_aggregations_category(year=year, month=month)
     for category in aggregate_map.keys():
         aggregations.append(aggregate_map[category])
 
     payment_method_aggregations = []
-    payment_method_aggregations_map = db_comm_txn.get_transaction_payment_methods_aggregations()
+    payment_method_aggregations_map = db_comm_txn.get_transaction_aggregations_payment_method()
     for payment_type in payment_method_aggregations_map.keys():
         payment_method_aggregations.append(payment_method_aggregations_map[payment_type])
 
@@ -74,7 +74,7 @@ def summary_page(year, month=None):
                            aggregations=sorted_aggregations,
                            payment_method_aggregations=payment_method_aggregations,
                            month=month, year=year,
-                           spent_in_month=spent_in_month_str, spent_in_year=spent_in_year_str,
+                           spent_in_month=month_spent, spent_in_year=year_spent,
                            month_income=month_income, year_income=year_income, prefix=ENVIRONMENT)
 
 
@@ -137,7 +137,7 @@ def transactions_page(year=None, month=None, category="ALL"):
 
     # 2 get year and month income/spending values
     (year_income, month_income) = db_comm_txn.get_income(year, month)
-    (spent_in_year_str, spent_in_month_str) = db_comm_txn.get_spending(year, month)
+    (year_spent, month_spent) = db_comm_txn.get_spending(year, month)
 
     # sort the transactions to display and store them in "transactions"
     transactions = sorted(year_transactions if month is None else month_transactions, key=lambda x: x.date,
@@ -158,7 +158,7 @@ def transactions_page(year=None, month=None, category="ALL"):
                            transactions=transactions,
                            txn_date_map_keys=sorted(txn_date_map.keys(), reverse=True),
                            txn_date_map=txn_date_map,
-                           spent_in_month=spent_in_month_str, spent_in_year=spent_in_year_str,
+                           spent_in_month=month_spent, spent_in_year=year_spent,
                            month_income=month_income, year_income=year_income, prefix=ENVIRONMENT)
 
 

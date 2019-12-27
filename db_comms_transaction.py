@@ -39,7 +39,7 @@ class DBCommsTransaction(DBComms):
         cmd = """UPDATE ledger SET title = '{0}', amount = {1}, category = '{2}', date = '{3}', description = '{4}', var_txn_tracking = '{5}', txn_type = {6} WHERE ledger.transaction_id = {7}""".format(
             writable_txn["title"],
             writable_txn["amount"], writable_txn["category"], writable_txn["date"], writable_txn["description"],
-            writable_txn["payment_method"], writable_txn["txn_type"],  writable_txn["transaction_id"])
+            writable_txn["payment_method"], writable_txn["txn_type"], writable_txn["transaction_id"])
         print(cmd)
         self.cursor.execute(cmd)
         self.db_conn.commit()
@@ -84,7 +84,8 @@ class DBCommsTransaction(DBComms):
         print("     " + "get_auto_added_transaction_for_date(date:{})".format(date))
         (self.db_conn, self.cursor) = self.get_instance()
 
-        cmd = "select * from ledger where ledger.title like '[AUTO_ADDED]%' and ledger.date like '{}-{}-{}%'".format(date.year, date.month, date.day)
+        cmd = "select * from ledger where ledger.title like '[AUTO_ADDED]%' and ledger.date like '{}-{}-{}%'".format(
+            date.year, date.month, date.day)
         print(cmd)
         self.cursor.execute(cmd)
 
@@ -100,42 +101,27 @@ class DBCommsTransaction(DBComms):
 
         return self.extract_categories(self.cursor)
 
-
     def get_spending(self, year, month):
         print("     " + self.__class__.__name__)
         print("     " + "get_spending()")
+        if month is None or year is None:
+            return ("--", "--")
 
         year_transactions = self.get_transactions(year=year)
+        month_transactions = [transaction for transaction in year_transactions if (transaction.date[5:7] == month)]
 
-        if month is not None:
-            # 3 filter month transactions
-            month_transactions = [transaction for transaction in year_transactions if (transaction.date[5:7] == month)]
+        year_spent = round(sum([transaction.amount for transaction in year_transactions if
+                                (transaction.txn_type == RecurrenceType.EXPENSE) and int(transaction.date[5:7]) <= int(
+                                    month)]), 2)
+        month_spent = round(sum([transaction.amount for transaction in month_transactions if
+                                 (transaction.txn_type == RecurrenceType.EXPENSE)]), 2)
 
-            # 4 calculate spent_in_year
-            spent_in_year = sum([transaction.amount for transaction in year_transactions if
-                                 (transaction.txn_type == RecurrenceType.EXPENSE) and int(transaction.date[5:7]) <= int(
-                                     month)])
-            spent_in_year_str = str(round(spent_in_year, 2))
-
-            # 5 calculate spent_in_month
-            spent_in_month = sum([transaction.amount for transaction in month_transactions if
-                                  (transaction.txn_type == RecurrenceType.EXPENSE)])
-            spent_in_month_str = str(round(spent_in_month, 2))
-        else:
-            # 4 calculate spent_in_month
-            spent_in_year = sum([transaction.amount for transaction in year_transactions if
-                                 (transaction.txn_type == RecurrenceType.EXPENSE)])
-            spent_in_year_str = str(round(spent_in_year, 2))
-
-            # 5 calculate spent_in_month
-            spent_in_month_str = "--"
-
-        return (spent_in_year_str, spent_in_month_str)
+        return (year_spent, month_spent)
 
     def get_income(self, year, month):
         print("     " + self.__class__.__name__)
         print("     " + "get_income()")
-        if month is None:
+        if month is None or year is None:
             return ("--", "--")
 
         year_transactions = self.get_transactions(year=year)
@@ -173,35 +159,7 @@ class DBCommsTransaction(DBComms):
         result = self.extract_transactions(self.cursor)
         return None if len(result) == 0 or len(result) > 1 else result[0]
 
-    def get_transactions_between(self, start_date, end_date, category=None):
-        print("     " + self.__class__.__name__)
-        print("     " + "get_transactions_between()")
-        (self.db_conn, self.cursor) = self.get_instance()
-
-        base_query = "select * from ledger"
-
-        date_query = "ledger.date >= '{}-{}-{} 00:00:00' and ledger.date <= '{}-{}-{} 23:59:59'".format(start_date.year,
-                                                                                                        '{:02d}'.format(
-                                                                                                            start_date.month),
-                                                                                                        '{:02d}'.format(
-                                                                                                            start_date.day),
-                                                                                                        end_date.year,
-                                                                                                        '{:02d}'.format(
-                                                                                                            end_date.month),
-                                                                                                        '{:02d}'.format(
-                                                                                                            end_date.day))
-
-        category_query = ""
-        if category is not None:
-            category_query = "ledger.category = '{}'".format(category.name)
-
-        cmd = base_query + " where " + date_query + (" and " if category is not None else "") + category_query
-        self.cursor.execute(cmd)
-        print(cmd)
-
-        return self.extract_transactions(self.cursor)
-
-    def get_transaction_aggregations(self, year, month):
+    def get_transaction_aggregations_category(self, year, month):
         print("     " + self.__class__.__name__)
         print("     " + "get_transaction_aggregations({},{})".format(year, month))
         if month is not None:
@@ -224,11 +182,12 @@ class DBCommsTransaction(DBComms):
 
         aggregate_map = {}
         for category, month_total, year_total in self.cursor:
-            aggregate_map[category] = SummaryPageInfo(category=category, spent_so_far_month=month_total, spent_so_far_year=year_total)
+            aggregate_map[category] = SummaryPageInfo(category=category, spent_so_far_month=month_total,
+                                                      spent_so_far_year=year_total)
 
         return aggregate_map
 
-    def get_transaction_payment_methods_aggregations(self):
+    def get_transaction_aggregations_payment_method(self):
         print("     " + self.__class__.__name__)
         print("     " + "get_transaction_payment_methods_aggregations()")
         cmd = """
@@ -254,29 +213,10 @@ class DBCommsTransaction(DBComms):
 
         aggregate_map = {}
         for payment_method, debit, credit, due in self.cursor:
-            aggregate_map[payment_method] = [payment_method, round(float(debit),2), round(float(credit),2), round(float(due),2)]
+            aggregate_map[payment_method] = [payment_method, round(float(debit), 2), round(float(credit), 2),
+                                             round(float(due), 2)]
 
         return aggregate_map
-
-    def extract_transactions(self, cursor):
-        print("     " + self.__class__.__name__)
-        print("     " + "extract_transactions()")
-        data = []
-        for transaction_id, title, amount, category, date, description, payment_method, txn_type in cursor:
-            transaction = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
-                                                        description=description, payment_method=payment_method,
-                                                        txn_type=txn_type, transaction_id=transaction_id)
-            data.append(transaction)
-        return data
-
-    def extract_categories(self, cursor):
-        print("     " + self.__class__.__name__)
-        print("     " + "extract_categories()")
-
-        data = []
-        for category, in cursor:
-            data.append(str(category))
-        return data
 
     def get_min_max_transaction_dates(self):
         print("     " + self.__class__.__name__)
@@ -305,3 +245,23 @@ class DBCommsTransaction(DBComms):
             return [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, until=end)]
 
         return (min_year, months(min_month, min_year, max_month, max_year))
+
+    def extract_transactions(self, cursor):
+        print("     " + self.__class__.__name__)
+        print("     " + "extract_transactions()")
+        data = []
+        for transaction_id, title, amount, category, date, description, payment_method, txn_type in cursor:
+            transaction = outside_to_python_transaction(title=title, amount=amount, category=category, date=date,
+                                                        description=description, payment_method=payment_method,
+                                                        txn_type=txn_type, transaction_id=transaction_id)
+            data.append(transaction)
+        return data
+
+    def extract_categories(self, cursor):
+        print("     " + self.__class__.__name__)
+        print("     " + "extract_categories()")
+
+        data = []
+        for category, in cursor:
+            data.append(str(category))
+        return data

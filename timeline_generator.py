@@ -4,7 +4,7 @@ from datetime import timedelta
 from models import BalanceRow
 from models import RecurrenceType
 from models import TimelineStats
-from utilities import get_day, outside_to_python_transaction
+from utilities import get_day, convert_recurrance_to_transaction
 
 
 class TimelineGenerator:
@@ -30,7 +30,7 @@ class TimelineGenerator:
                     self.timeline_start_date,
                     self.timeline_end_date):
 
-                # if it's a variable recurrence, then we need to query to see how much i've spent in
+                # if it's a variable recurrence, then we need to query to see how much has been spent in
                 # those variable categories, then update the 'amount' field of the Recurrence
                 if recurrence.days_till_repeat is None and recurrence.day_of_month is None and recurrence.amount == 0.0:
                     variable_txns = self.db_comm_txn.get_transactions_by_payment_method(recurrence.name)
@@ -52,13 +52,7 @@ class TimelineGenerator:
 
         if not_added_yet:
             for recurrence in recurrences:
-                transaction = outside_to_python_transaction(title="[AUTO_ADDED] {}".format(recurrence.description),
-                                                            amount=recurrence.amount,
-                                                            category=recurrence.name,
-                                                            date=date,
-                                                            description=recurrence.description,
-                                                            payment_method=recurrence.payment_method,
-                                                            txn_type=recurrence.rec_type.value)
+                transaction = convert_recurrance_to_transaction(recurrence, date)
                 self.db_comm_txn.add_transaction(transaction)
 
     def generate_table(self, starting_balance):

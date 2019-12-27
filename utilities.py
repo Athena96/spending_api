@@ -156,3 +156,13 @@ def python_to_outside_recurrence(recurrence):
     writable_recurrence["payment_method"] = SQL_NULL_or_valid(recurrence.payment_method)
     writable_recurrence["recurrence_id"] = SQL_NULL_or_valid(recurrence.recurrence_id)
     return writable_recurrence
+
+
+def convert_recurrance_to_transaction(recurrence, date):
+    return outside_to_python_transaction(title="[AUTO_ADDED] {}".format(recurrence.description),
+                                         amount=recurrence.amount,
+                                         category=recurrence.name,
+                                         date=date,
+                                         description=recurrence.description,
+                                         payment_method=recurrence.payment_method,
+                                         txn_type=recurrence.rec_type.value)
