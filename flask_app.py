@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import datetime
 
 from flask import Flask, jsonify, render_template
@@ -7,12 +8,9 @@ from db_comms_balance import DBCommsBalance
 from db_comms_recurrence import DBCommsRecurrence
 from db_comms_transaction import DBCommsTransaction
 from timeline_generator import TimelineGenerator
+from utilities import get_date_page_links
 from utilities import outside_to_python_recurrence
 from utilities import outside_to_python_transaction
-from utilities import string_to_date
-from utilities import get_date_page_links
-
-from collections import OrderedDict
 
 # declare our Flask app
 app = Flask(__name__)
@@ -71,7 +69,6 @@ def summary_page(year, month=None):
     for payment_type in payment_method_aggregations_map.keys():
         payment_method_aggregations.append(payment_method_aggregations_map[payment_type])
 
-
     sorted_aggregations = sorted(aggregations, key=lambda x: x.spent_so_far_month, reverse=True)
     return render_template('summary.html',
                            aggregations=sorted_aggregations,
@@ -90,25 +87,16 @@ def timeline_page():
     recurrences = db_comm_recurr.get_recurrences(None)
 
     generator = TimelineGenerator(months_to_generate=MONTHS_GENERATED, db_comm_txn=db_comm_txn,
-                                  initial_recurrences=recurrences,
-                                  starting_balance=starting_balance, green_range=GREEN_RANGE, yellow_range=YELLOW_RANGE)
-    table = generator.generate_table()
+                                  initial_recurrences=recurrences, green_range=GREEN_RANGE, yellow_range=YELLOW_RANGE)
+    (table, timeline_stats) = generator.generate_table(starting_balance)
 
-    last_day_bal_num = round(table[len(table) - 1].balance, 2)
-    last_day_bal = "${}".format(last_day_bal_num)
-    last_day_bal_dff = "${}".format(round((last_day_bal_num - GREEN_RANGE), 2))
-
-    average_bal_num = round((sum([x.balance for x in table])/len(table)),2)
-    average_bal = "${}".format( average_bal_num )
-    average_bal_dff = "${}".format(round((average_bal_num - GREEN_RANGE), 2))
-
-    return render_template('timeline.html', timeline_table=table, last_day_bal=last_day_bal,
-                           last_day_bal_dff=last_day_bal_dff,
-                           average_bal=average_bal,
-                           average_bal_dff=average_bal_dff,
-                           greens=generator.green,
-                           yellows=generator.yellow,
-                           reds=generator.red,
+    return render_template('timeline.html', timeline_table=table, last_day_bal=timeline_stats.last_day_bal,
+                           last_day_bal_dff=timeline_stats.last_day_bal_dff,
+                           average_bal=timeline_stats.average_bal,
+                           average_bal_dff=timeline_stats.average_bal_dff,
+                           greens=timeline_stats.green,
+                           yellows=timeline_stats.yellow,
+                           reds=timeline_stats.red,
                            STARTING_BAL=starting_balance,
                            prefix=ENVIRONMENT)
 
@@ -131,34 +119,17 @@ def add_transaction_page(transaction_id=None, duplicated=None):
     is_duplicated = True if duplicated is not None else False
     transaction = db_comm_txn.get_transaction(transaction_id)
     used_categories = db_comm_txn.get_categories()
-    used_categories.insert(0,"-")
-    return render_template('add_transaction.html', transaction=transaction, is_duplicated=is_duplicated, used_categories=used_categories, prefix=ENVIRONMENT)
+    used_categories.insert(0, "-")
+    return render_template('add_transaction.html', transaction=transaction, is_duplicated=is_duplicated,
+                           used_categories=used_categories, prefix=ENVIRONMENT)
 
 
 @app.route("/site/transactions/year:<string:year>", methods=["GET"])
 @app.route("/site/transactions/year:<string:year>/month:<string:month>", methods=["GET"])
 @app.route("/site/transactions/year:<string:year>/category:<string:category>", methods=["GET"])
 @app.route("/site/transactions/year:<string:year>/month:<string:month>/category:<string:category>", methods=["GET"])
-@app.route("/site/transactions/start_date:<string:start_date>/end_date:<string:end_date>/category:<string:category>",
-           methods=["GET"])
-def transactions_page(year=None, month=None, category="ALL", start_date=None, end_date=None):
+def transactions_page(year=None, month=None, category="ALL"):
     print("transactions_page()")
-
-    # if displaying only transactions between certain period
-    if start_date is not None and end_date is not None:
-        sd = string_to_date(start_date)
-        ed = string_to_date(end_date)
-
-        # get transactions for period recurrence
-        period_recurrence_period_transactions = db_comm_txn.get_transactions_between(start_date=sd, end_date=ed,
-                                                                                     category=category)
-
-        return render_template('transactions.html',
-                               month=month, year=year,
-                               category=category,
-                               transactions=period_recurrence_period_transactions,
-                               spent_in_month=0.0, spent_in_year=0.0,
-                               month_income=0.0, year_income=0.0, prefix=ENVIRONMENT)
 
     # get all the year transactions (and filter month as well)
     year_transactions = db_comm_txn.get_transactions(year=year, category=category)
@@ -260,27 +231,30 @@ def get_recurrences():
 
 
 @app.route(
-    '/recurrence/<string:name>/<string:amount>/<string:description>/<string:rec_type>/<string:start_date>/<string:end_date>/<string:days_till_repeat>/<string:day_of_month>',
+    '/recurrence/<string:name>/<string:amount>/<string:description>/<string:rec_type>/<string:start_date>/<string:end_date>/<string:days_till_repeat>/<string:day_of_month>/<string:payment_method>',
     methods=['POST'])
-def add_recurrence(name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month):
+def add_recurrence(name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month,
+                   payment_method):
     print("[api] add_recurrence()")
 
     recurrence = outside_to_python_recurrence(name=name, amount=amount, description=description, rec_type=rec_type,
                                               start_date=start_date, end_date=end_date,
-                                              days_till_repeat=days_till_repeat, day_of_month=day_of_month)
+                                              days_till_repeat=days_till_repeat, day_of_month=day_of_month,
+                                              payment_method=payment_method)
     return db_comm_recurr.add_recurrence(recurrence)
 
 
 @app.route(
-    '/recurrence/<string:recurrence_id>/<string:name>/<string:amount>/<string:description>/<string:rec_type>/<string:start_date>/<string:end_date>/<string:days_till_repeat>/<string:day_of_month>',
+    '/recurrence/<string:recurrence_id>/<string:name>/<string:amount>/<string:description>/<string:rec_type>/<string:start_date>/<string:end_date>/<string:days_till_repeat>/<string:day_of_month>/<string:payment_method>',
     methods=['PUT'])
 def update_recurrence(recurrence_id, name, amount, description, rec_type, start_date, end_date, days_till_repeat,
-                      day_of_month):
+                      day_of_month, payment_method):
     print("[api] update_recurrence()")
 
     recurrence = outside_to_python_recurrence(name=name, amount=amount, description=description, rec_type=rec_type,
                                               start_date=start_date, end_date=end_date,
                                               days_till_repeat=days_till_repeat, day_of_month=day_of_month,
+                                              payment_method=payment_method,
                                               recurrence_id=recurrence_id)
     return db_comm_recurr.update_recurrence(recurrence)
 
@@ -297,4 +271,3 @@ def set_starting_bal(starting_bal):
     print("[api] set_starting_bal()")
 
     return db_comm_bal.set_starting_balance(starting_bal)
-

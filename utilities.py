@@ -10,6 +10,7 @@ def get_day(balance_date):
     dt = "{}-{}-{}".format(balance_date.year, balance_date.month, balance_date.day)
     return "{} {}".format(dow[balance_date.weekday()], dt)
 
+
 def get_date_page_links(type, db_comm_txn, ENVIRONMENT):
     print("Helper: root_page_helper({})".format(type))
 
@@ -36,6 +37,7 @@ def get_date_page_links(type, db_comm_txn, ENVIRONMENT):
 
     return ((obj[0], (sorted(obj[1], reverse=True))) for obj in sorted(final_year_links, reverse=True))
 
+
 def string_to_date(date_string):
     year = int(date_string.split("_")[0][0:4])
     month = int(date_string.split("_")[0][5:7])
@@ -55,6 +57,7 @@ def SQL_NULL_or_valid(opt_str):
     if is_valid_or_none(opt_str) is not None:
         val = opt_str
     return val
+
 
 def outside_to_python_transaction(title, amount, category, date, description, payment_method, txn_type,
                                   transaction_id=None):
@@ -104,7 +107,7 @@ def python_to_outside_transaction(transaction):
 
 
 def outside_to_python_recurrence(name, amount, description, rec_type, start_date, end_date, days_till_repeat,
-                                 day_of_month, recurrence_id=None):
+                                 day_of_month, payment_method, recurrence_id=None):
     # name
 
     # amount
@@ -128,11 +131,15 @@ def outside_to_python_recurrence(name, amount, description, rec_type, start_date
     # day_of_month
     day_of_month = is_valid_or_none(day_of_month)
 
+    # payment method
+    payment_method = is_valid_or_none(payment_method)
+
     # recurrence_id
     recurrence_id = is_valid_or_none(recurrence_id)
 
     return Recurrence(name=name, amount=amount, description=description, rec_type=rec_type, start_date=start_date,
                       end_date=end_date, days_till_repeat=days_till_repeat, day_of_month=day_of_month,
+                      payment_method=payment_method,
                       recurrence_id=recurrence_id)
 
 
@@ -146,5 +153,6 @@ def python_to_outside_recurrence(recurrence):
     writable_recurrence["end_date"] = SQL_NULL_or_valid(recurrence.end_date)
     writable_recurrence["days_till_repeat"] = SQL_NULL_or_valid(recurrence.days_till_repeat)
     writable_recurrence["day_of_month"] = SQL_NULL_or_valid(recurrence.day_of_month)
+    writable_recurrence["payment_method"] = SQL_NULL_or_valid(recurrence.payment_method)
     writable_recurrence["recurrence_id"] = SQL_NULL_or_valid(recurrence.recurrence_id)
     return writable_recurrence

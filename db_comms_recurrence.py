@@ -16,10 +16,12 @@ class DBCommsRecurrence(DBComms):
         (self.db_conn, self.cursor) = self.get_instance()
 
         writable_recurr = python_to_outside_recurrence(recurrence)
-        cmd = """INSERT INTO recurrences (name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month) VALUES ('{}', {}, '{}', {}, '{}', '{}', {}, {})""".format(
-            writable_recurr["name"], writable_recurr["amount"], writable_recurr["description"], writable_recurr["rec_type"],
+        cmd = """INSERT INTO recurrences (name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month, payment_method) VALUES ('{}', {}, '{}', {}, '{}', '{}', {}, {}, '{}')""".format(
+            writable_recurr["name"], writable_recurr["amount"], writable_recurr["description"],
+            writable_recurr["rec_type"],
             writable_recurr["start_date"],
-            writable_recurr["end_date"], writable_recurr["days_till_repeat"], writable_recurr["day_of_month"])
+            writable_recurr["end_date"], writable_recurr["days_till_repeat"], writable_recurr["day_of_month"],
+            writable_recurr["payment_method"])
         self.cursor.execute(cmd)
         self.db_conn.commit()
         self.db_conn.close()
@@ -33,10 +35,11 @@ class DBCommsRecurrence(DBComms):
         (self.db_conn, self.cursor) = self.get_instance()
 
         recurrenceMP = python_to_outside_recurrence(recurrence)
-        cmd = """UPDATE recurrences SET name = '{}', amount = {}, description = '{}', rec_type = {}, start_date = '{}', end_date = '{}', days_till_repeat = {}, day_of_month = {} WHERE recurrences.recurrence_id = {}""".format(
+        cmd = """UPDATE recurrences SET name = '{}', amount = {}, description = '{}', rec_type = {}, start_date = '{}', end_date = '{}', days_till_repeat = {}, day_of_month = {}, payment_method = '{}' WHERE recurrences.recurrence_id = {}""".format(
             recurrenceMP["name"], recurrenceMP["amount"], recurrenceMP["description"], recurrenceMP["rec_type"],
             recurrenceMP["start_date"],
             recurrenceMP["end_date"], recurrenceMP["days_till_repeat"], recurrenceMP["day_of_month"],
+            recurrenceMP["payment_method"],
             recurrenceMP["recurrence_id"])
         self.cursor.execute(cmd)
         self.db_conn.commit()
@@ -95,11 +98,12 @@ class DBCommsRecurrence(DBComms):
         print("     " + self.__class__.__name__)
         print("     " + "extract_recurrence()")
         data = []
-        for recurrence_id, name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month in cursor:
+        for recurrence_id, name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month, payment_method in cursor:
             recurrence = outside_to_python_recurrence(name=name, amount=amount, description=description,
                                                       rec_type=rec_type,
                                                       start_date=start_date, end_date=end_date,
                                                       days_till_repeat=days_till_repeat, day_of_month=day_of_month,
+                                                      payment_method=payment_method,
                                                       recurrence_id=recurrence_id)
             data.append(recurrence)
 

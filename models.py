@@ -8,6 +8,26 @@ class RecurrenceType(Enum):
     EXPENSE = 2
 
 
+class TimelineStats:
+    def __init__(self, green, yellow, red):
+        self.green = green
+        self.yellow = yellow
+        self.red = red
+        self.last_day_bal = ""
+        self.last_day_bal_dff = ""
+        self.average_bal = ""
+        self.average_bal_dff = ""
+
+    def __init__(self):
+        self.green = 0.0
+        self.yellow = 0.0
+        self.red = 0.0
+        self.last_day_bal = ""
+        self.last_day_bal_dff = ""
+        self.average_bal = ""
+        self.average_bal_dff = ""
+
+
 class BalanceRow:
 
     def __init__(self, balance_date, balance, income, expense, income_desc, expenses_desc, bal_percent_color):
@@ -71,6 +91,7 @@ class Transaction:
 class Recurrence:
 
     def __init__(self, name, amount, description, rec_type, start_date, end_date, days_till_repeat, day_of_month,
+                 payment_method=None,
                  recurrence_id=None):
         self.name = name
         self.amount = amount
@@ -80,6 +101,7 @@ class Recurrence:
         self.end_date = end_date
         self.days_till_repeat = days_till_repeat
         self.day_of_month = day_of_month
+        self.payment_method = payment_method
         self.recurrence_id = recurrence_id
 
     def to_dict(self):
@@ -92,6 +114,7 @@ class Recurrence:
         contents["end_date"] = self.end_date
         contents["days_till_repeat"] = self.days_till_repeat
         contents["day_of_month"] = self.day_of_month
+        contents["payment_method"] = self.payment_method
         contents["recurrence_id"] = self.recurrence_id
         return contents
 

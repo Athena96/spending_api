@@ -24,6 +24,8 @@
         Recurrence Type (1=INCOME,2=EXPENSE): <input type="text" id="recTypeTextBoxU" name="recType" value="{{recurrence.rec_type.value}}"><br>
         Start Date: <input type="text" id="startDateTextBoxU" name="date" value="{{recurrence.start_date}}"><br>
         End Date: <input type="text" id="endDateTextBoxU" name="date" value="{{recurrence.end_date}}"><br>
+        Payment Method: <input type="text" id="paymentMethodTextBoxU" name="date" value="{{recurrence.payment_method}}"><br>
+
         {% if recurrence.days_till_repeat != None %}
             Days Till Repeat: <input type="text" id="daysTillRepeatTextBoxU" name="date" value="{{recurrence.days_till_repeat}}"><br>
         {% else %}
@@ -51,6 +53,7 @@
         Recurrence Type (1=INCOME,2=EXPENSE):<input type="text" id="recTypeTextBox" name="price" value=""><br>
         Start Date: <input type="text" id="startDateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
         End Date: <input type="text" id="endDateTextBox" name="date" placeholder="2019-02-01 00:00:00" value=""><br>
+        Payment Method: <input type="text" id="paymentMethodTextBox" name="date" value=""><br>
         Days Till Repeat: <input type="text" id="daysTillRepeatTextBox" name="date" placeholder="" value=""><br>
         Day of Month: <input type="text" id="dayOfMonthTextBox" name="repeateDays" value=""><br>
         Description:<br>

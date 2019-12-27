@@ -19,6 +19,8 @@ function addRecurrence() {
     var recType = document.getElementById("recTypeTextBox").value;
     var startDate = document.getElementById("startDateTextBox").value;
     var endDate = document.getElementById("endDateTextBox").value;
+    var paymentMethod = document.getElementById("paymentMethodTextBox").value;
+
     var daysTillRepeat = document.getElementById("daysTillRepeatTextBox").value;
     if (daysTillRepeat == "" || daysTillRepeat == null || daysTillRepeat == " ") {
         daysTillRepeat = null;
@@ -36,7 +38,7 @@ function addRecurrence() {
     }
 
     var xhr = new XMLHttpRequest();
-    var url_tmp = prefix + "/recurrence/" + name + "/" + amount + "/" + description + "/" + recType + "/" + startDate + "/" + endDate  + "/" + daysTillRepeat + "/" + dayOfMonth;
+    var url_tmp = prefix + "/recurrence/" + name + "/" + amount + "/" + description + "/" + recType + "/" + startDate + "/" + endDate  + "/" + daysTillRepeat + "/" + dayOfMonth + "/" + paymentMethod;
     var url = url_tmp.replace(" ", "%20");
     console.log(url_tmp);
     if (prefix == "http://inherentvice.pythonanywhere.com") {
@@ -61,6 +63,8 @@ function updateRecurrence(recurrence_id) {
     var startDate = document.getElementById("startDateTextBoxU").value;
     var endDate = document.getElementById("endDateTextBoxU").value;
     var daysTillRepeat = document.getElementById("daysTillRepeatTextBoxU").value;
+    var paymentMethod = document.getElementById("paymentMethodTextBoxU").value;
+
     if (daysTillRepeat == "" || daysTillRepeat == null || daysTillRepeat == " ") {
         daysTillRepeat = null;
     }
@@ -78,7 +82,7 @@ function updateRecurrence(recurrence_id) {
     var passcode = document.getElementById("passcodeTextBoxU").value;
 
     var xhr = new XMLHttpRequest();
-    var url_w_spc = prefix + "/recurrence/" + recurrence_id + "/" + name + "/" + amount + "/" + description + "/" + recType + "/" + startDate + "/" + endDate  + "/" + daysTillRepeat + "/" + dayOfMonth;
+    var url_w_spc = prefix + "/recurrence/" + recurrence_id + "/" + name + "/" + amount + "/" + description + "/" + recType + "/" + startDate + "/" + endDate  + "/" + daysTillRepeat + "/" + dayOfMonth + "/" + paymentMethod;
     var url = url_w_spc.replace(" ", "%20");
 
     xhr.withCredentials = true;
