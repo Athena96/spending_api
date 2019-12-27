@@ -4,7 +4,7 @@ from dateutil.rrule import rrule, MONTHLY
 from flask import jsonify
 
 from db_comms import DBComms
-from models import RecurrenceType, SummaryPageInfo
+from models import SummaryPageInfo
 from utilities import outside_to_python_transaction, python_to_outside_transaction
 
 
@@ -52,9 +52,9 @@ class DBCommsTransaction(DBComms):
         (self.db_conn, self.cursor) = self.get_instance()
 
         cmd = "DELETE FROM ledger WHERE ledger.transaction_id = {0};".format(int(transaction_id))
+        print(cmd)
         self.cursor.execute(cmd)
         self.db_conn.commit()
-        print(cmd)
 
         return jsonify({'result': 'successfully deleted transaction!'})
 
@@ -74,8 +74,8 @@ class DBCommsTransaction(DBComms):
             category_query = "ledger.category like '%{}%'".format(category)
 
         cmd = base_query + " where " + date_query + (" and " if category != "ALL" else "") + category_query
-        self.cursor.execute(cmd)
         print(cmd)
+        self.cursor.execute(cmd)
 
         return self.extract_transactions(self.cursor)
 
@@ -97,42 +97,27 @@ class DBCommsTransaction(DBComms):
         (self.db_conn, self.cursor) = self.get_instance()
 
         cmd = "select distinct(ledger.category) from ledger order by ledger.category;"
+        print(cmd)
         self.cursor.execute(cmd)
 
         return self.extract_categories(self.cursor)
 
-    def get_spending(self, year, month):
+    def get_totals(self, year, month, type):
         print("     " + self.__class__.__name__)
-        print("     " + "get_spending()")
+        print("     " + "get_totals()")
         if month is None or year is None:
             return ("--", "--")
 
         year_transactions = self.get_transactions(year=year)
         month_transactions = [transaction for transaction in year_transactions if (transaction.date[5:7] == month)]
 
-        year_spent = round(sum([transaction.amount for transaction in year_transactions if
-                                (transaction.txn_type == RecurrenceType.EXPENSE) and int(transaction.date[5:7]) <= int(
+        year_total = round(sum([transaction.amount for transaction in year_transactions if
+                                (transaction.txn_type == type) and int(transaction.date[5:7]) <= int(
                                     month)]), 2)
-        month_spent = round(sum([transaction.amount for transaction in month_transactions if
-                                 (transaction.txn_type == RecurrenceType.EXPENSE)]), 2)
+        month_total = round(sum([transaction.amount for transaction in month_transactions if
+                                 (transaction.txn_type == type)]), 2)
 
-        return (year_spent, month_spent)
-
-    def get_income(self, year, month):
-        print("     " + self.__class__.__name__)
-        print("     " + "get_income()")
-        if month is None or year is None:
-            return ("--", "--")
-
-        year_transactions = self.get_transactions(year=year)
-
-        year_income = round(sum([transaction.amount for transaction in year_transactions if
-                                 (transaction.txn_type == RecurrenceType.INCOME) and int(transaction.date[5:7]) <= int(
-                                     month)]), 2)
-        month_income = round(sum([transaction.amount for transaction in year_transactions if
-                                  (transaction.txn_type == RecurrenceType.INCOME) and (
-                                          transaction.date[5:7] == month)]), 2)
-        return (year_income, month_income)
+        return (year_total, month_total)
 
     def get_transactions_by_payment_method(self, payment_method):
         print("     " + self.__class__.__name__)
@@ -140,6 +125,7 @@ class DBCommsTransaction(DBComms):
         (self.db_conn, self.cursor) = self.get_instance()
 
         cmd = "select * from ledger where ledger.var_txn_tracking like '{}'".format(payment_method)
+        print(cmd)
         self.cursor.execute(cmd)
 
         return self.extract_transactions(self.cursor)
@@ -153,8 +139,8 @@ class DBCommsTransaction(DBComms):
             return None
 
         cmd = "SELECT * FROM ledger where ledger.transaction_id = {}".format(transaction_id)
-        self.cursor.execute(cmd)
         print(cmd)
+        self.cursor.execute(cmd)
 
         result = self.extract_transactions(self.cursor)
         return None if len(result) == 0 or len(result) > 1 else result[0]
@@ -178,6 +164,8 @@ class DBCommsTransaction(DBComms):
             where ledger.date like('%{}%' )
             group by ledger.category
             order by year_total desc""".format("{}-".format(year))
+
+        print(cmd)
         self.cursor.execute(cmd)
 
         aggregate_map = {}
@@ -209,6 +197,7 @@ class DBCommsTransaction(DBComms):
         on A.var_txn_tracking = B.var_txn_tracking
         order by payment_method;
         """
+        print(cmd)
         self.cursor.execute(cmd)
 
         aggregate_map = {}
@@ -225,6 +214,7 @@ class DBCommsTransaction(DBComms):
 
         cmd = """select min(ledger.date)
             from ledger"""
+        print(cmd)
         self.cursor.execute(cmd)
         min_date = self.cursor.fetchone()[0]
         min_month = int(min_date[5:7])
@@ -232,14 +222,13 @@ class DBCommsTransaction(DBComms):
 
         cmd = """select max(ledger.date)
             from ledger"""
+        print(cmd)
         self.cursor.execute(cmd)
         max_date = self.cursor.fetchone()[0]
         max_month = int(max_date[5:7])
         max_year = int(max_date[0:4])
 
         def months(start_month, start_year, end_month, end_year):
-            print("Helper: months({},{},{},{})".format(start_month, start_year, end_month, end_year))
-
             start = datetime(start_year, start_month, 1)
             end = datetime(end_year, end_month, 1)
             return [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, until=end)]
@@ -260,7 +249,6 @@ class DBCommsTransaction(DBComms):
     def extract_categories(self, cursor):
         print("     " + self.__class__.__name__)
         print("     " + "extract_categories()")
-
         data = []
         for category, in cursor:
             data.append(str(category))

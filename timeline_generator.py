@@ -46,8 +46,6 @@ class TimelineGenerator:
         return (total_amnt, total_descriptions, todays_recurrences)
 
     def auto_add_todays_recurring_txns(self, recurrences, date):
-        print("auto_add_todays_recurring_txns()")
-
         not_added_yet = True if len(self.db_comm_txn.get_auto_added_transaction_for_date(date)) == 0 else False
 
         if not_added_yet:
@@ -83,8 +81,10 @@ class TimelineGenerator:
                 timeline_stats.red += 1
 
             pretty_date = get_day(date)
-            rows.append(BalanceRow(balance_date=pretty_date, balance=balance, income=incomes, income_desc=income_desc, income_recurrences=income_recurrs,
-                                   expense_recurrences=expense_recurrs,expense=expenses, expenses_desc=expenses_desc, bal_percent_color=bal_percent_color))
+            rows.append(BalanceRow(balance_date=pretty_date, balance=balance, income=incomes, income_desc=income_desc,
+                                   income_recurrences=income_recurrs,
+                                   expense_recurrences=expense_recurrs, expense=expenses, expenses_desc=expenses_desc,
+                                   bal_percent_color=bal_percent_color))
 
         total = timeline_stats.green + timeline_stats.red + timeline_stats.yellow
         timeline_stats.green = round(float(timeline_stats.green) / total, 2)
