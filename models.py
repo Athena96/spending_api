@@ -13,8 +13,6 @@ class TimelineStats:
         self.green = green
         self.yellow = yellow
         self.red = red
-        self.last_day_bal = ""
-        self.last_day_bal_dff = ""
         self.average_bal = ""
         self.average_bal_dff = ""
 
@@ -22,8 +20,6 @@ class TimelineStats:
         self.green = 0.0
         self.yellow = 0.0
         self.red = 0.0
-        self.last_day_bal = ""
-        self.last_day_bal_dff = ""
         self.average_bal = ""
         self.average_bal_dff = ""
 

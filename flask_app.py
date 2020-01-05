@@ -90,8 +90,7 @@ def timeline_page():
                                   initial_recurrences=recurrences, green_range=GREEN_RANGE, yellow_range=YELLOW_RANGE)
     (table, timeline_stats) = generator.generate_table(starting_balance)
 
-    return render_template('timeline.html', timeline_table=table, last_day_bal=timeline_stats.last_day_bal,
-                           last_day_bal_dff=timeline_stats.last_day_bal_dff,
+    return render_template('timeline.html', timeline_table=table,
                            average_bal=timeline_stats.average_bal,
                            average_bal_dff=timeline_stats.average_bal_dff,
                            greens=timeline_stats.green,

@@ -91,10 +91,6 @@ class TimelineGenerator:
         timeline_stats.yellow = round(float(timeline_stats.yellow) / total, 2)
         timeline_stats.red = round(float(timeline_stats.red) / total, 2)
 
-        last_day_bal_num = round(rows[len(rows) - 1].balance, 2)
-        timeline_stats.last_day_bal = "${}".format(last_day_bal_num)
-        timeline_stats.last_day_bal_dff = "${}".format(round((last_day_bal_num - self.green_range), 2))
-
         average_bal_num = round((sum([x.balance for x in rows]) / len(rows)), 2)
         timeline_stats.average_bal = "${}".format(average_bal_num)
         timeline_stats.average_bal_dff = "${}".format(round((average_bal_num - self.green_range), 2))
