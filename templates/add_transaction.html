@@ -22,7 +22,7 @@
 
         Title: <input type="text" id="titleTextBox" name="title" value="{{transaction.title}}"><br>
         Amount: <input type="text" id="amountTextBox" name="amount" value="{{transaction.amount}}"><br>
-        Variable Transaction Tracking Code: <input type="text" id="paymentMethod" name="amount" value="{{transaction.payment_method}}"><br>
+        Payment Method: <input type="text" id="paymentMethod" name="amount" value="{{transaction.payment_method}}"><br>
         Categories: <input type="text" id="mySelectCategory" name="category" value="{{"-".join(transaction.category)}}">
         <select id="mySelectorCategory">
             {% for category in used_categories %}
@@ -56,7 +56,7 @@
 
         Title: <input type="text" id="titleTextBoxU" name="title" value="{{transaction.title}}"><br>
         Amount: <input type="text" id="amountTextBoxU" name="amount" value="{{transaction.amount}}"><br>
-        Variable Transaction Tracking Code: <input type="text" id="paymentMethodU" name="amount" value="{{transaction.payment_method}}"><br>
+        Payment Method: <input type="text" id="paymentMethodU" name="amount" value="{{transaction.payment_method}}"><br>
         Categories: <input type="text" id="mySelectCategoryU" name="category" value="{{"-".join(transaction.category)}}">
         <select id="mySelectorCategoryU">
             {% for category in used_categories %}
@@ -87,7 +87,7 @@
     {% else %}
         Title: <input type="text" id="titleTextBox" name="title" value=""><br>
         Amount: <input type="text" id="amountTextBox" name="amount" value=""><br>
-        Variable Transaction Tracking Code: <input type="text" id="paymentMethod" name="amount" placeholder="cc_prime_2019_12" value=""><br>
+        Payment Method: <input type="text" id="paymentMethod" name="amount" placeholder="cc_prime_2019_12" value=""><br>
         Category: <input type="text" id="mySelectCategory" name="category" value="">
         <select id="mySelectorCategory">
             {% for category in used_categories %}
