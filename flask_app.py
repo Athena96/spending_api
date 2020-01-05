@@ -7,6 +7,7 @@ from flask import current_app
 from db_comms_balance import DBCommsBalance
 from db_comms_recurrence import DBCommsRecurrence
 from db_comms_transaction import DBCommsTransaction
+from models import RecurrenceType
 from timeline_generator import TimelineGenerator
 from utilities import get_date_page_links
 from utilities import outside_to_python_recurrence
@@ -56,8 +57,9 @@ def summary_root_page():
 @app.route("/site/summary/year:<string:year>", methods=["GET"])
 def summary_page(year, month=None):
     print("summary_page()")
-    (year_income, month_income) = db_comm_txn.get_income(year, month)
-    (year_spent, month_spent) = db_comm_txn.get_spending(year, month)
+
+    (year_income, month_income) = db_comm_txn.get_totals(year, month, RecurrenceType.INCOME)
+    (year_spent, month_spent) = db_comm_txn.get_totals(year, month, RecurrenceType.EXPENSE)
 
     aggregations = []
     aggregate_map = db_comm_txn.get_transaction_aggregations_category(year=year, month=month)
@@ -83,9 +85,9 @@ def summary_page(year, month=None):
 @app.route("/site/timeline", methods=["GET"])
 def timeline_page():
     print("timeline_page()")
+
     starting_balance = db_comm_bal.get_starting_balance()
     recurrences = db_comm_recurr.get_recurrences(None)
-
     generator = TimelineGenerator(months_to_generate=MONTHS_GENERATED, db_comm_txn=db_comm_txn,
                                   initial_recurrences=recurrences, green_range=GREEN_RANGE, yellow_range=YELLOW_RANGE)
     (table, timeline_stats) = generator.generate_table(starting_balance)
@@ -115,6 +117,7 @@ def transactions_root_page():
 @app.route("/site/add_transaction/<string:transaction_id>", methods=["GET"])
 def add_transaction_page(transaction_id=None, duplicated=None):
     print("add_transaction_page()")
+
     is_duplicated = True if duplicated is not None else False
     transaction = db_comm_txn.get_transaction(transaction_id)
     used_categories = db_comm_txn.get_categories()
@@ -135,8 +138,8 @@ def transactions_page(year=None, month=None, category="ALL"):
     month_transactions = [transaction for transaction in year_transactions if (transaction.date[5:7] == month)]
 
     # 2 get year and month income/spending values
-    (year_income, month_income) = db_comm_txn.get_income(year, month)
-    (year_spent, month_spent) = db_comm_txn.get_spending(year, month)
+    (year_income, month_income) = db_comm_txn.get_totals(year, month, RecurrenceType.INCOME)
+    (year_spent, month_spent) = db_comm_txn.get_totals(year, month, RecurrenceType.EXPENSE)
 
     # sort the transactions to display and store them in "transactions"
     transactions = sorted(year_transactions if month is None else month_transactions, key=lambda x: x.date,
@@ -175,6 +178,7 @@ def add_recurrence_page(recurrence_id=None):
 @app.route("/site/recurrences", methods=["GET"])
 def recurrence_page():
     print("recurrences_page()")
+
     recurrences = db_comm_recurr.get_recurrences(None)
     return render_template('recurrences.html', recurrences=recurrences, prefix=ENVIRONMENT)
 
